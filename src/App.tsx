@@ -1,9 +1,9 @@
-import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
-import TravelRecommender from "./views/GeneralView/TravelRecommender";
-import LoadCountriesTask from "./tasks/LoadCountriesTask";
-import Loading from "./views/GeneralView/Loading";
+import React from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
+import TravelRecommender from './views/GeneralView/TravelRecommender';
+import LoadCountriesTask from './tasks/LoadCountriesTask';
+import Loading from './views/GeneralView/Loading';
 
 const App = () => {
   const [countries, setCountries] = React.useState<MapCountry[]>([]);
@@ -32,28 +32,18 @@ const App = () => {
   const calculateScores = () => {
     if (fileRetrieved.length > 0) {
       const loadCountriesTask = new LoadCountriesTask();
-      loadCountriesTask.processCountries(
-        fileRetrieved,
-        userData,
-        setCountries,
-        setResults
-      );
+      loadCountriesTask.processCountries(fileRetrieved, userData, setCountries, setResults);
     }
   };
   React.useEffect(load, []);
   React.useEffect(calculateScores, [userData, fileRetrieved]);
 
   return (
-    <div style={{ height: "100vh" }}>
+    <div style={{ height: '100vh' }}>
       {countries.length === 0 ? (
         <Loading />
       ) : (
-        <TravelRecommender
-          countries={countries}
-          userData={userData}
-          setUserData={setUserData}
-          results={results}
-        />
+        <TravelRecommender countries={countries} userData={userData} setUserData={setUserData} results={results} />
       )}
     </div>
   );

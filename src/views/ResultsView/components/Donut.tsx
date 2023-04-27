@@ -1,7 +1,6 @@
-import React from "react";
-import { PieChart, Pie, Cell } from "recharts";
-import * as constants from "../../../data/constantData";
-import { Score } from "./ResultInfo";
+import React from 'react';
+import { PieChart, Pie, Cell } from 'recharts';
+import * as constants from '../../../data/constantData';
 
 interface DonutProps {
   scores: Score[];
@@ -9,7 +8,7 @@ interface DonutProps {
 }
 
 const Donut = ({ scores, label }: DonutProps) => {
-  let donutState = {
+  const donutState = {
     innerRadius: 30,
     outerRadius: 50,
   };
@@ -20,7 +19,7 @@ const Donut = ({ scores, label }: DonutProps) => {
       y={donutState.outerRadius}
       textAnchor="middle"
       dominantBaseline="middle"
-      style={{ fontWeight: "bold" }}
+      style={{ fontWeight: 'bold' }}
       fontSize={20}
     >
       {label}
@@ -28,10 +27,7 @@ const Donut = ({ scores, label }: DonutProps) => {
   );
 
   return (
-    <PieChart
-      width={(donutState.outerRadius + 15) * 2}
-      height={donutState.outerRadius * 2}
-    >
+    <PieChart width={(donutState.outerRadius + 15) * 2} height={donutState.outerRadius * 2}>
       {centerLabel}
       <Pie
         data={scores}
@@ -43,10 +39,7 @@ const Donut = ({ scores, label }: DonutProps) => {
         isAnimationActive={false}
       >
         {scores.map((entry, index) => (
-          <Cell
-            key={`cell-${index}`}
-            fill={constants.COLORS[index % constants.COLORS.length]}
-          />
+          <Cell key={`cell-${index}`} fill={constants.COLORS[index % constants.COLORS.length]} />
         ))}
       </Pie>
     </PieChart>

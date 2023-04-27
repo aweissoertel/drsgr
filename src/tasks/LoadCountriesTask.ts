@@ -1,10 +1,9 @@
-import papa from "papaparse";
-import mapData from "../data/regions.json";
+import papa from 'papaparse';
+import mapData from '../data/regions.json';
 
 class LoadCountriesTask {
   allResults: CompleteResult[] = [];
-  countryScoresUrl =
-    "https://raw.githubusercontent.com/assalism/travel-data/main/regionmodel.csv";
+  countryScoresUrl = 'https://raw.githubusercontent.com/assalism/travel-data/main/regionmodel.csv';
   mapCountries = mapData.features as MapCountry[];
   load = (setFileRetrieved: React.Dispatch<React.SetStateAction<RawCountries[]>>) => {
     papa.parse<RawCountries>(this.countryScoresUrl, {
@@ -19,12 +18,10 @@ class LoadCountriesTask {
     countryScores: RawCountries[],
     userData: UserPreferences,
     setCountries: React.Dispatch<React.SetStateAction<MapCountry[]>>,
-    setResults: React.Dispatch<React.SetStateAction<CompleteResult[]>>
+    setResults: React.Dispatch<React.SetStateAction<CompleteResult[]>>,
   ) => {
-    this.mapCountries.map(mapCountry => {
-      const scoreCountry = countryScores.find(
-        (c) => c.u_name === mapCountry.properties.u_name
-      );
+    this.mapCountries.map((mapCountry) => {
+      const scoreCountry = countryScores.find((c) => c.u_name === mapCountry.properties.u_name);
       if (scoreCountry != null) {
         const res: CompleteResult = {
           country: scoreCountry.ParentRegion,
@@ -33,19 +30,13 @@ class LoadCountriesTask {
           price: Math.ceil((scoreCountry.costPerWeek || 400 * userData.stay) / 7),
           qualifications: {
             nature: this.calculateQualification(scoreCountry.nature),
-            architecture: this.calculateQualification(
-              scoreCountry.architecture
-            ),
+            architecture: this.calculateQualification(scoreCountry.architecture),
             hiking: this.calculateQualification(scoreCountry.hiking),
-            wintersports: this.calculateQualification(
-              scoreCountry.wintersports
-            ),
+            wintersports: this.calculateQualification(scoreCountry.wintersports),
             beach: this.calculateQualification(scoreCountry.beach),
             culture: this.calculateQualification(scoreCountry.culture),
             culinary: this.calculateQualification(scoreCountry.culinary),
-            entertainment: this.calculateQualification(
-              scoreCountry.entertainment
-            ),
+            entertainment: this.calculateQualification(scoreCountry.entertainment),
             shopping: this.calculateQualification(scoreCountry.shopping),
           },
           scores: {
@@ -68,44 +59,32 @@ class LoadCountriesTask {
         mapCountry.properties.country = scoreCountry.ParentRegion;
         mapCountry.properties.name = scoreCountry.Region;
         // calculate the score for nature
-        res.scores.attr.nature = this.calculateAttributeScore(
-          res.qualifications.nature,
-          userData.attributes.nature
-        );
+        res.scores.attr.nature = this.calculateAttributeScore(res.qualifications.nature, userData.attributes.nature);
         res.scores.attr.architecture = this.calculateAttributeScore(
           res.qualifications.architecture,
-          userData.attributes.architecture
+          userData.attributes.architecture,
         );
-        res.scores.attr.hiking = this.calculateAttributeScore(
-          res.qualifications.hiking,
-          userData.attributes.hiking
-        );
+        res.scores.attr.hiking = this.calculateAttributeScore(res.qualifications.hiking, userData.attributes.hiking);
         res.scores.attr.wintersports = this.calculateAttributeScore(
           res.qualifications.wintersports,
-          userData.attributes.wintersports
+          userData.attributes.wintersports,
         );
-        res.scores.attr.beach = this.calculateAttributeScore(
-          res.qualifications.beach,
-          userData.attributes.beach
-        );
-        res.scores.attr.culture = this.calculateAttributeScore(
-          res.qualifications.culture,
-          userData.attributes.culture
-        );
+        res.scores.attr.beach = this.calculateAttributeScore(res.qualifications.beach, userData.attributes.beach);
+        res.scores.attr.culture = this.calculateAttributeScore(res.qualifications.culture, userData.attributes.culture);
         res.scores.attr.culinary = this.calculateAttributeScore(
           res.qualifications.culinary,
-          userData.attributes.culinary
+          userData.attributes.culinary,
         );
         res.scores.attr.entertainment = this.calculateAttributeScore(
           res.qualifications.entertainment,
-          userData.attributes.entertainment
+          userData.attributes.entertainment,
         );
         res.scores.attr.shopping = this.calculateAttributeScore(
           res.qualifications.shopping,
-          userData.attributes.shopping
+          userData.attributes.shopping,
         );
 
-        var totalScore = isAffordable
+        const totalScore = isAffordable
           ? (res.scores.attr.nature +
               res.scores.attr.architecture +
               res.scores.attr.hiking +
@@ -125,9 +104,7 @@ class LoadCountriesTask {
       }
     });
     this.mapCountries.sort(
-      (a, b) =>
-        b.properties.result?.scores.totalScore || 0 -
-        (a.properties.result?.scores.totalScore || 0)
+      (a, b) => b.properties.result?.scores.totalScore || 0 - (a.properties.result?.scores.totalScore || 0),
     );
     setCountries(this.mapCountries);
     this.allResults.sort((a, b) => b.scores.totalScore - a.scores.totalScore);
@@ -137,19 +114,19 @@ class LoadCountriesTask {
   calculateQualification = (qualification: string) => {
     let numScore;
     switch (qualification) {
-      case "--":
+      case '--':
         numScore = 0;
         break;
-      case "-":
+      case '-':
         numScore = 25;
         break;
-      case "o":
+      case 'o':
         numScore = 50;
         break;
-      case "+":
+      case '+':
         numScore = 75;
         break;
-      case "++":
+      case '++':
         numScore = 100;
         break;
       default:

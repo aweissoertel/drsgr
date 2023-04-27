@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import Accordion from "react-bootstrap/Accordion";
-import ResultInfo from "./components/ResultInfo";
+import React, { useState, useEffect, useRef } from 'react';
+import Accordion from 'react-bootstrap/Accordion';
+import ResultInfo from './components/ResultInfo';
 
 interface ResultsProps {
   results: CompleteResult[];
@@ -19,18 +19,18 @@ export const Results = ({ results, stay, activeResult, userData }: ResultsProps)
       } else {
         setActiveIndex(activeResult);
         accordElem.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "end",
-          inline: "start",
+          behavior: 'smooth',
+          block: 'end',
+          inline: 'start',
         });
       }
     }
   }, [activeResult]);
   return (
-    <div style={{ padding: "10px 0", height: "100%", overflow: "hidden" }}>
-      <p style={{ textAlign: "left" }}>Best destinations for you:</p>
+    <div style={{ padding: '10px 0', height: '100%', overflow: 'hidden' }}>
+      <p style={{ textAlign: 'left' }}>Best destinations for you:</p>
       {results.length > 0 ? (
-        <div style={{ overflow: "auto", height: "90%" }} ref={accordElem}>
+        <div style={{ overflow: 'auto', height: '90%' }} ref={accordElem}>
           <Accordion activeKey={activeIndex.toString()}>
             {results?.map((item, index) => (
               <Accordion.Item eventKey={index.toString()} key={index}>
@@ -41,9 +41,9 @@ export const Results = ({ results, stay, activeResult, userData }: ResultsProps)
                     } else {
                       setActiveIndex(index);
                       accordElem.current?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                        inline: "nearest",
+                        behavior: 'smooth',
+                        block: 'center',
+                        inline: 'nearest',
                       });
                     }
                   }}
@@ -51,12 +51,7 @@ export const Results = ({ results, stay, activeResult, userData }: ResultsProps)
                   {index + 1}. {item.region}
                 </Accordion.Header>
                 <Accordion.Body>
-                  <ResultInfo
-                    country={item}
-                    label={index + 1}
-                    stay={stay}
-                    userData={userData}
-                  />
+                  <ResultInfo country={item} label={index + 1} stay={stay} userData={userData} />
                 </Accordion.Body>
               </Accordion.Item>
             ))}
@@ -65,14 +60,14 @@ export const Results = ({ results, stay, activeResult, userData }: ResultsProps)
       ) : (
         <div
           style={{
-            height: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignContent: "center",
-            flexDirection: "column",
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignContent: 'center',
+            flexDirection: 'column',
           }}
         >
-          <p style={{ fontWeight: "bold", color: "red" }}>No results found!</p>
+          <p style={{ fontWeight: 'bold', color: 'red' }}>No results found!</p>
         </div>
       )}
     </div>

@@ -1,7 +1,6 @@
-import React from "react";
-import { AttributeScore } from "./AttributeScore";
-import { Row, Col } from "react-bootstrap";
-import { Score } from "../../ResultsView/components/ResultInfo";
+import React from 'react';
+import { AttributeScore } from './AttributeScore';
+import { Row, Col } from 'react-bootstrap';
 
 interface DetailScoresProps {
   scores: Score[];
@@ -13,15 +12,15 @@ export const DetailScores = ({ scores, price }: DetailScoresProps) => {
     <div>
       <div
         style={{
-          padding: "10px 10px",
-          width: "250px",
-          backgroundColor: "white",
-          color: "#000",
+          padding: '10px 10px',
+          width: '250px',
+          backgroundColor: 'white',
+          color: '#000',
         }}
       >
-        <div style={{ width: "100%" }}>
+        <div style={{ width: '100%' }}>
           <p style={{ margin: 0 }}>Price: {price}€</p>
-          <hr style={{ marginBottom: "1.2rem", marginTop: 0 }} />
+          <hr style={{ marginBottom: '1.2rem', marginTop: 0 }} />
         </div>
         <div>
           {scores.map((entry, index) => (
@@ -29,22 +28,22 @@ export const DetailScores = ({ scores, price }: DetailScoresProps) => {
           ))}
         </div>
       </div>
-      <div style={{ padding: "0px 10px", width: "250px" }}>
-        <Row style={{ alignItems: "center" }}>
+      <div style={{ padding: '0px 10px', width: '250px' }}>
+        <Row style={{ alignItems: 'center' }}>
           <Col xs={4}>estimation*</Col>
           <Col xs={8}>
             <Row>
               <Col xs={4}>
-                <div style={{ padding: "0", fontSize: "x-small" }}>.</div>
-                <div style={{ padding: "0", fontSize: "x-small" }}>0</div>
+                <div style={{ padding: '0', fontSize: 'x-small' }}>.</div>
+                <div style={{ padding: '0', fontSize: 'x-small' }}>0</div>
               </Col>
-              <Col xs={4} style={{ textAlign: "center" }}>
-                <div style={{ padding: "0", fontSize: "x-small" }}>.</div>
-                <div style={{ padding: "0", fontSize: "x-small" }}>50</div>
+              <Col xs={4} style={{ textAlign: 'center' }}>
+                <div style={{ padding: '0', fontSize: 'x-small' }}>.</div>
+                <div style={{ padding: '0', fontSize: 'x-small' }}>50</div>
               </Col>
-              <Col xs={4} style={{ textAlign: "end" }}>
-                <div style={{ padding: "0", fontSize: "x-small" }}>.</div>
-                <div style={{ padding: "0", fontSize: "x-small" }}>100</div>
+              <Col xs={4} style={{ textAlign: 'end' }}>
+                <div style={{ padding: '0', fontSize: 'x-small' }}>.</div>
+                <div style={{ padding: '0', fontSize: 'x-small' }}>100</div>
               </Col>
             </Row>
           </Col>

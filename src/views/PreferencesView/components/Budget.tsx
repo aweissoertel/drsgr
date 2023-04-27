@@ -1,5 +1,5 @@
-import React from "react";
-import { Form, Row, Col } from "react-bootstrap";
+import React from 'react';
+import { Form, Row, Col } from 'react-bootstrap';
 
 interface BudgetProps {
   userData: UserPreferences;
@@ -9,7 +9,7 @@ interface BudgetProps {
 const Budget = ({ userData, setUserData }: BudgetProps) => {
   return (
     <Form>
-      <p style={{ textAlign: "left" }}>Budget</p>
+      <p style={{ textAlign: 'left' }}>Budget</p>
       <Row>
         <Col>
           <Form.Check

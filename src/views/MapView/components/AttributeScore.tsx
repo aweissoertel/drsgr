@@ -1,20 +1,21 @@
-import React from "react";
-import { Row, Col } from "react-bootstrap";
-import * as myConstant from "../../../data/constantData";
-import { BarChart } from "../../SharedComponents/BarChart";
+import React from 'react';
+import { Row, Col } from 'react-bootstrap';
+import * as myConstant from '../../../data/constantData';
+import { BarChart } from '../../SharedComponents/BarChart';
 
-export const AttributeScore = ({ score, index }) => {
+interface AttributeScoreProps {
+  score: Score;
+  index: number;
+}
+
+export const AttributeScore = ({ score, index }: AttributeScoreProps) => {
   return (
     <Row>
-      <Col xs={4} style={{ textAlign: "left", fontSize: "small" }}>
+      <Col xs={4} style={{ textAlign: 'left', fontSize: 'small' }}>
         {score.name}
       </Col>
       <Col xs={8}>
-        <BarChart
-          score={score}
-          showBenchmark={false}
-          color={myConstant.COLORS[index % myConstant.COLORS.length]}
-        />
+        <BarChart score={score} showBenchmark={false} color={myConstant.COLORS[index % myConstant.COLORS.length]} />
       </Col>
     </Row>
   );

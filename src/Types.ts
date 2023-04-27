@@ -1,56 +1,57 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 interface RawCountries {
-  ParentRegion: string,
-  Region: string,
-  u_name: string,
-  costPerWeek: number,
-  jan: Rating,
-  feb: Rating,
-  mar: Rating,
-  apr: Rating,
-  may: Rating,
-  jun: Rating,
-  jul: Rating,
-  aug: Rating,
-  sep: Rating,
-  oct: Rating,
-  nov: Rating,
-  dec: Rating,
-  safety: Rating,
-  nature: Rating,
-  hiking: Rating,
-  beach: Rating,
-  watersports: Rating,
-  entertainment: Rating,
-  wintersports: Rating,
-  culture: Rating,
-  culinary: Rating,
-  architecture: Rating,
-  shopping: Rating,
+  ParentRegion: string;
+  Region: string;
+  u_name: string;
+  costPerWeek: number;
+  jan: Rating;
+  feb: Rating;
+  mar: Rating;
+  apr: Rating;
+  may: Rating;
+  jun: Rating;
+  jul: Rating;
+  aug: Rating;
+  sep: Rating;
+  oct: Rating;
+  nov: Rating;
+  dec: Rating;
+  safety: Rating;
+  nature: Rating;
+  hiking: Rating;
+  beach: Rating;
+  watersports: Rating;
+  entertainment: Rating;
+  wintersports: Rating;
+  culture: Rating;
+  culinary: Rating;
+  architecture: Rating;
+  shopping: Rating;
 }
 
 type Rating = '++' | '+' | 'o' | '-' | '--';
 
 interface UserPreferences {
   isPriceImportant: boolean;
-    stay: number;
-    budget: number;
-    attributes: Attributes;
+  stay: number;
+  budget: number;
+  attributes: Attributes;
 }
 
 interface MapCountry {
   type: string;
   properties: {
-      u_name: string;
-      AREA: number;
-      PERIMETER: number;
-      country?: string;
-      name?: string;
-      result?: CompleteResult
+    u_name: string;
+    AREA: number;
+    PERIMETER: number;
+    country?: string;
+    name?: string;
+    result?: CompleteResult;
   };
   geometry: {
-      type: string;
-      coordinates: number[][][][];
-  };  
+    type: string;
+    coordinates: number[][][][];
+  };
 }
 
 interface Attributes {
@@ -74,5 +75,10 @@ interface CompleteResult {
   scores: {
     totalScore: number;
     attr: Attributes;
-  }
+  };
+}
+
+interface Score {
+  name: string;
+  value: number;
 }

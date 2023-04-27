@@ -2,7 +2,7 @@
   text-align: center;
   padding: 0px 20px;
   height: 100%;
-  background-color: #193D4B;
+  background-color: #193d4b;
   color: white;
   accent-color: #282c34;
 }
@@ -33,21 +33,21 @@
   color: #61dafb;
 }
 
-.react-datepicker__input-container input{
+.react-datepicker__input-container input {
   width: 100%;
   height: 44px;
 }
 
-input.stay-days{
+input.stay-days {
   width: 100%;
   height: 44px;
 }
 
-.dark-theme{
+.dark-theme {
   color: #000;
 }
 
-.bar-chart .tooltip-box{
+.bar-chart .tooltip-box {
   visibility: hidden;
   width: 300px;
   background-color: black;
@@ -57,7 +57,7 @@ input.stay-days{
   border-radius: 6px;
   padding: 5px 5px;
   bottom: 100%;
-  right:-100px;
+  right: -100px;
   /* Position the tooltip */
   position: absolute;
   z-index: 100;
@@ -67,21 +67,21 @@ input.stay-days{
 }
 
 .bar-chart .tooltip-box::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 100%;
   left: 50%;
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color:  black transparent transparent transparent;
+  border-color: black transparent transparent transparent;
 }
-.filter .tooltip-box{
+.filter .tooltip-box {
   visibility: hidden;
   width: 300px;
   background-color: black;
   color: #fff;
-  left:50px;
+  left: 50px;
   font-size: small;
   text-align: center;
   border-radius: 6px;
@@ -89,24 +89,21 @@ input.stay-days{
   /* Position the tooltip */
   position: absolute;
   z-index: 100;
-  
 }
 .filter:hover .tooltip-box {
   visibility: visible;
 }
 
 .filter .tooltip-box::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: 100%;
   left: 50%;
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color:  transparent transparent black transparent;
+  border-color: transparent transparent black transparent;
 }
-
-
 
 @keyframes App-logo-spin {
   from {
