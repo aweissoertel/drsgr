@@ -1,5 +1,5 @@
 {
-  "name": "travel-recommennder",
+  "name": "drsgr",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -18,7 +18,9 @@
     "serve": "vite preview"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.3",
     "@types/node": "^18.16.1",
+    "@types/papaparse": "^5.3.7",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.1",
     "@vitejs/plugin-react": "^4.0.0",

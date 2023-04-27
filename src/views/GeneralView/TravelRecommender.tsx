@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../App.css";
 import { Row, Col } from "react-bootstrap";
 import Map from "../MapView/Map";
 import Preferences from "../PreferencesView/Preferences";
 import { Results } from "../ResultsView/Results";
 
-const TravelRecommender = ({ countries, userData, setUserData, results }) => {
+interface TravelRecommenderProps {
+  countries: MapCountry[];
+  userData: UserPreferences;
+  setUserData: React.Dispatch<React.SetStateAction<UserPreferences>>;
+  results: CompleteResult[];
+}
+
+const TravelRecommender = ({ countries, userData, setUserData, results }: TravelRecommenderProps) => {
   const [activeResult, setActiveResult] = useState(0);
   return (
     <div className="App">
@@ -23,7 +29,7 @@ const TravelRecommender = ({ countries, userData, setUserData, results }) => {
         <Col style={{ height: "100%" }}>
           <Results
             results={results}
-            stay={userData.Stay}
+            stay={userData.stay}
             activeResult={activeResult}
             userData={userData}
           />

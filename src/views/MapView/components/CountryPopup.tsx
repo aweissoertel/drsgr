@@ -3,7 +3,13 @@ import "../../../App.css";
 import { DetailScores } from "./DetailScores";
 import { Row, Col } from "react-bootstrap";
 
-export const CountryPopup = ({ country }) => {
+interface CountryPopupProps {
+  country?: CompleteResult; 
+}
+
+export const CountryPopup = ({ country }: CountryPopupProps) => {
+  if (!country) return null;
+  console.log(country);
   return (
     <div style={{ color: "white" }}>
       <h6>{country.region}</h6>
@@ -18,7 +24,7 @@ export const CountryPopup = ({ country }) => {
         <DetailScores
           scores={Object.keys(country.qualifications)?.map((key) => ({
             name: key,
-            value: country.qualifications[key],
+            value: country.qualifications[key as keyof Attributes],
           }))}
           price={country.price}
         />

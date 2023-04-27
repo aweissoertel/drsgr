@@ -1,18 +1,23 @@
 import React from "react";
 import Attribute from "./Attribute";
-import * as myConstant from "../../../data/constantData";
+import * as constants from "../../../data/constantData";
 
-export const CustomizationContainer = ({ userData, setUserData }) => {
+interface CustomizationContainerProps {
+  userData: UserPreferences;
+  setUserData: React.Dispatch<React.SetStateAction<UserPreferences>>;
+}
+
+export const CustomizationContainer = ({ userData, setUserData }: CustomizationContainerProps) => {
   return (
     <div>
       <p style={{ textAlign: "start", fontSize: "small" }}>
         Rate the topics according to their importance to you:
       </p>
-      {Object.keys(userData.Attributes).map((item, index) => (
+      {Object.keys(userData.attributes).map((item, index) => (
         <div
           style={{
             backgroundColor:
-              myConstant.COLORS[index % myConstant.COLORS.length],
+              constants.COLORS[index % constants.COLORS.length],
             borderRadius: "100",
             color: "#fff",
             textAlign: "left",

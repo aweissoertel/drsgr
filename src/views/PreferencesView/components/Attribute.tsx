@@ -1,9 +1,14 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
-import "../../../App.css";
 import SlideRange from "./SlideRange";
 
-const Attribute = ({ attrName, userData, setUserData }) => {
+interface AttributeProps {
+  attrName: string;
+  userData: UserPreferences;
+  setUserData: React.Dispatch<React.SetStateAction<UserPreferences>>;
+}
+
+const Attribute = ({ attrName, userData, setUserData }: AttributeProps) => {
   return (
     <Row
       style={{
@@ -19,7 +24,7 @@ const Attribute = ({ attrName, userData, setUserData }) => {
           attrName={attrName}
           userData={userData}
           setUserData={setUserData}
-          color="#000"
+          // color="#000"
         />
       </Col>
     </Row>

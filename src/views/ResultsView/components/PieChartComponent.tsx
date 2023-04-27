@@ -1,8 +1,16 @@
 import React from "react";
 import Donut from "./Donut";
 import { Row, Col } from "react-bootstrap";
+import { Score } from "./ResultInfo";
 
-export const PieChartComponent = ({ scores, label, countryName, region }) => {
+interface PieChartComponentProps {
+  scores: Score[];
+  label: number;
+  countryName?: string;
+  region: string;
+}
+
+const PieChartComponent = ({ scores, label, countryName, region }: PieChartComponentProps) => {
   return (
     <Row style={{ textAlign: "left" }}>
       <Col>
@@ -18,3 +26,4 @@ export const PieChartComponent = ({ scores, label, countryName, region }) => {
     </Row>
   );
 };
+export default PieChartComponent;

@@ -1,10 +1,14 @@
 import React from "react";
-import "../../App.css";
 import Budget from "./components/Budget";
 import { CustomizationContainer } from "./components/CustomizationContainer";
 import AdditionalInfo from "./components/AdditionalInfo";
 
-const Preferences = ({ userData, setUserData }) => {
+interface PreferencesProps {
+  userData: UserPreferences;
+  setUserData: React.Dispatch<React.SetStateAction<UserPreferences>>;
+}
+
+const Preferences = ({ userData, setUserData }: PreferencesProps) => {
   return (
     <div style={{ height: "100%", overflowY: "auto", overflowX: "hidden" }}>
       <div style={{ padding: "10px 0" }}>

@@ -1,8 +1,12 @@
 import React from "react";
 import { Form, Row, Col } from "react-bootstrap";
-import "../../../App.css";
 
-const Budget = ({ userData, setUserData }) => {
+interface BudgetProps {
+  userData: UserPreferences;
+  setUserData: React.Dispatch<React.SetStateAction<UserPreferences>>;
+}
+
+const Budget = ({ userData, setUserData }: BudgetProps) => {
   return (
     <Form>
       <p style={{ textAlign: "left" }}>Budget</p>
@@ -18,7 +22,7 @@ const Budget = ({ userData, setUserData }) => {
             onChange={(event) =>
               setUserData({
                 ...userData,
-                Budget: parseInt(event.target.value),
+                budget: parseInt(event.target.value),
               })
             }
           />
@@ -31,7 +35,7 @@ const Budget = ({ userData, setUserData }) => {
             onChange={(event) =>
               setUserData({
                 ...userData,
-                Budget: parseInt(event.target.value),
+                budget: parseInt(event.target.value),
               })
             }
           />
@@ -44,7 +48,7 @@ const Budget = ({ userData, setUserData }) => {
             onChange={(event) =>
               setUserData({
                 ...userData,
-                Budget: parseInt(event.target.value),
+                budget: parseInt(event.target.value),
               })
             }
           />
@@ -59,7 +63,7 @@ const Budget = ({ userData, setUserData }) => {
             onChange={(event) =>
               setUserData({
                 ...userData,
-                Budget: parseInt(event.target.value),
+                budget: parseInt(event.target.value),
               })
             }
           />
@@ -73,7 +77,7 @@ const Budget = ({ userData, setUserData }) => {
             onChange={(event) =>
               setUserData({
                 ...userData,
-                Budget: parseInt(event.target.value),
+                budget: parseInt(event.target.value),
               })
             }
           />
@@ -86,7 +90,7 @@ const Budget = ({ userData, setUserData }) => {
             onChange={(event) =>
               setUserData({
                 ...userData,
-                Budget: parseInt(event.target.value),
+                budget: parseInt(event.target.value),
               })
             }
           />

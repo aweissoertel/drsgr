@@ -3,7 +3,7 @@
       "target": "ESNext",
       "useDefineForClassFields": true,
       "lib": ["DOM", "DOM.Iterable", "ESNext"],
-      "allowJs": true, // TODO-1: change back to false after ts migration complete
+      "allowJs": false, // TODO-1: change back to false after ts migration complete
       "skipLibCheck": true,
       "esModuleInterop": false,
       "allowSyntheticDefaultImports": true,
