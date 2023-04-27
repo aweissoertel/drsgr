@@ -8,7 +8,7 @@ interface DetailScoresProps {
 
 export const DetailScores = ({ scores, userData }: DetailScoresProps) => {
   const getUserData = (attrName: string) => {
-    const key = attrName.charAt(0).toUpperCase() + attrName.slice(1);
+    const key = attrName.charAt(0) + attrName.slice(1);
     return userData.attributes[key as keyof Attributes];
   };
   return (
