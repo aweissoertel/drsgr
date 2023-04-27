@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { Row, Col } from 'react-bootstrap';
 import Map from '../MapView/Map';
 import Preferences from '../PreferencesView/Preferences';
