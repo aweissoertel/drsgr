@@ -1,8 +1,12 @@
-import L from "leaflet";
-import { useEffect } from "react";
-import "../styles/Map.css";
-function Legend({ map }) {
-  const getColor = (d) => {
+import React from "react";
+import L, { Map } from "leaflet";
+
+interface LegendProps {
+  map?: Map;
+}
+
+function Legend({ map }: LegendProps) {
+  const getColor = (d: number) => {
     return d > 90
       ? "#109146"
       : d > 70
@@ -15,21 +19,21 @@ function Legend({ map }) {
       ? "#BF1E24"
       : "#fff";
   };
-  useEffect(() => {
+  React.useEffect(() => {
     if (map) {
-      const legend = L.control({ position: "bottomleft" });
+      const legend = L.control.attribution({ position: 'bottomleft' });
 
       legend.onAdd = () => {
         const div = L.DomUtil.create("div", "info legend");
         const grades = [100, 90, 70, 60, 50];
         const texts = ["Excellent", "Good", "Fair", "Uncertain", "Poor"];
-        let labels = [];
+        let labels: string[] = [];
 
-        for (let i = 0; i < grades.length; i++) {
+        grades.map((grade, idx) => {
           labels.push(
-            '<i style="background:' + getColor(grades[i]) + '"></i> ' + texts[i]
+            '<i style="background:' + getColor(grade) + '"></i> ' + texts[idx]
           );
-        }
+        });
 
         div.innerHTML = labels.join("<br>");
         return div;
@@ -37,7 +41,7 @@ function Legend({ map }) {
 
       legend.addTo(map);
     }
-  }, [map]); //here add map
+  }, [map]);
   return null;
 }
 

@@ -1,10 +1,16 @@
 import React from "react";
 import { AttributeScore } from "./AttributeScore";
+import { Score } from "./ResultInfo";
 
-export const DetailScores = ({ scores, userData }) => {
-  const getUserData = (attrName) => {
+interface DetailScoresProps {
+  scores: Score[];
+  userData: UserPreferences;
+}
+
+export const DetailScores = ({ scores, userData }: DetailScoresProps) => {
+  const getUserData = (attrName: string) => {
     var key = attrName.charAt(0).toUpperCase() + attrName.slice(1);
-    return userData.Attributes[key];
+    return userData.attributes[key as keyof Attributes];
   };
   return (
     <div style={{ padding: "0px 10px" }}>

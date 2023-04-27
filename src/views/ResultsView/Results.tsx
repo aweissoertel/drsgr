@@ -1,18 +1,24 @@
 import React, { useState, useEffect, useRef } from "react";
 import Accordion from "react-bootstrap/Accordion";
-import "../../App.css";
 import ResultInfo from "./components/ResultInfo";
 
-export const Results = ({ results, stay, activeResult, userData }) => {
+interface ResultsProps {
+  results: CompleteResult[];
+  stay: number;
+  activeResult: number;
+  userData: UserPreferences;
+}
+
+export const Results = ({ results, stay, activeResult, userData }: ResultsProps) => {
   const [activeIndex, setActiveIndex] = useState(-1);
-  const accordElem = useRef(null);
+  const accordElem = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (results.length > 0) {
       if (activeResult === activeIndex) {
         setActiveIndex(-1);
       } else {
         setActiveIndex(activeResult);
-        accordElem.current.scrollIntoView({
+        accordElem.current?.scrollIntoView({
           behavior: "smooth",
           block: "end",
           inline: "start",
@@ -25,18 +31,18 @@ export const Results = ({ results, stay, activeResult, userData }) => {
       <p style={{ textAlign: "left" }}>Best destinations for you:</p>
       {results.length > 0 ? (
         <div style={{ overflow: "auto", height: "90%" }} ref={accordElem}>
-          <Accordion activeKey={activeIndex}>
+          <Accordion activeKey={activeIndex.toString()}>
             {results?.map((item, index) => (
-              <Accordion.Item eventKey={index} key={index}>
+              <Accordion.Item eventKey={index.toString()} key={index}>
                 <Accordion.Header
                   onClick={() => {
                     if (index === activeIndex) {
                       setActiveIndex(-1);
                     } else {
                       setActiveIndex(index);
-                      accordElem.current.scrollIntoView({
+                      accordElem.current?.scrollIntoView({
                         behavior: "smooth",
-                        block: "middle",
+                        block: "center",
                         inline: "nearest",
                       });
                     }

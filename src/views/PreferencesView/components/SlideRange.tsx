@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 
-const SlideRange = ({ attrName, userData, setUserData, color }) => {
-  const [value, setValue] = useState(userData.Attributes[attrName]);
+interface SlideRangeProps {
+  attrName: string;
+  userData: UserPreferences;
+  setUserData: React.Dispatch<React.SetStateAction<UserPreferences>>;
+}
+
+const SlideRange = ({ attrName, userData, setUserData }: SlideRangeProps) => {
+  const [value, setValue] = useState(userData.attributes[attrName as keyof Attributes]);
   return (
     <form style={{ width: "100%", display: "flex" }}>
       <input
@@ -14,8 +20,8 @@ const SlideRange = ({ attrName, userData, setUserData, color }) => {
           setValue(e.target.valueAsNumber);
           setUserData({
             ...userData,
-            Attributes: {
-              ...userData.Attributes,
+            attributes: {
+              ...userData.attributes,
               [attrName]: e.target.valueAsNumber,
             },
           });

@@ -1,8 +1,12 @@
 import React from "react";
 import { Row, Col, Form } from "react-bootstrap";
-import "../../../App.css";
 
-const AdditionalInfo = ({ userData, setUserData }) => {
+interface AdditionalInfoProps {
+  userData: UserPreferences;
+  setUserData: React.Dispatch<React.SetStateAction<UserPreferences>>;
+}
+
+const AdditionalInfo = ({ userData, setUserData }: AdditionalInfoProps) => {
   return (
     <div>
       <Form className="filter">
@@ -39,8 +43,8 @@ const AdditionalInfo = ({ userData, setUserData }) => {
           <input
             type="number"
             className="stay-days"
-            defaultValue={userData.Stay}
-            onChange={(e) => setUserData({ ...userData, Stay: e.target.value })}
+            defaultValue={userData.stay}
+            onChange={(e) => setUserData({ ...userData, stay: parseInt(e.target.value) })}
           />
         </Col>
       </Row>

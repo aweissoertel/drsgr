@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from "react";
-import "../../../App.css";
 import { DetailScores } from "./DetailScores";
-import { PieChartComponent } from "./PieChartComponent";
+import PieChartComponent from "./PieChartComponent";
 
-const ResultInfo = ({ country, label, stay, userData }) => {
-  const [scores, setScores] = useState([]);
+export interface Score {
+  name: string;
+  value: number;
+}
+
+interface ResultInfoProps {
+  country: CompleteResult;
+  label: number;
+  stay: number;
+  userData: UserPreferences;
+}
+
+const ResultInfo = ({ country, label, stay, userData }: ResultInfoProps) => {
+  const [scores, setScores] = useState<Score[]>([]);
   const loadData = () => {
     var s = Object.keys(country.scores.attr)?.map((key) => ({
       name: key,
-      value: country.scores.attr[key],
+      value: country.scores.attr[key as keyof Attributes],
     }));
     setScores(s);
   };
@@ -34,7 +45,7 @@ const ResultInfo = ({ country, label, stay, userData }) => {
       <DetailScores
         scores={Object.keys(country.qualifications)?.map((key) => ({
           name: key,
-          value: country.qualifications[key],
+          value: country.qualifications[key as keyof Attributes],
         }))}
         userData={userData}
       />

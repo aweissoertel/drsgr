@@ -1,35 +1,41 @@
 import React, { useRef, useState, useEffect } from "react";
 import * as ReactDOMServer from "react-dom/server";
 import { MapContainer, GeoJSON } from "react-leaflet";
+import { LatLngExpression, Layer, LeafletMouseEvent, Map as IMAP } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./styles/Map.css";
 import { CountryPopup } from "./components/CountryPopup";
 import { IndexLabel } from "./components/IndexLabel";
 import Legend from "./components/Legend";
 
-const position = [51.0967884, 5.9671304];
+const position: LatLngExpression = [51.0967884, 5.9671304];
 
-const Map = ({ countries, setActiveResult }) => {
-  const [map, setMap] = useState(null);
-  const geoJsonLayer = useRef(null);
+interface MapProps {
+  countries: MapCountry[];
+  setActiveResult: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const Map = ({ countries, setActiveResult }: MapProps) => {
+  const [map, setMap] = useState<IMAP | undefined>(undefined);
+  const geoJsonLayer = useRef<any>(null);
 
   useEffect(() => {
     if (geoJsonLayer.current) {
       geoJsonLayer.current.clearLayers().addData(countries);
     }
   });
-
-  const onEachCountry = (country, layer) => {
+//feature: Feature<Geometry, any>, layer: Layer
+  const onEachCountry: any = (country: MapCountry, layer: any) => {
     var c = countries.findIndex(
       (r) => r.properties.u_name === country.properties.u_name
     );
-    var score = country.properties.result.scores.totalScore;
+    var score = country.properties.result!.scores.totalScore;
     layer.options.fillColor = getColor(score);
     const popupContent = ReactDOMServer.renderToString(
       <CountryPopup country={country.properties.result} />
     );
     layer.bindPopup(popupContent, {
-      direction: "auto",
+      // direction: "auto",
       keepInView: true,
     });
     const tooltipContent = ReactDOMServer.renderToString(
@@ -58,7 +64,7 @@ const Map = ({ countries, setActiveResult }) => {
     weight: 1,
   };
 
-  const highlightFeature = (e) => {
+  const highlightFeature = (e: LeafletMouseEvent) => {
     var layer = e.target;
 
     layer.setStyle({
@@ -68,7 +74,7 @@ const Map = ({ countries, setActiveResult }) => {
     });
   };
 
-  const resetHighlight = (e) => {
+  const resetHighlight = (e: LeafletMouseEvent) => {
     var layer = e.target;
     layer.setStyle({
       fillOpacity: 1,
@@ -77,7 +83,7 @@ const Map = ({ countries, setActiveResult }) => {
     });
   };
 
-  const clickCountry = (e) => {
+  const clickCountry = (e: LeafletMouseEvent) => {
     let ind = countries.findIndex(
       (r) => r.properties.u_name === e.target.feature.properties.u_name
     );
@@ -88,7 +94,7 @@ const Map = ({ countries, setActiveResult }) => {
     }
   };
 
-  const getColor = (d) => {
+  const getColor = (d: number) => {
     return d > 90
       ? "#109146"
       : d > 70
@@ -108,7 +114,7 @@ const Map = ({ countries, setActiveResult }) => {
         style={{ height: "100vh", width: "auto" }}
         zoom={4}
         center={position}
-        ref={setMap}
+        ref={setMap as any}
         doubleClickZoom={false}
         // zoomControl={false}
         // touchZoom={false}
@@ -119,7 +125,7 @@ const Map = ({ countries, setActiveResult }) => {
         <GeoJSON
           ref={geoJsonLayer}
           style={countryStyle}
-          data={countries}
+          data={countries as any}
           onEachFeature={onEachCountry}
         />
         <Legend map={map} />

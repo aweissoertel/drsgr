@@ -2,12 +2,12 @@ import papa from "papaparse";
 import mapData from "../data/regions.json";
 
 class LoadCountriesTask {
-  allResults = [];
+  allResults: CompleteResult[] = [];
   countryScoresUrl =
     "https://raw.githubusercontent.com/assalism/travel-data/main/regionmodel.csv";
-  mapCountries = mapData.features;
-  load = (setFileRetrieved) => {
-    papa.parse(this.countryScoresUrl, {
+  mapCountries = mapData.features as MapCountry[];
+  load = (setFileRetrieved: React.Dispatch<React.SetStateAction<RawCountries[]>>) => {
+    papa.parse<RawCountries>(this.countryScoresUrl, {
       download: true,
       header: true,
       complete: (result) => {
@@ -15,18 +15,22 @@ class LoadCountriesTask {
       },
     });
   };
-  processCountries = (countryScores, userData, setCountries, setResults) => {
-    for (let i = 0; i < this.mapCountries.length; i++) {
-      const mapCountry = this.mapCountries[i];
+  processCountries = (
+    countryScores: RawCountries[],
+    userData: UserPreferences,
+    setCountries: React.Dispatch<React.SetStateAction<MapCountry[]>>,
+    setResults: React.Dispatch<React.SetStateAction<CompleteResult[]>>
+  ) => {
+    this.mapCountries.map(mapCountry => {
       const scoreCountry = countryScores.find(
         (c) => c.u_name === mapCountry.properties.u_name
       );
       if (scoreCountry != null) {
-        var res = {
+        const res: CompleteResult = {
           country: scoreCountry.ParentRegion,
           region: scoreCountry.Region,
           uname: scoreCountry.u_name,
-          price: Math.ceil((scoreCountry.costPerWeek * userData.Stay) / 7),
+          price: Math.ceil((scoreCountry.costPerWeek || 400 * userData.stay) / 7),
           qualifications: {
             nature: this.calculateQualification(scoreCountry.nature),
             architecture: this.calculateQualification(
@@ -59,46 +63,46 @@ class LoadCountriesTask {
             },
           },
         };
-        var budgetScore = this.calculatePriceScore(res.price, userData);
-        var isAffordable = !userData.isPriceImportant || budgetScore === 100;
+        const budgetScore = this.calculatePriceScore(res.price, userData.budget);
+        const isAffordable = !userData.isPriceImportant || budgetScore === 100;
         mapCountry.properties.country = scoreCountry.ParentRegion;
         mapCountry.properties.name = scoreCountry.Region;
         // calculate the score for nature
         res.scores.attr.nature = this.calculateAttributeScore(
           res.qualifications.nature,
-          userData.Attributes.Nature
+          userData.attributes.nature
         );
         res.scores.attr.architecture = this.calculateAttributeScore(
           res.qualifications.architecture,
-          userData.Attributes.Architecture
+          userData.attributes.architecture
         );
         res.scores.attr.hiking = this.calculateAttributeScore(
           res.qualifications.hiking,
-          userData.Attributes.Hiking
+          userData.attributes.hiking
         );
         res.scores.attr.wintersports = this.calculateAttributeScore(
           res.qualifications.wintersports,
-          userData.Attributes.Wintersports
+          userData.attributes.wintersports
         );
         res.scores.attr.beach = this.calculateAttributeScore(
           res.qualifications.beach,
-          userData.Attributes.Beach
+          userData.attributes.beach
         );
         res.scores.attr.culture = this.calculateAttributeScore(
           res.qualifications.culture,
-          userData.Attributes.Culture
+          userData.attributes.culture
         );
         res.scores.attr.culinary = this.calculateAttributeScore(
           res.qualifications.culinary,
-          userData.Attributes.Culinary
+          userData.attributes.culinary
         );
         res.scores.attr.entertainment = this.calculateAttributeScore(
           res.qualifications.entertainment,
-          userData.Attributes.Entertainment
+          userData.attributes.entertainment
         );
         res.scores.attr.shopping = this.calculateAttributeScore(
           res.qualifications.shopping,
-          userData.Attributes.Shopping
+          userData.attributes.shopping
         );
 
         var totalScore = isAffordable
@@ -119,18 +123,18 @@ class LoadCountriesTask {
         mapCountry.properties.result = res;
         this.allResults.push(res);
       }
-    }
+    });
     this.mapCountries.sort(
       (a, b) =>
-        b.properties.result.scores.totalScore -
-        a.properties.result.scores.totalScore
+        b.properties.result?.scores.totalScore || 0 -
+        (a.properties.result?.scores.totalScore || 0)
     );
     setCountries(this.mapCountries);
     this.allResults.sort((a, b) => b.scores.totalScore - a.scores.totalScore);
     this.allResults = this.allResults.filter((a) => a.scores.totalScore > 0);
     setResults(this.allResults.slice(0, 10));
   };
-  calculateQualification = (qualification) => {
+  calculateQualification = (qualification: string) => {
     let numScore;
     switch (qualification) {
       case "--":
@@ -153,12 +157,12 @@ class LoadCountriesTask {
     }
     return numScore;
   };
-  calculateAttributeScore = (countryScore, userScore) => {
+  calculateAttributeScore = (countryScore: number, userScore: number) => {
     return 100 - Math.abs(userScore - countryScore);
   };
-  calculatePriceScore = (countryPrice, userData) => {
+  calculatePriceScore = (countryPrice: number, userBudget: number) => {
     //change price per week to # days that user going to stay
-    const maxBudget = this.getBudgetCeiling(userData.Budget);
+    const maxBudget = this.getBudgetCeiling(userBudget);
     if (countryPrice <= maxBudget) {
       return 100;
     }
@@ -166,8 +170,8 @@ class LoadCountriesTask {
     return 0;
   };
 
-  calculateTimingScore = (country, userData) => {};
-  getPriceGroup = (price) => {
+  // calculateTimingScore = (country, userData) => {};
+  getPriceGroup = (price: number) => {
     if (price <= 100) {
       return 1;
     } else if (price > 100 && price <= 300) {
@@ -182,7 +186,7 @@ class LoadCountriesTask {
       return 6;
     }
   };
-  getBudgetCeiling = (budget) => {
+  getBudgetCeiling = (budget: number) => {
     let maxBudget = 0;
     switch (budget) {
       case 1:

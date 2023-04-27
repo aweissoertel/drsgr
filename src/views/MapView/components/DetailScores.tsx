@@ -1,8 +1,14 @@
 import React from "react";
 import { AttributeScore } from "./AttributeScore";
 import { Row, Col } from "react-bootstrap";
+import { Score } from "../../ResultsView/components/ResultInfo";
 
-export const DetailScores = ({ scores, price }) => {
+interface DetailScoresProps {
+  scores: Score[];
+  price: number;
+}
+
+export const DetailScores = ({ scores, price }: DetailScoresProps) => {
   return (
     <div>
       <div

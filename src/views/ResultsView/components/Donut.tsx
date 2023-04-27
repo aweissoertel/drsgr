@@ -1,9 +1,14 @@
 import React from "react";
 import { PieChart, Pie, Cell } from "recharts";
-import "../../../App.css";
-import * as myConstant from "../../../data/constantData";
+import * as constants from "../../../data/constantData";
+import { Score } from "./ResultInfo";
 
-const Donut = ({ scores, label }) => {
+interface DonutProps {
+  scores: Score[];
+  label: number;
+}
+
+const Donut = ({ scores, label }: DonutProps) => {
   let donutState = {
     innerRadius: 30,
     outerRadius: 50,
@@ -40,7 +45,7 @@ const Donut = ({ scores, label }) => {
         {scores.map((entry, index) => (
           <Cell
             key={`cell-${index}`}
-            fill={myConstant.COLORS[index % myConstant.COLORS.length]}
+            fill={constants.COLORS[index % constants.COLORS.length]}
           />
         ))}
       </Pie>

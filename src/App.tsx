@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import TravelRecommender from "./views/GeneralView/TravelRecommender";
@@ -6,23 +6,23 @@ import LoadCountriesTask from "./tasks/LoadCountriesTask";
 import Loading from "./views/GeneralView/Loading";
 
 const App = () => {
-  const [countries, setCountries] = useState([]);
-  const [fileRetrieved, setFileRetrieved] = useState([]);
-  const [results, setResults] = useState([]);
-  const [userData, setUserData] = useState({
+  const [countries, setCountries] = React.useState<MapCountry[]>([]);
+  const [fileRetrieved, setFileRetrieved] = React.useState<RawCountries[]>([]);
+  const [results, setResults] = React.useState<CompleteResult[]>([]);
+  const [userData, setUserData] = React.useState<UserPreferences>({
     isPriceImportant: false,
-    Stay: 4,
-    Budget: 1,
-    Attributes: {
-      Nature: 50,
-      Architecture: 50,
-      Hiking: 50,
-      Wintersports: 50,
-      Beach: 50,
-      Culture: 50,
-      Culinary: 50,
-      Entertainment: 50,
-      Shopping: 50,
+    stay: 4,
+    budget: 1,
+    attributes: {
+      nature: 50,
+      architecture: 50,
+      hiking: 50,
+      wintersports: 50,
+      beach: 50,
+      culture: 50,
+      culinary: 50,
+      entertainment: 50,
+      shopping: 50,
     },
   });
   const load = () => {
@@ -40,8 +40,8 @@ const App = () => {
       );
     }
   };
-  useEffect(load, []);
-  useEffect(calculateScores, [userData, fileRetrieved]);
+  React.useEffect(load, []);
+  React.useEffect(calculateScores, [userData, fileRetrieved]);
 
   return (
     <div style={{ height: "100vh" }}>
