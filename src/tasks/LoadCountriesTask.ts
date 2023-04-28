@@ -1,4 +1,5 @@
 import papa from 'papaparse';
+
 import mapData from '../data/regions.json';
 
 class LoadCountriesTask {

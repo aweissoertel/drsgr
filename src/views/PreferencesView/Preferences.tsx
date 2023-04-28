@@ -1,7 +1,8 @@
 import React from 'react';
+
+import AdditionalInfo from './components/AdditionalInfo';
 import Budget from './components/Budget';
 import { CustomizationContainer } from './components/CustomizationContainer';
-import AdditionalInfo from './components/AdditionalInfo';
 
 interface PreferencesProps {
   userData: UserPreferences;

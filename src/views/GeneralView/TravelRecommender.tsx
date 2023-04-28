@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Row, Col } from 'react-bootstrap';
+
+import { Col, Row } from 'react-bootstrap';
+
 import Map from '../MapView/Map';
 import Preferences from '../PreferencesView/Preferences';
 import { Results } from '../ResultsView/Results';

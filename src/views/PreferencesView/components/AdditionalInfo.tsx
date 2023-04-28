@@ -1,5 +1,6 @@
 import React from 'react';
-import { Row, Col, Form } from 'react-bootstrap';
+
+import { Col, Form, Row } from 'react-bootstrap';
 
 interface AdditionalInfoProps {
   userData: UserPreferences;

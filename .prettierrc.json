@@ -4,6 +4,9 @@
     "semi": true,
     "singleQuote": true,
     "printWidth": 120,
-    "bracketSpacing": true
+    "bracketSpacing": true,
+    "importOrder": ["^react(-dom(.)*)?$", "<THIRD_PARTY_MODULES>", "^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true
 }
   

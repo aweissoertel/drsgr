@@ -1,7 +1,8 @@
 import React from 'react';
-import '../../../App.css';
+
+import { Col, Row } from 'react-bootstrap';
+
 import { DetailScores } from './DetailScores';
-import { Row, Col } from 'react-bootstrap';
 
 interface CountryPopupProps {
   country?: CompleteResult;

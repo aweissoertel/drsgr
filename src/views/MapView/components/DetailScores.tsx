@@ -1,6 +1,8 @@
 import React from 'react';
+
+import { Col, Row } from 'react-bootstrap';
+
 import { AttributeScore } from './AttributeScore';
-import { Row, Col } from 'react-bootstrap';
 
 interface DetailScoresProps {
   scores: Score[];

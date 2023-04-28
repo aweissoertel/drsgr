@@ -1,12 +1,14 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as ReactDOMServer from 'react-dom/server';
-import { MapContainer, GeoJSON } from 'react-leaflet';
-import { LatLngExpression, LeafletMouseEvent, Map as IMAP } from 'leaflet';
+
+import { Map as IMAP, LatLngExpression, LeafletMouseEvent } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import './styles/Map.css';
+import { GeoJSON, MapContainer } from 'react-leaflet';
+
 import { CountryPopup } from './components/CountryPopup';
 import { IndexLabel } from './components/IndexLabel';
 import Legend from './components/Legend';
+import './styles/Map.css';
 
 const position: LatLngExpression = [51.0967884, 5.9671304];
 
@@ -90,14 +92,14 @@ const Map = ({ countries, setActiveResult }: MapProps) => {
     return d > 90
       ? '#109146'
       : d > 70
-        ? '#7CBA43'
-        : d > 60
-          ? '#FFCC06'
-          : d > 50
-            ? '#F58E1D'
-            : d >= 0
-              ? '#BF1E24'
-              : '#fff';
+      ? '#7CBA43'
+      : d > 60
+      ? '#FFCC06'
+      : d > 50
+      ? '#F58E1D'
+      : d >= 0
+      ? '#BF1E24'
+      : '#fff';
   };
 
   return (
@@ -108,11 +110,11 @@ const Map = ({ countries, setActiveResult }: MapProps) => {
         center={position}
         ref={setMap as any}
         doubleClickZoom={false}
-      // zoomControl={false}
-      // touchZoom={false}
-      // scrollWheelZoom={false}
-      // boxZoom={false}
-      // keyboard={false}
+        // zoomControl={false}
+        // touchZoom={false}
+        // scrollWheelZoom={false}
+        // boxZoom={false}
+        // keyboard={false}
       >
         <GeoJSON ref={geoJsonLayer} style={countryStyle} data={countries as any} onEachFeature={onEachCountry} />
         <Legend map={map} />

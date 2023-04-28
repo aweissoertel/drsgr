@@ -1,9 +1,11 @@
 import React from 'react';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 import './App.css';
-import TravelRecommender from './views/GeneralView/TravelRecommender';
 import LoadCountriesTask from './tasks/LoadCountriesTask';
 import Loading from './views/GeneralView/Loading';
+import TravelRecommender from './views/GeneralView/TravelRecommender';
 
 const App = () => {
   const [countries, setCountries] = React.useState<MapCountry[]>([]);

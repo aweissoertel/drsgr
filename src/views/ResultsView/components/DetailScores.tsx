@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { AttributeScore } from './AttributeScore';
 
 interface DetailScoresProps {

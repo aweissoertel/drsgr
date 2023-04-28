@@ -1,5 +1,7 @@
 import React from 'react';
-import { PieChart, Pie, Cell } from 'recharts';
+
+import { Cell, Pie, PieChart } from 'recharts';
+
 import * as constants from '../../../data/constantData';
 
 interface DonutProps {

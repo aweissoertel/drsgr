@@ -1,5 +1,7 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+
+import { Col, Row } from 'react-bootstrap';
+
 import * as myConstant from '../../../data/constantData';
 import { BarChart } from '../../SharedComponents/BarChart';
 

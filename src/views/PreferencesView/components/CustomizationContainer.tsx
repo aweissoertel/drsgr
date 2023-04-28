@@ -1,6 +1,7 @@
 import React from 'react';
-import Attribute from './Attribute';
+
 import * as constants from '../../../data/constantData';
+import Attribute from './Attribute';
 
 interface CustomizationContainerProps {
   userData: UserPreferences;

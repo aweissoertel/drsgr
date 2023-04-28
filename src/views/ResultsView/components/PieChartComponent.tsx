@@ -1,6 +1,8 @@
 import React from 'react';
+
+import { Col, Row } from 'react-bootstrap';
+
 import Donut from './Donut';
-import { Row, Col } from 'react-bootstrap';
 
 interface PieChartComponentProps {
   scores: Score[];
