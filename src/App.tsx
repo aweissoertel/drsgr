@@ -27,16 +27,26 @@ const App = () => {
       shopping: 50,
     },
   });
+
+  const test = async () => {
+    const response = await fetch('/hello');
+    const data = await response.text();
+    console.log(data);
+  };
+
   const load = () => {
     const loadCountriesTask = new LoadCountriesTask();
     loadCountriesTask.load(setFileRetrieved);
+    test();
   };
+
   const calculateScores = () => {
     if (fileRetrieved.length > 0) {
       const loadCountriesTask = new LoadCountriesTask();
       loadCountriesTask.processCountries(fileRetrieved, userData, setCountries, setResults);
     }
   };
+
   React.useEffect(load, []);
   React.useEffect(calculateScores, [userData, fileRetrieved]);
 
