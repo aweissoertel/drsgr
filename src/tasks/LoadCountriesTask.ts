@@ -1,14 +1,13 @@
 import papa from 'papaparse';
 
+import regionModel from '../data/regionModel';
 import mapData from '../data/regions.json';
 
 class LoadCountriesTask {
   allResults: CompleteResult[] = [];
-  countryScoresUrl = 'https://raw.githubusercontent.com/assalism/travel-data/main/regionmodel.csv';
   mapCountries = mapData.features as MapCountry[];
   load = (setFileRetrieved: React.Dispatch<React.SetStateAction<RawCountries[]>>) => {
-    papa.parse<RawCountries>(this.countryScoresUrl, {
-      download: true,
+    papa.parse<RawCountries>(regionModel, {
       header: true,
       complete: (result) => {
         setFileRetrieved(result.data);
