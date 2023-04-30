@@ -20,7 +20,7 @@ const Attribute = ({ attrName, userData, setUserData }: AttributeProps) => {
         height: '100%',
       }}
     >
-      <Col xs={4}>{attrName}</Col>
+      <Col xs={4}>{attrName.charAt(0).toUpperCase() + attrName.slice(1)}</Col>
       <Col xs={8}>
         <SlideRange
           attrName={attrName}

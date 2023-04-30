@@ -28,7 +28,7 @@ class LoadCountriesTask {
           country: scoreCountry.ParentRegion,
           region: scoreCountry.Region,
           uname: scoreCountry.u_name,
-          price: Math.ceil((scoreCountry.costPerWeek || 400 * userData.stay) / 7),
+          price: Math.ceil(((scoreCountry.costPerWeek || 400) * userData.stay) / 7),
           qualifications: {
             nature: this.calculateQualification(scoreCountry.nature),
             architecture: this.calculateQualification(scoreCountry.architecture),
@@ -105,7 +105,7 @@ class LoadCountriesTask {
       }
     });
     this.mapCountries.sort(
-      (a, b) => b.properties.result?.scores.totalScore || 0 - (a.properties.result?.scores.totalScore || 0),
+      (a, b) => (b.properties.result?.scores.totalScore || 0) - (a.properties.result?.scores.totalScore || 0),
     );
     setCountries(this.mapCountries);
     this.allResults.sort((a, b) => b.scores.totalScore - a.scores.totalScore);

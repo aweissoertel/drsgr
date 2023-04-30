@@ -5,6 +5,7 @@
     "singleQuote": true,
     "printWidth": 120,
     "bracketSpacing": true,
+    "endOfLine": "crlf",
     "importOrder": ["^react(-dom(.)*)?$", "<THIRD_PARTY_MODULES>", "^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
     "importOrderSeparation": true,
     "importOrderSortSpecifiers": true
