@@ -3,7 +3,7 @@ import ViteExpress from 'vite-express';
 
 import hello from './server/hello';
 
-const port = parseInt(process.env.PORT || '3000');
+const port = parseInt(process.env.PORT || '8080');
 const app = express();
 
 app.get('/hello', (_, res) => hello(res));
