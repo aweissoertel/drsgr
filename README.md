@@ -1,23 +1,21 @@
-# destination-finder
-A new user interface to recommend destinations based on the user's preferences and needs. This application was implemented for Master Thesis at TUM with the title "Dynamic Adaptation of User Preferences and Results in Complex Recommender Systems". 
+# Destination Recommender System for Group Recommendations (drsgr)
+
+Repository for the front and back end of a destination recommender system. This application was implemented for a Master Thesis at [TUM](https://www.tum.de/) with the title "Extending a Web-based Destination Recommender System for Group Recommendations".
+It is extending a [recommender system](https://github.com/asalnesar/destination-finder) developed for a single user.
+
+⚠️The thesis is still ongoing and this code is also work in progess⚠️
 
 ## Demo
-A demo of this interface is available on https://destination-finder.netlify.app/
+
+A demo of the interface is available on https://group-travel.fly.dev/
+
 ## Getting Started
 
-You need git to clone our repository.
-
-```
-git clone https://github.com/asalnesar/destination-finder.git
-cd destination-finder/
-```
+To run the system yourself, clone it and install [node](https://nodejs.org/en/download) (if not already available).
 
 ### Install Dependencies
 
-You can follow the next steps to do that step by step:
-
-
-We get the tools we depend upon via `npm`, the [node package manager](https://www.npmjs.com).
+Inside the cloned directory, run
 
 ```
 npm install
@@ -25,11 +23,27 @@ npm install
 
 ### Run the Application
 
-We have preconfigured the project with a simple development web server.  The simplest way to start
-this server is:
+This project uses `vite-express` to run the front end and back end simultaneously. Therefore, a single command is enough to run the development server:
 
 ```
 npm start
 ```
 
-Now browse to the app at `http://localhost:3000/`.
+Now browse to the app at http://localhost:8080/.
+
+In order to run the frontend alone, run
+
+```
+npm run frontend
+```
+
+### Building
+
+An optimized version can be built with
+
+```
+npm run build
+```
+
+You can run `npm run prod` afterwards in order to spawn a node process, which serves the frontend and runs the backend, which is what happens in the deployed version.<br/>
+Alternatively, you can use the Dockerfile in this project.

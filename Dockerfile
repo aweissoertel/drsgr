@@ -41,6 +41,7 @@ FROM base
 COPY --from=build /app /app
 # COPY --from=build . .
 
-EXPOSE 3000
+ENV PORT=8080
+EXPOSE 8080
 # Start the server by default, this can be overwritten at runtime
 CMD [ "npm", "run", "prod" ]
