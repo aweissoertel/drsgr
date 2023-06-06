@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model GroupRecommendation{
+  id                  String      @id @default(auto()) @map("_id") @db.ObjectId
+  sessionCode         String      @unique
+  userVotes           UserVote[]
+  votingEnded         Boolean
+  aggregationResults  AggregationResult[]
+}
+
+model UserVote {
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId
+  name              String              @unique
+  recommendation    GroupRecommendation @relation(fields: [recommendationId], references: [id])
+  recommendationId  String              @db.ObjectId
+  preferences       Attributes
+}
+
+model AggregationResult {
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId
+  recommendation    GroupRecommendation @relation(fields: [recommendationId], references: [id])
+  recommendationId  String              @db.ObjectId
+  method            String
+  rankedCountries   RankResult[]
+}
+
+model Country {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  u_name      String
+  name        String
+  region      String
+  attributes  Attributes
+}
+
+type RankResult {
+  u_name  String
+  rank    Int
+}
+
+type Attributes {
+  nature        Int
+  architecture  Int
+  hiking        Int
+  wintersports  Int
+  beach         Int
+  culture       Int
+  culinary      Int
+  entertainment Int
+  shopping      Int
+}
