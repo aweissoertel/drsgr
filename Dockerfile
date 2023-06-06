@@ -30,6 +30,9 @@ COPY . .
 # Build application
 RUN npm run build
 
+# Set up prisma
+RUN npx prisma generate
+
 # Remove development dependencies
 RUN npm prune --production
 
