@@ -15,6 +15,7 @@ interface TravelRecommenderProps {
 
 const TravelRecommender = ({ countries, userData, setUserData, results }: TravelRecommenderProps) => {
   const [activeResult, setActiveResult] = useState(0);
+
   return (
     <div className="App">
       <Row style={{ height: '100%' }}>
