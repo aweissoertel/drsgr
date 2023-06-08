@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 import type { Response } from 'express';
 
 export default async function createRecommendation(res: Response, prisma: PrismaClient) {

@@ -1,10 +1,10 @@
 import type { PrismaClient } from '@prisma/client';
 import type { Request, Response } from 'express';
 
-export default async function deleteRecommendation(req: Request<{ id: string }>, res: Response, prisma: PrismaClient) {
+export default async function deleteUserVote(req: Request<{ id: string }>, res: Response, prisma: PrismaClient) {
   const params = req.query.id as string;
   try {
-    await prisma.groupRecommendation.delete({
+    await prisma.userVote.delete({
       where: {
         id: params,
       },
