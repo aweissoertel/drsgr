@@ -27,11 +27,11 @@ RUN npm ci --production=false
 # Copy application code
 COPY . .
 
-# Build application
-RUN npm run build
-
 # Set up prisma
 RUN npx prisma generate
+
+# Build application
+RUN npm run build
 
 # Remove development dependencies
 RUN npm prune --production
