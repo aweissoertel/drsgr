@@ -19,8 +19,8 @@ const Donut = ({ scores, label }: DonutProps) => {
     <text
       x={donutState.outerRadius + 15}
       y={donutState.outerRadius}
-      textAnchor="middle"
-      dominantBaseline="middle"
+      textAnchor='middle'
+      dominantBaseline='middle'
       style={{ fontWeight: 'bold' }}
       fontSize={20}
     >
@@ -35,9 +35,9 @@ const Donut = ({ scores, label }: DonutProps) => {
         data={scores}
         innerRadius={donutState.innerRadius}
         outerRadius={donutState.outerRadius}
-        fill="#8884d8"
+        fill='#8884d8'
         paddingAngle={0}
-        dataKey="value"
+        dataKey='value'
         isAnimationActive={false}
       >
         {scores.map((entry, index) => (

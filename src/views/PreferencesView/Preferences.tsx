@@ -53,6 +53,15 @@ const Preferences = ({ userData, setUserData }: PreferencesProps) => {
       console.log('NOT FOUND');
     }
   };
+  const handleCloseButton = async () => {
+    const response = await fetch(`/recommendation?id=${query.toLowerCase()}`, { method: 'PUT' });
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+    } else {
+      console.log('NOT FOUND');
+    }
+  };
 
   return (
     <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
@@ -65,13 +74,16 @@ const Preferences = ({ userData, setUserData }: PreferencesProps) => {
       <div style={{ padding: '10px 0' }}>
         <CustomizationContainer userData={userData} setUserData={setUserData} />
       </div>
-      <Button variant="success" onClick={() => handleSendUserVote()}>
+      <Button variant='success' onClick={() => handleSendUserVote()}>
         Send these values
       </Button>
       <Button onClick={() => handleTestButton()}>Create Recommendation</Button>
-      <Form.Control type="text" value={query} onChange={(e) => setQuery(e.target.value.toUpperCase())} />
+      <Form.Control type='text' value={query} onChange={(e) => setQuery(e.target.value.toUpperCase())} />
       <Button onClick={() => handleGetButton()}>Get Recommendation</Button>
-      <Button variant="danger" onClick={() => handleDeleteButton()}>
+      <Button variant='warning' onClick={() => handleCloseButton()}>
+        Close Recommendation
+      </Button>
+      <Button variant='danger' onClick={() => handleDeleteButton()}>
         Delete Recommendation
       </Button>
     </div>

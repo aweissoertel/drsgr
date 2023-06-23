@@ -11,9 +11,9 @@ const SlideRange = ({ attrName, userData, setUserData }: SlideRangeProps) => {
   return (
     <form style={{ width: '100%', display: 'flex' }}>
       <input
-        id="slider"
+        id='slider'
         style={{ width: '100%', height: '1.5rem' }}
-        type="range"
+        type='range'
         step={25}
         value={value}
         onChange={(e) => {

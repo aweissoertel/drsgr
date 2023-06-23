@@ -17,7 +17,7 @@ const TravelRecommender = ({ countries, userData, setUserData, results }: Travel
   const [activeResult, setActiveResult] = useState(0);
 
   return (
-    <div className="App">
+    <div className='App'>
       <Row style={{ height: '100%' }}>
         <Col style={{ height: '100%' }}>
           <Preferences userData={userData} setUserData={setUserData}></Preferences>

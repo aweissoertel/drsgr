@@ -10,15 +10,15 @@ interface AdditionalInfoProps {
 const AdditionalInfo = ({ userData, setUserData }: AdditionalInfoProps) => {
   return (
     <div>
-      <Form className="filter">
+      <Form className='filter'>
         <Form.Check
-          className="filter"
-          type="checkbox"
-          id="custom-switch"
-          label="Filter out the destinations over the  budget"
+          className='filter'
+          type='checkbox'
+          id='custom-switch'
+          label='Filter out the destinations over the  budget'
           onChange={(e) => setUserData({ ...userData, isPriceImportant: e.target.checked })}
         ></Form.Check>
-        <span className="tooltip-box">
+        <span className='tooltip-box'>
           If you select the checkbox the over-budget destinations will be filtered out. if it is not selected, price
           would have an impact on the recommendations just like any other attribute.
         </span>
@@ -39,8 +39,8 @@ const AdditionalInfo = ({ userData, setUserData }: AdditionalInfoProps) => {
         </Col>
         <Col>
           <input
-            type="number"
-            className="stay-days"
+            type='number'
+            className='stay-days'
             defaultValue={userData.stay}
             onChange={(e) => setUserData({ ...userData, stay: parseInt(e.target.value) })}
           />

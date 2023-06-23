@@ -21,7 +21,7 @@ const ResultInfo = ({ country, label, stay, userData }: ResultInfoProps) => {
   };
   useEffect(loadData, [country]);
   return (
-    <div className="dark-theme">
+    <div className='dark-theme'>
       <PieChartComponent scores={scores} label={label} countryName={country.country} region={country.region} />
       <p style={{ paddingTop: '10px' }}>
         Price for {stay} days: {country.price}€

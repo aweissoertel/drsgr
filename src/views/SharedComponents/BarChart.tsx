@@ -61,7 +61,7 @@ export const BarChart = ({ score, benchmark = 0, color, showBenchmark = false }:
   };
   return (
     <div
-      className="bar-chart"
+      className='bar-chart'
       style={{
         height: '15px',
         width: '100%',
@@ -69,7 +69,7 @@ export const BarChart = ({ score, benchmark = 0, color, showBenchmark = false }:
         border: 'solid 1px #868686',
       }}
     >
-      <span className="tooltip-box">{getText()}</span>
+      <span className='tooltip-box'>{getText()}</span>
 
       <div
         style={{
