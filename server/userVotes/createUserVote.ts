@@ -12,7 +12,6 @@ export default async function createUserVote(
   res: Response,
   prisma: PrismaClient,
 ) {
-  console.dir(req.body);
   try {
     const entity = await prisma.userVote.create({
       data: {

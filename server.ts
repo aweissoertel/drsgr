@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
+// eslint-disable-next-line import/default
 import ViteExpress from 'vite-express';
 
 import hello from './server/hello';
@@ -18,7 +19,7 @@ const prisma = new PrismaClient();
 app.get('/hello', (_, res) => hello(res));
 
 ///// recommendations /////
-app.post('/recommendation', async (_, response) => createRecommendation(response, prisma));
+app.post('/recommendation', async (_, response) => await createRecommendation(response, prisma));
 app.get<{ code: string }>('/recommendation', (request, response) => getRecommendation(request, response, prisma));
 app.put<{ id: string }>('/recommendation', (request, response) => endVoting(request, response, prisma));
 app.delete<{ id: string }>('/recommendation', (request, response) => deleteRecommendation(request, response, prisma));
