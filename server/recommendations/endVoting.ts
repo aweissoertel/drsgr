@@ -31,8 +31,9 @@ export default async function endVoting(req: Request<{ id: string }>, res: Respo
     }
 
     const multi = multiplicativeAggregation(userVotes);
+    const average = averageAggregation(userVotes).normalizedResult;
 
-    res.send(multi);
+    res.send({ multi, average });
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -61,7 +62,36 @@ function multiplicativeAggregation(preferences: Attributes[]): AggregationResult
 
   preferences.forEach((preference) => {
     for (const [key, value] of Object.entries(preference)) {
-      result[key as keyof Attributes] *= value;
+      // PROBLEM: value of 0. Multiplies everything to 0.
+      // setting value to 1 in case of 0, for now
+      result[key as keyof Attributes] *= value > 0 ? value : 1;
+    }
+  });
+  for (const [rKey, value] of Object.entries(result)) {
+    normalizedResult[rKey as keyof Attributes] = value / normalizeFactor;
+  }
+
+  return { result, normalizedResult };
+}
+
+function averageAggregation(preferences: Attributes[]): AggregationResult {
+  const normalizeFactor = preferences.length;
+  const result: Attributes = {
+    nature: 1,
+    architecture: 1,
+    hiking: 1,
+    wintersports: 1,
+    beach: 1,
+    culture: 1,
+    culinary: 1,
+    entertainment: 1,
+    shopping: 1,
+  };
+  const normalizedResult = { ...result };
+
+  preferences.forEach((preference) => {
+    for (const [key, value] of Object.entries(preference)) {
+      result[key as keyof Attributes] += value;
     }
   });
   for (const [rKey, value] of Object.entries(result)) {
