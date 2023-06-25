@@ -33,8 +33,9 @@ export default async function endVoting(req: Request<{ id: string }>, res: Respo
     const multi = multiplicativeAggregation(userVotes);
     const average = averageAggregation(userVotes).normalizedResult;
     const borda = bordaCountAggregation(rankPreferences(userVotes));
+    const pleasure = mostPleasure(userVotes);
 
-    res.send({ multi, average, borda });
+    res.send({ multi, average, borda, pleasure });
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -182,6 +183,28 @@ function bordaCountAggregation(preferences: RankedPreferences[]) {
   }
 
   return { result, normalizedResult };
+}
+
+function mostPleasure(preferences: Attributes[]) {
+  const result: Attributes = {
+    nature: 0,
+    architecture: 0,
+    hiking: 0,
+    wintersports: 0,
+    beach: 0,
+    culture: 0,
+    culinary: 0,
+    entertainment: 0,
+    shopping: 0,
+  };
+
+  preferences.forEach((preference) => {
+    for (const [key, value] of entries(preference)) {
+      result[key] = Math.max(result[key], value);
+    }
+  });
+
+  return result;
 }
 
 type Entry<T> = { [K in keyof T]: [K, T[K]] }[keyof T];
