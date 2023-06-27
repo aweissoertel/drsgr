@@ -28,8 +28,8 @@ const ResultInfo = ({ country, label, stay, userData }: ResultInfoProps) => {
       </p>
       <hr />
       <p style={{ fontSize: 'x-small' }}>
-        Scores of {country.region} based on your preferences: (The bar demonstrates the score of the given attribute for{' '}
-        {country.region} and the black line shows your preference - hover on the bars for more details)
+        Scores of {country.region} based on your preferences: (The bar demonstrates the score of the given attribute for {country.region}{' '}
+        and the black line shows your preference - hover on the bars for more details)
       </p>
       <DetailScores
         scores={Object.keys(country.qualifications)?.map((key) => ({

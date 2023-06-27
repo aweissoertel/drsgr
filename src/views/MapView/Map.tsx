@@ -89,17 +89,7 @@ const Map = ({ countries, setActiveResult }: MapProps) => {
   };
 
   const getColor = (d: number) => {
-    return d > 90
-      ? '#109146'
-      : d > 70
-      ? '#7CBA43'
-      : d > 60
-      ? '#FFCC06'
-      : d > 50
-      ? '#F58E1D'
-      : d >= 0
-      ? '#BF1E24'
-      : '#fff';
+    return d > 90 ? '#109146' : d > 70 ? '#7CBA43' : d > 60 ? '#FFCC06' : d > 50 ? '#F58E1D' : d >= 0 ? '#BF1E24' : '#fff';
   };
 
   return (

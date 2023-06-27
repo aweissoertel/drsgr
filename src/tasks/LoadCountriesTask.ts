@@ -60,29 +60,14 @@ class LoadCountriesTask {
         mapCountry.properties.name = scoreCountry.Region;
         // calculate the score for nature
         res.scores.attr.nature = this.calculateAttributeScore(res.qualifications.nature, userData.attributes.nature);
-        res.scores.attr.architecture = this.calculateAttributeScore(
-          res.qualifications.architecture,
-          userData.attributes.architecture,
-        );
+        res.scores.attr.architecture = this.calculateAttributeScore(res.qualifications.architecture, userData.attributes.architecture);
         res.scores.attr.hiking = this.calculateAttributeScore(res.qualifications.hiking, userData.attributes.hiking);
-        res.scores.attr.wintersports = this.calculateAttributeScore(
-          res.qualifications.wintersports,
-          userData.attributes.wintersports,
-        );
+        res.scores.attr.wintersports = this.calculateAttributeScore(res.qualifications.wintersports, userData.attributes.wintersports);
         res.scores.attr.beach = this.calculateAttributeScore(res.qualifications.beach, userData.attributes.beach);
         res.scores.attr.culture = this.calculateAttributeScore(res.qualifications.culture, userData.attributes.culture);
-        res.scores.attr.culinary = this.calculateAttributeScore(
-          res.qualifications.culinary,
-          userData.attributes.culinary,
-        );
-        res.scores.attr.entertainment = this.calculateAttributeScore(
-          res.qualifications.entertainment,
-          userData.attributes.entertainment,
-        );
-        res.scores.attr.shopping = this.calculateAttributeScore(
-          res.qualifications.shopping,
-          userData.attributes.shopping,
-        );
+        res.scores.attr.culinary = this.calculateAttributeScore(res.qualifications.culinary, userData.attributes.culinary);
+        res.scores.attr.entertainment = this.calculateAttributeScore(res.qualifications.entertainment, userData.attributes.entertainment);
+        res.scores.attr.shopping = this.calculateAttributeScore(res.qualifications.shopping, userData.attributes.shopping);
 
         const totalScore = isAffordable
           ? (res.scores.attr.nature +
@@ -103,9 +88,7 @@ class LoadCountriesTask {
         this.allResults.push(res);
       }
     });
-    this.mapCountries.sort(
-      (a, b) => (b.properties.result?.scores.totalScore || 0) - (a.properties.result?.scores.totalScore || 0),
-    );
+    this.mapCountries.sort((a, b) => (b.properties.result?.scores.totalScore || 0) - (a.properties.result?.scores.totalScore || 0));
     setCountries(this.mapCountries);
     this.allResults.sort((a, b) => b.scores.totalScore - a.scores.totalScore);
     this.allResults = this.allResults.filter((a) => a.scores.totalScore > 0);

@@ -7,11 +7,7 @@ export interface CreateUserVoteBody {
   preferences: Attributes;
 }
 
-export default async function createUserVote(
-  req: Request<any, CreateUserVoteBody>,
-  res: Response,
-  prisma: PrismaClient,
-) {
+export default async function createUserVote(req: Request<any, CreateUserVoteBody>, res: Response, prisma: PrismaClient) {
   try {
     const entity = await prisma.userVote.create({
       data: {
