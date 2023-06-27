@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import type { Request, Response } from 'express';
+import papa from 'papaparse';
+import request from 'request';
 
 import { entries, values } from './util/helpers';
 
@@ -26,7 +28,12 @@ interface RankDetails {
 }
 
 export default class Aggregator {
-  public countries = [];
+  private _ready = false;
+
+  /**
+   * Country information. **CAUTION**: Only filled when `ready` is true!
+   */
+  public countries: Region[] = [];
 
   /**
    * The prisma instance for db communication
@@ -35,12 +42,19 @@ export default class Aggregator {
 
   /**
    * Maximum value that can be set in voting of attributes.
-   * Needed for aggregation algorythms
+   * Needed for aggregation algorithms
    */
   private MAX_VOTE_VALUE = 100;
 
   constructor() {
-    // noop
+    this.initCountries();
+  }
+
+  /**
+   * Indicates whether setup initialization processing is complete
+   */
+  public get ready() {
+    return this._ready;
   }
 
   ////////////////////////////// ENDPOINTS //////////////////////////////
@@ -272,5 +286,84 @@ export default class Aggregator {
       entertainment: fill,
       shopping: fill,
     };
+  }
+
+  private async initCountries() {
+    const countryScoresUrl = 'https://raw.githubusercontent.com/assalism/travel-data/main/regionmodel.csv';
+
+    const processCountries = (data: any[]) => {
+      this.countries = data.flatMap((raw: any) =>
+        raw.u_name?.length > 0
+          ? {
+              name: raw.Region,
+              parentRegion: raw.ParentRegion,
+              u_name: raw.u_name,
+              costPerWeek: raw.costPerWeek,
+              attributes: this.getAttributesFromRawCountry(raw),
+            }
+          : [],
+      );
+      this._ready = true;
+    };
+
+    const stripBom = function (str: string) {
+      if (str.charCodeAt(0) === 0xfeff) {
+        return str.slice(1);
+      }
+      return str;
+    };
+
+    const stream = papa.parse(papa.NODE_STREAM_INPUT, { header: true });
+
+    const dataStream = request.get(countryScoresUrl);
+    dataStream.pipe(stream);
+
+    const data: RawCountry[] = [];
+    stream.on('data', (chunk) => {
+      const input = Object.fromEntries(Object.entries(chunk).map(([k, v]) => [stripBom(k), v]));
+      data.push(input as any);
+    });
+
+    stream.on('finish', () => {
+      processCountries(data);
+    });
+  }
+
+  private getAttributesFromRawCountry(raw: RawCountry): Attributes {
+    return {
+      nature: this.convertAttribute(raw.nature),
+      architecture: this.convertAttribute(raw.architecture),
+      hiking: this.convertAttribute(raw.hiking),
+      wintersports: this.convertAttribute(raw.wintersports),
+      beach: this.convertAttribute(raw.beach),
+      culture: this.convertAttribute(raw.culture),
+      culinary: this.convertAttribute(raw.culinary),
+      entertainment: this.convertAttribute(raw.entertainment),
+      shopping: this.convertAttribute(raw.shopping),
+    };
+  }
+
+  private convertAttribute(value: string) {
+    let numScore;
+    switch (value) {
+      case '--':
+        numScore = 0;
+        break;
+      case '-':
+        numScore = 25;
+        break;
+      case 'o':
+        numScore = 50;
+        break;
+      case '+':
+        numScore = 75;
+        break;
+      case '++':
+        numScore = 100;
+        break;
+      default:
+        numScore = 50;
+    }
+    return numScore;
   }
 }

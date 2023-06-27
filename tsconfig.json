@@ -18,5 +18,5 @@
     "outDir": "build",
     "baseUrl": "."
   },
-  "include": ["src", "server.ts"]
+  "include": ["server", "server.ts"]
 }
