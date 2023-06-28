@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, RankResult } from '@prisma/client';
 import type { Request, Response } from 'express';
 import fetch from 'node-fetch';
 import papa from 'papaparse';
@@ -97,6 +97,9 @@ export default class Aggregator {
         where: {
           sessionCode: params,
         },
+        include: {
+          aggregationResults: true,
+        },
       });
       res.send(entity);
     } catch (error) {
@@ -158,9 +161,52 @@ export default class Aggregator {
       const multi = this.multiplicativeAggregation(userVotes);
       const average = this.averageAggregation(userVotes).normalizedResult;
       const borda = this.bordaCountAggregation(this.rankPreferences(userVotes));
-      const pleasure = this.mostPleasure(userVotes);
+      const pleasure = this.mostPleasureAggregation(userVotes);
 
-      res.send({ multi, average, borda, pleasure });
+      const rankedCountriesMulti = this.getRankedCountriesFromPreferences(multi.normalizedResult).slice(0, 10);
+      const rankedCountriesAverage = this.getRankedCountriesFromPreferences(average).slice(0, 10);
+      const rankedCountriesBorda = this.getRankedCountriesFromPreferences(borda.normalizedResult).slice(0, 10);
+      const rankedCountriesPleasure = this.getRankedCountriesFromPreferences(pleasure).slice(0, 10);
+
+      const gr = await this.prisma.groupRecommendation.update({
+        where: {
+          id: params,
+        },
+        data: {
+          aggregationResults: {
+            create: [
+              {
+                method: 'multiplicative',
+                rankedCountries: rankedCountriesMulti,
+              },
+              {
+                method: 'average',
+                rankedCountries: rankedCountriesAverage,
+              },
+              {
+                method: 'bordaCount',
+                rankedCountries: rankedCountriesBorda,
+              },
+              {
+                method: 'mostPleasure',
+                rankedCountries: rankedCountriesPleasure,
+              },
+            ],
+          },
+        },
+      });
+
+      res.send({
+        rankedCountriesMulti,
+        multi,
+        rankedCountriesAverage,
+        average,
+        rankedCountriesBorda,
+        borda,
+        rankedCountriesPleasure,
+        pleasure,
+        gr,
+      });
     } catch (error) {
       console.log(error);
       res.sendStatus(500);
@@ -224,7 +270,7 @@ export default class Aggregator {
     return { result, normalizedResult };
   }
 
-  private mostPleasure(preferences: Attributes[]) {
+  private mostPleasureAggregation(preferences: Attributes[]) {
     const result = this.getNewEmptyAttributes();
 
     preferences.forEach((preference) => {
@@ -369,5 +415,28 @@ export default class Aggregator {
         numScore = 50;
     }
     return numScore;
+  }
+
+  private getRankedCountriesFromPreferences(pref: Attributes): RankResult[] {
+    const countries: RankResult[] = this.countries.map((country) => {
+      const attributeScore = this.getNewEmptyAttributes();
+      let totalScore = 0;
+      for (const [rKey, value] of entries(country.attributes)) {
+        const subScore = 100 - Math.abs(pref[rKey] - value);
+        attributeScore[rKey] = subScore;
+        totalScore += subScore;
+      }
+      return {
+        u_name: country.u_name,
+        // name: country.name, // for debug only
+        // countryAttributes: country.attributes, // for debug only
+        rank: 0,
+        totalScore: totalScore / 9,
+        attributeScore,
+      };
+    });
+    countries.sort((a, b) => b.totalScore - a.totalScore);
+    countries.forEach((country, idx) => (country.rank = idx + 1));
+    return countries;
   }
 }

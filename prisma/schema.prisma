@@ -20,7 +20,7 @@ model GroupRecommendation{
 
 model UserVote {
   id                String              @id @default(auto()) @map("_id") @db.ObjectId
-  name              String              @unique
+  name              String
   recommendation    GroupRecommendation @relation(fields: [recommendationId], references: [id])
   recommendationId  String              @db.ObjectId
   preferences       Attributes
@@ -43,18 +43,20 @@ model Country {
 }
 
 type RankResult {
-  u_name  String
-  rank    Int
+  u_name          String
+  rank            Int
+  totalScore      Float
+  attributeScore  Attributes
 }
 
 type Attributes {
-  nature        Int
-  architecture  Int
-  hiking        Int
-  wintersports  Int
-  beach         Int
-  culture       Int
-  culinary      Int
-  entertainment Int
-  shopping      Int
+  nature        Float
+  architecture  Float
+  hiking        Float
+  wintersports  Float
+  beach         Float
+  culture       Float
+  culinary      Float
+  entertainment Float
+  shopping      Float
 }
