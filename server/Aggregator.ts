@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import type { Request, Response } from 'express';
+import fetch from 'node-fetch';
 import papa from 'papaparse';
-import request from 'request';
 
 import { entries, values } from './util/helpers';
 
@@ -315,8 +315,12 @@ export default class Aggregator {
 
     const stream = papa.parse(papa.NODE_STREAM_INPUT, { header: true });
 
-    const dataStream = request.get(countryScoresUrl);
-    dataStream.pipe(stream);
+    const dataStream = await fetch(countryScoresUrl);
+    if (!dataStream.body) {
+      console.log('Error while fetching countryScores csv file: ', dataStream);
+      return;
+    }
+    dataStream.body.pipe(stream);
 
     const data: RawCountry[] = [];
     stream.on('data', (chunk) => {
