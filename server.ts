@@ -3,16 +3,14 @@ import express from 'express';
 import ViteExpress from 'vite-express';
 
 import Aggregator from './server/Aggregator';
-import hello from './server/hello';
 import createUserVote, { CreateUserVoteBody } from './server/userVotes/createUserVote';
 import deleteUserVote from './server/userVotes/deleteUserVote';
 
 const port = parseInt(process.env.PORT || '8080');
 const app = express();
 app.use(express.json());
-const aggregator = new Aggregator();
 
-app.get('/hello', (_, res) => hello(res));
+const aggregator = new Aggregator();
 
 ///// recommendations /////
 app.post('/recommendation', async (_, response) => aggregator.createRecommendation(response));

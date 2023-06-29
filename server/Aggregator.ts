@@ -1,9 +1,11 @@
-import { PrismaClient, RankResult } from '@prisma/client';
+import { GroupRecommendation, Prisma, PrismaClient, RankResult } from '@prisma/client';
 import type { Request, Response } from 'express';
 import fetch from 'node-fetch';
 import papa from 'papaparse';
 
 import { entries, values } from './util/helpers';
+
+const DEBUG_MODE = true;
 
 interface AggregationResult {
   result: Attributes;
@@ -68,7 +70,6 @@ export default class Aggregator {
     // string of length 6 with random uppercase letters and digits
     // duplicates after 70 million generations
     const sessionCode = Math.random().toString(36).slice(2, 8).toUpperCase();
-    // TODO: make sure this is really unique
 
     try {
       const entity = await this.prisma.groupRecommendation.create({
@@ -134,83 +135,112 @@ export default class Aggregator {
    * @param res Response object
    */
   public async endVoting(req: Request<{ id: string }>, res: Response) {
+    if (!this.ready) {
+      return;
+    }
     const params = req.query.id as string;
-    // TODO:
-    // - update gR with results
 
-    // check if not already closed?
     try {
-      const entity = await this.prisma.groupRecommendation.update({
+      const recommenation = await this.prisma.groupRecommendation.findUniqueOrThrow({
         where: {
           id: params,
         },
-        data: {
-          votingEnded: true,
-        },
-        include: {
-          userVotes: true,
-        },
       });
-
-      const userVotes: Attributes[] = entity.userVotes.map((userVote) => userVote.preferences);
-      if (userVotes.length === 0) {
-        res.status(500).send('No votes for this code');
+      if (recommenation.votingEnded && !DEBUG_MODE) {
+        res.status(405).send('Voting already closed!');
         return;
       }
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
 
-      const multi = this.multiplicativeAggregation(userVotes);
-      const average = this.averageAggregation(userVotes).normalizedResult;
-      const borda = this.bordaCountAggregation(this.rankPreferences(userVotes));
-      const pleasure = this.mostPleasureAggregation(userVotes);
+    type FullGR = Prisma.GroupRecommendationGetPayload<{ include: { userVotes: true } }>;
+    let entity: FullGR;
 
-      const rankedCountriesMulti = this.getRankedCountriesFromPreferences(multi.normalizedResult).slice(0, 10);
-      const rankedCountriesAverage = this.getRankedCountriesFromPreferences(average).slice(0, 10);
-      const rankedCountriesBorda = this.getRankedCountriesFromPreferences(borda.normalizedResult).slice(0, 10);
-      const rankedCountriesPleasure = this.getRankedCountriesFromPreferences(pleasure).slice(0, 10);
-
-      const gr = await this.prisma.groupRecommendation.update({
-        where: {
-          id: params,
-        },
-        data: {
-          aggregationResults: {
-            create: [
-              {
-                method: 'multiplicative',
-                rankedCountries: rankedCountriesMulti,
-              },
-              {
-                method: 'average',
-                rankedCountries: rankedCountriesAverage,
-              },
-              {
-                method: 'bordaCount',
-                rankedCountries: rankedCountriesBorda,
-              },
-              {
-                method: 'mostPleasure',
-                rankedCountries: rankedCountriesPleasure,
-              },
-            ],
-          },
-        },
-      });
-
-      res.send({
-        rankedCountriesMulti,
-        multi,
-        rankedCountriesAverage,
-        average,
-        rankedCountriesBorda,
-        borda,
-        rankedCountriesPleasure,
-        pleasure,
-        gr,
-      });
+    const updateQuery = {
+      where: {
+        id: params,
+      },
+      data: {
+        votingEnded: true,
+      },
+      include: {
+        userVotes: true,
+      },
+    };
+    try {
+      entity = await this.prisma.groupRecommendation.update(updateQuery);
     } catch (error) {
       console.log(error);
       res.sendStatus(500);
+      return;
     }
+
+    const userVotes: Attributes[] = entity.userVotes.map((userVote) => userVote.preferences);
+    if (userVotes.length === 0) {
+      res.status(500).send('No votes for this code');
+      return;
+    }
+
+    const multi = this.multiplicativeAggregation(userVotes);
+    const average = this.averageAggregation(userVotes).normalizedResult;
+    const borda = this.bordaCountAggregation(this.rankPreferences(userVotes));
+    const pleasure = this.mostPleasureAggregation(userVotes);
+
+    const rankedCountriesMulti = this.getRankedCountriesFromPreferences(multi.normalizedResult).slice(0, 10);
+    const rankedCountriesAverage = this.getRankedCountriesFromPreferences(average).slice(0, 10);
+    const rankedCountriesBorda = this.getRankedCountriesFromPreferences(borda.normalizedResult).slice(0, 10);
+    const rankedCountriesPleasure = this.getRankedCountriesFromPreferences(pleasure).slice(0, 10);
+
+    const insertQuery = {
+      where: {
+        id: params,
+      },
+      data: {
+        aggregationResults: {
+          create: [
+            {
+              method: 'multiplicative',
+              rankedCountries: rankedCountriesMulti,
+            },
+            {
+              method: 'average',
+              rankedCountries: rankedCountriesAverage,
+            },
+            {
+              method: 'bordaCount',
+              rankedCountries: rankedCountriesBorda,
+            },
+            {
+              method: 'mostPleasure',
+              rankedCountries: rankedCountriesPleasure,
+            },
+          ],
+        },
+      },
+    };
+
+    let gr: GroupRecommendation;
+    try {
+      gr = await this.prisma.groupRecommendation.update(insertQuery);
+    } catch (e) {
+      console.log(e);
+      res.status(500).send('DB failure on inserting aggregationResults');
+      return;
+    }
+
+    res.send({
+      rankedCountriesMulti,
+      multi,
+      rankedCountriesAverage,
+      average,
+      rankedCountriesBorda,
+      borda,
+      rankedCountriesPleasure,
+      pleasure,
+      gr,
+    });
   }
 
   ////////////////////////////// AGGREGATION LOGIC //////////////////////////////
