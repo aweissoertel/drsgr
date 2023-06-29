@@ -28,16 +28,9 @@ const App = () => {
     },
   });
 
-  const test = async () => {
-    const response = await fetch('/hello');
-    const data = await response.text();
-    console.log(data);
-  };
-
   const load = () => {
     const loadCountriesTask = new LoadCountriesTask();
     loadCountriesTask.load(setFileRetrieved);
-    test();
   };
 
   const calculateScores = () => {

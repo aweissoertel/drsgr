@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "main": "build/server.js",
+  "overrides": {
+    "semver": "^7.5.3"
+  },
   "dependencies": {
     "@prisma/client": "^4.16.1",
     "@vitejs/plugin-react": "^4.0.0",

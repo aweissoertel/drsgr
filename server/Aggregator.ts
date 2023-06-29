@@ -188,10 +188,15 @@ export default class Aggregator {
     const borda = this.bordaCountAggregation(this.rankPreferences(userVotes));
     const pleasure = this.mostPleasureAggregation(userVotes);
 
-    const rankedCountriesMulti = this.getRankedCountriesFromPreferences(multi.normalizedResult).slice(0, 10);
-    const rankedCountriesAverage = this.getRankedCountriesFromPreferences(average).slice(0, 10);
-    const rankedCountriesBorda = this.getRankedCountriesFromPreferences(borda.normalizedResult).slice(0, 10);
-    const rankedCountriesPleasure = this.getRankedCountriesFromPreferences(pleasure).slice(0, 10);
+    const rankedCountriesMultiExact = this.getRankedCountriesFromPreferencesExact(multi.normalizedResult).slice(0, 10);
+    const rankedCountriesAverageExact = this.getRankedCountriesFromPreferencesExact(average).slice(0, 10);
+    const rankedCountriesBordaExact = this.getRankedCountriesFromPreferencesExact(borda.normalizedResult).slice(0, 10);
+    const rankedCountriesPleasureExact = this.getRankedCountriesFromPreferencesExact(pleasure).slice(0, 10);
+
+    const rankedCountriesMultiMinimum = this.getRankedCountriesFromPreferencesMinimum(multi.normalizedResult).slice(0, 10);
+    const rankedCountriesAverageMinimum = this.getRankedCountriesFromPreferencesMinimum(average).slice(0, 10);
+    const rankedCountriesBordaMinimum = this.getRankedCountriesFromPreferencesMinimum(borda.normalizedResult).slice(0, 10);
+    const rankedCountriesPleasureMinimum = this.getRankedCountriesFromPreferencesMinimum(pleasure).slice(0, 10);
 
     const insertQuery = {
       where: {
@@ -202,28 +207,30 @@ export default class Aggregator {
           create: [
             {
               method: 'multiplicative',
-              rankedCountries: rankedCountriesMulti,
+              rankedCountries: rankedCountriesMultiExact,
             },
             {
               method: 'average',
-              rankedCountries: rankedCountriesAverage,
+              rankedCountries: rankedCountriesAverageExact,
             },
             {
               method: 'bordaCount',
-              rankedCountries: rankedCountriesBorda,
+              rankedCountries: rankedCountriesBordaExact,
             },
             {
               method: 'mostPleasure',
-              rankedCountries: rankedCountriesPleasure,
+              rankedCountries: rankedCountriesPleasureExact,
             },
           ],
         },
       },
     };
 
-    let gr: GroupRecommendation;
+    let gr: GroupRecommendation | undefined;
     try {
-      gr = await this.prisma.groupRecommendation.update(insertQuery);
+      if (!DEBUG_MODE) {
+        gr = await this.prisma.groupRecommendation.update(insertQuery);
+      }
     } catch (e) {
       console.log(e);
       res.status(500).send('DB failure on inserting aggregationResults');
@@ -231,13 +238,17 @@ export default class Aggregator {
     }
 
     res.send({
-      rankedCountriesMulti,
+      rankedCountriesMultiExact,
+      rankedCountriesMultiMinimum,
       multi,
-      rankedCountriesAverage,
+      rankedCountriesAverageExact,
+      rankedCountriesAverageMinimum,
       average,
-      rankedCountriesBorda,
+      rankedCountriesBordaExact,
+      rankedCountriesBordaMinimum,
       borda,
-      rankedCountriesPleasure,
+      rankedCountriesPleasureExact,
+      rankedCountriesPleasureMinimum,
       pleasure,
       gr,
     });
@@ -447,26 +458,50 @@ export default class Aggregator {
     return numScore;
   }
 
-  private getRankedCountriesFromPreferences(pref: Attributes): RankResult[] {
+  private getRankedCountries(pref: Attributes, scoreFunction: (should: number, is: number) => number): RankResult[] {
     const countries: RankResult[] = this.countries.map((country) => {
       const attributeScore = this.getNewEmptyAttributes();
       let totalScore = 0;
       for (const [rKey, value] of entries(country.attributes)) {
-        const subScore = 100 - Math.abs(pref[rKey] - value);
+        // const subScore = 100 - Math.abs(pref[rKey] - value);
+        const subScore = scoreFunction(pref[rKey], value);
         attributeScore[rKey] = subScore;
         totalScore += subScore;
       }
-      return {
+      const result = {
         u_name: country.u_name,
-        // name: country.name, // for debug only
-        // countryAttributes: country.attributes, // for debug only
         rank: 0,
         totalScore: totalScore / 9,
         attributeScore,
+      };
+      const debug = DEBUG_MODE
+        ? {
+            name: country.name, // for debug only
+            countryAttributes: country.attributes, // for debug only
+          }
+        : undefined;
+      return {
+        ...result,
+        ...debug,
       };
     });
     countries.sort((a, b) => b.totalScore - a.totalScore);
     countries.forEach((country, idx) => (country.rank = idx + 1));
     return countries;
+  }
+
+  private getRankedCountriesFromPreferencesExact(pref: Attributes): RankResult[] {
+    const scoreFunction = (should: number, is: number) => {
+      return 100 - Math.abs(should - is);
+    };
+    return this.getRankedCountries(pref, scoreFunction);
+  }
+
+  private getRankedCountriesFromPreferencesMinimum(pref: Attributes): RankResult[] {
+    const scoreFunction = (should: number, is: number) => {
+      const diff = is - should;
+      return diff > 0 ? Math.min(25, diff) : diff * 10;
+    };
+    return this.getRankedCountries(pref, scoreFunction);
   }
 }
