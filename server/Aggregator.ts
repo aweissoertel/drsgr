@@ -220,6 +220,9 @@ export default class Aggregator {
     const recommendationsPerUserVote = userVotes.map((vote) => this.getRankedCountriesFromPreferencesExact(vote));
 
     const multiAR = this.multiplicativeAggregationAR(recommendationsPerUserVote).slice(0, 10);
+    const averageAR = this.averageAggregationAR(recommendationsPerUserVote).slice(0, 10);
+    const bordaAR = this.bordaCountAggregationAR(recommendationsPerUserVote).slice(0, 10);
+    const pleasureAR = this.mostPleasureAggregationAR(recommendationsPerUserVote).slice(0, 10);
 
     res.send({
       rankedCountriesMultiExact,
@@ -235,8 +238,10 @@ export default class Aggregator {
       rankedCountriesPleasureMinimum,
       pleasure,
       gr,
-      recommendationsPerUserVote,
       multiAR,
+      averageAR,
+      bordaAR,
+      pleasureAR,
     });
   }
 
@@ -312,14 +317,69 @@ export default class Aggregator {
   ////////////////////////////// AGGREGATION LOGIC - AGGREGATING RECOMMENDATIONS //////////////////////////////
 
   private multiplicativeAggregationAR(recommendations: RankResult[][]): RankResult[] {
-    const result = recommendations.reduce((accumulator, current) =>
-      accumulator.map((country) => {
-        const score = country.rankReverse * current.find((element) => element.u_name === country.u_name)!.rankReverse;
-        return {
-          ...country,
-          totalScore: score,
-        };
-      }),
+    const start: RankResult[] = this.countries.map((country) => ({ ...country, totalScore: 1, rank: 0, rankReverse: 0 }));
+    const result = recommendations.reduce(
+      (accumulator, current) =>
+        accumulator.map((country) => {
+          const score = country.totalScore * current.find((element) => element.u_name === country.u_name)!.rankReverse;
+          return {
+            ...country,
+            totalScore: score,
+          };
+        }),
+      start,
+    );
+    this.sortAndUpdateRanks(result);
+    return result;
+  }
+
+  private averageAggregationAR(recommendations: RankResult[][]): RankResult[] {
+    const start: RankResult[] = this.countries.map((country) => ({ ...country, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const result = recommendations.reduce(
+      (accumulator, current) =>
+        accumulator.map((country) => {
+          const score = country.totalScore + current.find((element) => element.u_name === country.u_name)!.rankReverse;
+          return {
+            ...country,
+            totalScore: score,
+          };
+        }),
+      start,
+    );
+    result.forEach((res) => (res.totalScore /= recommendations.length));
+    this.sortAndUpdateRanks(result);
+    return result;
+  }
+
+  private bordaCountAggregationAR(recommendations: RankResult[][]): RankResult[] {
+    const start: RankResult[] = this.countries.map((country) => ({ ...country, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const result = recommendations.reduce(
+      (accumulator, current) =>
+        accumulator.map((country) => {
+          const score = country.totalScore + current.find((element) => element.u_name === country.u_name)!.rankReverse - 1;
+          return {
+            ...country,
+            totalScore: score,
+          };
+        }),
+      start,
+    );
+    this.sortAndUpdateRanks(result);
+    return result;
+  }
+
+  private mostPleasureAggregationAR(recommendations: RankResult[][]): RankResult[] {
+    const start: RankResult[] = this.countries.map((country) => ({ ...country, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const result = recommendations.reduce(
+      (accumulator, current) =>
+        accumulator.map((country) => {
+          const score = Math.max(country.totalScore, current.find((element) => element.u_name === country.u_name)!.rankReverse);
+          return {
+            ...country,
+            totalScore: score,
+          };
+        }),
+      start,
     );
     this.sortAndUpdateRanks(result);
     return result;

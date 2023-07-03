@@ -47,7 +47,6 @@ type RankResult {
   rank            Int
   rankReverse     Int
   totalScore      Float
-  attributeScore  Attributes
 }
 
 type Attributes {

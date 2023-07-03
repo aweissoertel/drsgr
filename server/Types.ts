@@ -78,5 +78,5 @@ interface RankResult {
   rank: number;
   rankReverse: number;
   totalScore: number;
-  attributeScore: Attributes;
+  // attributeScore: Attributes;
 }
