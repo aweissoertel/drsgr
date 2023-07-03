@@ -9,6 +9,11 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "🤖"
+    ignore:
+      - dependency-name: "node-fetch"
+        versions: ["^3.0.0"]
     groups:
       auto-dependencies:
         patterns:
