@@ -7,28 +7,6 @@ import { entries, values } from './util/helpers';
 
 const DEBUG_MODE = true;
 
-interface AggregationResult {
-  result: Attributes;
-  normalizedResult: Attributes;
-}
-
-interface RankedPreferences {
-  nature: RankDetails;
-  architecture: RankDetails;
-  hiking: RankDetails;
-  wintersports: RankDetails;
-  beach: RankDetails;
-  culture: RankDetails;
-  culinary: RankDetails;
-  entertainment: RankDetails;
-  shopping: RankDetails;
-}
-
-interface RankDetails {
-  preference: number;
-  rating: number;
-}
-
 export default class Aggregator {
   private _ready = false;
 
