@@ -45,6 +45,7 @@ model Country {
 type RankResult {
   u_name          String
   rank            Int
+  rankReverse     Int
   totalScore      Float
   attributeScore  Attributes
 }

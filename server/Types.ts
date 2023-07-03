@@ -72,3 +72,11 @@ interface RankDetails {
   preference: number;
   rating: number;
 }
+
+interface RankResult {
+  u_name: string;
+  rank: number;
+  rankReverse: number;
+  totalScore: number;
+  attributeScore: Attributes;
+}

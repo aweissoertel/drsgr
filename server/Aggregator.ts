@@ -1,4 +1,4 @@
-import { GroupRecommendation, Prisma, PrismaClient, RankResult } from '@prisma/client';
+import { GroupRecommendation, Prisma, PrismaClient } from '@prisma/client';
 import type { Request, Response } from 'express';
 import fetch from 'node-fetch';
 import papa from 'papaparse';
@@ -161,10 +161,11 @@ export default class Aggregator {
       return;
     }
 
-    const multi = this.multiplicativeAggregation(userVotes);
-    const average = this.averageAggregation(userVotes).normalizedResult;
-    const borda = this.bordaCountAggregation(this.rankPreferences(userVotes));
-    const pleasure = this.mostPleasureAggregation(userVotes);
+    //////////////////////////// AGGREGATING PREFERENCES ////////////////////////////
+    const multi = this.multiplicativeAggregationAP(userVotes);
+    const average = this.averageAggregationAP(userVotes).normalizedResult;
+    const borda = this.bordaCountAggregationAP(this.rankPreferences(userVotes));
+    const pleasure = this.mostPleasureAggregationAP(userVotes);
 
     const rankedCountriesMultiExact = this.getRankedCountriesFromPreferencesExact(multi.normalizedResult).slice(0, 10);
     const rankedCountriesAverageExact = this.getRankedCountriesFromPreferencesExact(average).slice(0, 10);
@@ -215,6 +216,11 @@ export default class Aggregator {
       return;
     }
 
+    //////////////////////////// AGGREGATING RECOMMENDATIONS ////////////////////////////
+    const recommendationsPerUserVote = userVotes.map((vote) => this.getRankedCountriesFromPreferencesExact(vote));
+
+    const multiAR = this.multiplicativeAggregationAR(recommendationsPerUserVote).slice(0, 10);
+
     res.send({
       rankedCountriesMultiExact,
       rankedCountriesMultiMinimum,
@@ -229,12 +235,14 @@ export default class Aggregator {
       rankedCountriesPleasureMinimum,
       pleasure,
       gr,
+      recommendationsPerUserVote,
+      multiAR,
     });
   }
 
-  ////////////////////////////// AGGREGATION LOGIC //////////////////////////////
+  ////////////////////////////// AGGREGATION LOGIC - AGGREGATING PREFERENCES //////////////////////////////
 
-  private multiplicativeAggregation(preferences: Attributes[]): AggregationResult {
+  private multiplicativeAggregationAP(preferences: Attributes[]): AggregationResult {
     const normalizeFactor = this.MAX_VOTE_VALUE ** (preferences.length - 1);
     const result = this.getNewEmptyAttributes(1);
     const normalizedResult = { ...result };
@@ -253,7 +261,7 @@ export default class Aggregator {
     return { result, normalizedResult };
   }
 
-  private averageAggregation(preferences: Attributes[]): AggregationResult {
+  private averageAggregationAP(preferences: Attributes[]): AggregationResult {
     const normalizeFactor = preferences.length;
     const result = this.getNewEmptyAttributes();
     const normalizedResult = { ...result };
@@ -270,7 +278,7 @@ export default class Aggregator {
     return { result, normalizedResult };
   }
 
-  private bordaCountAggregation(preferences: RankedPreferences[]) {
+  private bordaCountAggregationAP(preferences: RankedPreferences[]) {
     // 4 because that is the highest rank a preference can obtain with 5 distinct vote options
     const normalizeFactor = preferences.length * 4;
     const result = this.getNewEmptyAttributes();
@@ -289,7 +297,7 @@ export default class Aggregator {
     return { result, normalizedResult };
   }
 
-  private mostPleasureAggregation(preferences: Attributes[]) {
+  private mostPleasureAggregationAP(preferences: Attributes[]) {
     const result = this.getNewEmptyAttributes();
 
     preferences.forEach((preference) => {
@@ -298,6 +306,22 @@ export default class Aggregator {
       }
     });
 
+    return result;
+  }
+
+  ////////////////////////////// AGGREGATION LOGIC - AGGREGATING RECOMMENDATIONS //////////////////////////////
+
+  private multiplicativeAggregationAR(recommendations: RankResult[][]): RankResult[] {
+    const result = recommendations.reduce((accumulator, current) =>
+      accumulator.map((country) => {
+        const score = country.rankReverse * current.find((element) => element.u_name === country.u_name)!.rankReverse;
+        return {
+          ...country,
+          totalScore: score,
+        };
+      }),
+    );
+    this.sortAndUpdateRanks(result);
     return result;
   }
 
@@ -441,7 +465,6 @@ export default class Aggregator {
       const attributeScore = this.getNewEmptyAttributes();
       let totalScore = 0;
       for (const [rKey, value] of entries(country.attributes)) {
-        // const subScore = 100 - Math.abs(pref[rKey] - value);
         const subScore = scoreFunction(pref[rKey], value);
         attributeScore[rKey] = subScore;
         totalScore += subScore;
@@ -449,6 +472,7 @@ export default class Aggregator {
       const result = {
         u_name: country.u_name,
         rank: 0,
+        rankReverse: 0,
         totalScore: totalScore / 9,
         attributeScore,
       };
@@ -463,8 +487,7 @@ export default class Aggregator {
         ...debug,
       };
     });
-    countries.sort((a, b) => b.totalScore - a.totalScore);
-    countries.forEach((country, idx) => (country.rank = idx + 1));
+    this.sortAndUpdateRanks(countries);
     return countries;
   }
 
@@ -481,5 +504,13 @@ export default class Aggregator {
       return diff > 0 ? Math.min(25, diff) : diff * 10;
     };
     return this.getRankedCountries(pref, scoreFunction);
+  }
+
+  private sortAndUpdateRanks(list: RankResult[]) {
+    list.sort((a, b) => b.totalScore - a.totalScore);
+    list.forEach((country, idx) => {
+      country.rank = idx + 1;
+      country.rankReverse = list.length - idx;
+    });
   }
 }
