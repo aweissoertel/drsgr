@@ -223,6 +223,7 @@ export default class Aggregator {
     const averageAR = this.averageAggregationAR(recommendationsPerUserVote).slice(0, 10);
     const bordaAR = this.bordaCountAggregationAR(recommendationsPerUserVote).slice(0, 10);
     const pleasureAR = this.mostPleasureAggregationAR(recommendationsPerUserVote).slice(0, 10);
+    const withoutMiseryAR = this.averageWithoutMiseryAggregationAR(recommendationsPerUserVote).slice(0, 10);
 
     res.send({
       rankedCountriesMultiExact,
@@ -238,10 +239,12 @@ export default class Aggregator {
       rankedCountriesPleasureMinimum,
       pleasure,
       gr,
+      recommendationsPerUserVote,
       multiAR,
       averageAR,
       bordaAR,
       pleasureAR,
+      withoutMiseryAR,
     });
   }
 
@@ -383,6 +386,38 @@ export default class Aggregator {
     );
     this.sortAndUpdateRanks(result);
     return result;
+  }
+
+  private averageWithoutMiseryAggregationAR(recommendations: RankResult[][]): RankResult[] {
+    /**
+     * This value determines what is considered "misery". `0.4` means the lower 40% of a ranked list are considered misery
+     * and are therefore excluded from recommendations
+     */
+    const miseryPercentage = 0.4;
+
+    const start: RankResult[] = this.countries.map((country) => ({ ...country, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const threshold = Math.floor((1 - miseryPercentage) * this.countries.length);
+    const result = recommendations.reduce(
+      (accumulator, current) =>
+        current.map((country, idx) => {
+          if (idx > threshold || country.totalScore === -1) {
+            return {
+              ...country,
+              totalScore: -1,
+            };
+          }
+          const score = country.rankReverse + accumulator.find((element) => element.u_name === country.u_name)!.totalScore;
+          return {
+            ...country,
+            totalScore: score,
+          };
+        }),
+      start,
+    );
+    const filtered = result.filter((item) => item.totalScore > 0);
+    filtered.forEach((res) => (res.totalScore /= recommendations.length));
+    this.sortAndUpdateRanks(filtered);
+    return filtered;
   }
 
   ////////////////////////////// HELPERS //////////////////////////////
