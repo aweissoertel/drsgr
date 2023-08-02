@@ -80,3 +80,9 @@ interface RankResult {
   totalScore: number;
   // attributeScore: Attributes;
 }
+
+interface GetReqI {
+  code: string;
+  full: string;
+  id: string;
+}

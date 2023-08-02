@@ -82,3 +82,28 @@ interface Score {
   name: string;
   value: number;
 }
+
+interface GroupRecommendation {
+  id: string;
+  sessionCode: string;
+  userVotes?: UserVote[];
+  votingEnded: boolean;
+  aggregationResults?: AggregationResult[];
+}
+
+interface UserVote {
+  id: string;
+  name: string;
+  preferences: Attributes;
+}
+
+interface AggregationResult {
+  id: string;
+  method: string;
+  rankedCountries: {
+    u_name: string;
+    rank: number;
+    rankReverse: number;
+    totalScore: number;
+  }[];
+}

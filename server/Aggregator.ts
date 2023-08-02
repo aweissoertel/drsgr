@@ -64,20 +64,27 @@ export default class Aggregator {
   }
 
   /**
-   * Handles get request for a recommendation. Tries to find a recommendation by **code**, *not* id.
-   * Responds whole recommendation if found, 500 if not
-   * @param req Request with recommenation `code` as query parameter
+   * Handles get request for a recommendation. Tries to find a recommendation by `code` *or* `id`.
+   * Responds recommendation if found, 500 if not
+   * @param req Request with recommenation (`code` **and** `full = 1`) *or* (`id` **and** `full = 0`)  as query parameter
    * @param res Response object
    */
-  public async getRecommendation(req: Request<{ code: string }>, res: Response) {
-    const params = req.query.code as string;
+  public async getRecommendation(req: Request<GetReqI>, res: Response) {
+    const { code, id, full } = req.query as any;
+    if ((!code && full === '0') || (!id && full === '1')) {
+      res.sendStatus(400);
+      return;
+    }
+
     try {
       const entity = await this.prisma.groupRecommendation.findFirstOrThrow({
         where: {
-          sessionCode: params,
+          sessionCode: full === '0' ? code : undefined,
+          id: full === '1' ? id : undefined,
         },
         include: {
-          aggregationResults: true,
+          aggregationResults: full === '1',
+          userVotes: full === '1',
         },
       });
       res.send(entity);
@@ -94,6 +101,10 @@ export default class Aggregator {
    */
   public async deleteRecommendation(req: Request<{ id: string }>, res: Response) {
     const params = req.query.id as string;
+    if (!params) {
+      res.sendStatus(400);
+      return;
+    }
     try {
       await this.prisma.groupRecommendation.delete({
         where: {
@@ -117,6 +128,10 @@ export default class Aggregator {
       return;
     }
     const params = req.query.id as string;
+    if (!params) {
+      res.sendStatus(400);
+      return;
+    }
 
     try {
       const recommenation = await this.prisma.groupRecommendation.findUniqueOrThrow({

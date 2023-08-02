@@ -8,10 +8,17 @@ export interface CreateUserVoteBody {
 }
 
 export default async function createUserVote(req: Request<any, CreateUserVoteBody>, res: Response, prisma: PrismaClient) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { parentId, id, ...rest } = req.body;
   try {
     const entity = await prisma.userVote.create({
       data: {
-        ...req.body,
+        ...rest,
+        recommendation: {
+          connect: {
+            id: parentId,
+          },
+        },
       },
     });
     res.send(entity);
