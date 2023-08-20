@@ -24,12 +24,16 @@ const SessionPage = () => {
     }
   };
 
+  const update = () => {
+    fetchRecommendation(id!).then((res) => setData(res));
+  };
+
   React.useEffect(() => {
     if (!id) {
       console.error('In SessionPage but no id?!', params);
       setLocation('/error');
     } else {
-      fetchRecommendation(id).then((res) => setData(res));
+      update();
     }
   }, []);
 
@@ -38,7 +42,7 @@ const SessionPage = () => {
   ) : data.votingEnded ? (
     <div> This is the Resultsview</div>
   ) : (
-    <Votingview item={data} />
+    <Votingview item={data} update={update} />
   );
 };
 export default SessionPage;

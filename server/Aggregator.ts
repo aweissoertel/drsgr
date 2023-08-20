@@ -2,6 +2,7 @@ import { GroupRecommendation, Prisma, PrismaClient } from '@prisma/client';
 import type { Request, Response } from 'express';
 import fetch from 'node-fetch';
 import papa from 'papaparse';
+import QRCode from 'qrcode';
 
 import { entries, values } from './util/helpers';
 
@@ -54,9 +55,19 @@ export default class Aggregator {
         data: {
           sessionCode,
           votingEnded: false,
+          qrcode: '',
         },
       });
-      res.send(entity);
+      const qrcode = await QRCode.toDataURL(`https://group-travel.fly.dev/session/${entity.id}`);
+      const fullEntity = await this.prisma.groupRecommendation.update({
+        where: {
+          id: entity.id,
+        },
+        data: {
+          qrcode,
+        },
+      });
+      res.send(fullEntity);
     } catch (error) {
       console.log(error);
       res.sendStatus(500);

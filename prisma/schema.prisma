@@ -16,6 +16,7 @@ model GroupRecommendation{
   userVotes           UserVote[]
   votingEnded         Boolean
   aggregationResults  AggregationResult[]
+  qrcode              String
 }
 
 model UserVote {

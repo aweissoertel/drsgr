@@ -3,16 +3,40 @@ import * as React from 'react';
 import { Alert, Button, FloatingLabel, Form, Modal, Stack } from 'react-bootstrap';
 
 import VotingContainer from '../components/VotingContainer';
+import { useLocation } from 'wouter';
 
-const Votingview = ({ item }: { item: GroupRecommendation }) => {
+interface VotingViewProps {
+  item: GroupRecommendation;
+  update: () => void;
+}
+
+const Votingview = ({ item, update }: VotingViewProps) => {
+  const [, setLocation] = useLocation();
   const [modalDelete, setModalDelete] = React.useState<UserVote | undefined>(undefined);
   const [modalEdit, setModalEdit] = React.useState<UserVote | undefined>(undefined);
   const [showEditModal, setShowEditModal] = React.useState(false);
 
+  const endVoting = async () => {
+    const response = await fetch(`/recommendation?id=${item.id}&full=0`, { method: 'PUT' });
+    if (!response.ok) {
+      console.log(response);
+      setLocation('/error');
+    }
+    update();
+  };
+
   return (
     <div>
-      <h1>Group Recommendation #{item.sessionCode}</h1>
-      <p>Here you can see Votes from others, vote yourself or end the voting phase when you are ready</p>
+      <Stack direction='horizontal' gap={4}>
+        <div>
+          <h1>Group Recommendation #{item.sessionCode}</h1>
+          <p>Here you can see votes from others, vote yourself or end the voting phase when you are ready</p>
+        </div>
+        <div className='ms-auto d-flex flex-column align-items-center'>
+          <img src={item.qrcode} alt='alt' />
+          <h5 className='mt-2'>Share with your friends!</h5>
+        </div>
+      </Stack>
       <hr className='mt-5' />
       <Stack gap={1} className='mt-5'>
         {item.userVotes?.map((vote) => (
@@ -37,6 +61,9 @@ const Votingview = ({ item }: { item: GroupRecommendation }) => {
         <Button size='lg' variant='success' onClick={() => setShowEditModal(true)}>
           + Create new vote
         </Button>
+        <Button size='lg' variant='warning' onClick={() => endVoting()}>
+          End voting phase & see results
+        </Button>
       </Stack>
       <CreateEditModal
         parentId={item.id}
@@ -46,6 +73,7 @@ const Votingview = ({ item }: { item: GroupRecommendation }) => {
           setModalEdit(undefined);
           setShowEditModal(false);
         }}
+        update={update}
       />
       <DeleteConfirmationModal
         item={modalDelete}
@@ -53,6 +81,7 @@ const Votingview = ({ item }: { item: GroupRecommendation }) => {
         onHide={() => {
           setModalDelete(undefined);
         }}
+        update={update}
       />
     </div>
   );
@@ -63,13 +92,14 @@ interface DeleteConfirmationModalProps {
   item?: UserVote;
   show: boolean;
   onHide: () => void;
+  update: () => void;
 }
 
-const DeleteConfirmationModal = ({ item, onHide, ...rest }: DeleteConfirmationModalProps) => {
+const DeleteConfirmationModal = ({ item, onHide, update, ...rest }: DeleteConfirmationModalProps) => {
   const handleDelete = () => {
     fetch(`/userVote?id=${item!.id}`, { method: 'DELETE' }).then(() => {
-      onHide;
-      location.reload();
+      onHide();
+      update();
     });
   };
 
@@ -118,9 +148,10 @@ interface CreateEditModalProps {
   parentId: string;
   show: boolean;
   onHide: () => void;
+  update: () => void;
 }
 
-const CreateEditModal = ({ item, parentId, onHide, ...rest }: CreateEditModalProps) => {
+const CreateEditModal = ({ item, parentId, onHide, update, ...rest }: CreateEditModalProps) => {
   const empty = { ...emptyVote, parentId };
   const [value, setValue] = React.useState<UserVote>(item ?? empty);
   const [lock, setLock] = React.useState(false);
@@ -139,7 +170,7 @@ const CreateEditModal = ({ item, parentId, onHide, ...rest }: CreateEditModalPro
         headers: { 'Content-Type': 'application/json' },
       }).then(() => {
         onHide();
-        location.reload();
+        update();
       });
     } else {
       fetch('/userVote', {
@@ -148,7 +179,7 @@ const CreateEditModal = ({ item, parentId, onHide, ...rest }: CreateEditModalPro
         headers: { 'Content-Type': 'application/json' },
       }).then(() => {
         onHide();
-        location.reload();
+        update();
       });
     }
   };

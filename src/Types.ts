@@ -89,6 +89,7 @@ interface GroupRecommendation {
   userVotes?: UserVote[];
   votingEnded: boolean;
   aggregationResults?: AggregationResult[];
+  qrcode: string;
 }
 
 interface UserVote {

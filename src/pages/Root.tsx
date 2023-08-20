@@ -6,17 +6,29 @@ import { Link, useLocation } from 'wouter';
 const Root = () => {
   const [input, setInput] = React.useState('');
   const [showError, setShowError] = React.useState(false);
+  const [createLoading, setCreateLoading] = React.useState(false);
   const [, setLocation] = useLocation();
 
   const handleGetButton = async () => {
     const response = await fetch(`/recommendation?code=${input}&full=0`, { method: 'GET' });
     if (response.ok) {
       const data = await response.json();
-      console.log(data);
       setLocation(`/session/${data.id}`);
     } else {
       console.log('id not found:', input);
       setShowError(true);
+    }
+  };
+
+  const handleCreate = async () => {
+    setCreateLoading(true);
+    const response = await fetch('/recommendation', { method: 'POST' });
+    if (response.ok) {
+      const data = await response.json();
+      setLocation(`/session/${data.id}`);
+    } else {
+      console.log('error on creation of recommendation', input);
+      setLocation('error');
     }
   };
 
@@ -25,7 +37,9 @@ const Root = () => {
       <h1 style={{ flex: '0 1 auto' }}>Welcome to the Destination Group Recommender System!</h1>
       <div style={{ flex: '1 1 auto', display: 'grid', justifyContent: 'center' }}>
         <Stack gap={2} className='mx-auto my-auto'>
-          <Button variant='success'>Create a new session</Button>
+          <Button disabled={createLoading} variant='success' onClick={() => handleCreate()}>
+            {createLoading ? 'Loading...' : 'Create a new session'}
+          </Button>
           <h4>or</h4>
           <Stack direction='horizontal' gap={3}>
             <Form.Control
