@@ -1,40 +1,39 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import Accordion from 'react-bootstrap/Accordion';
 
-import ResultInfo from './components/ResultInfo';
+import ResultInfo from './ResultInfo';
 
 interface ResultsProps {
-  results: CompleteResult[];
+  results: FullCountry[];
   stay: number;
-  activeResult: number;
-  userData: UserPreferences;
+  // activeResult: number;
 }
 
-export const Results = ({ results, stay, activeResult, userData }: ResultsProps) => {
+export const Results = ({ results, stay }: ResultsProps) => {
   const [activeIndex, setActiveIndex] = useState(-1);
   const accordElem = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (results.length > 0) {
-      if (activeResult === activeIndex) {
-        setActiveIndex(-1);
-      } else {
-        setActiveIndex(activeResult);
-        accordElem.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'end',
-          inline: 'start',
-        });
-      }
-    }
-  }, [activeResult]);
+  // useEffect(() => {
+  //   if (results.length > 0) {
+  //     if (activeResult === activeIndex) {
+  //       setActiveIndex(-1);
+  //     } else {
+  //       setActiveIndex(activeResult);
+  //       accordElem.current?.scrollIntoView({
+  //         behavior: 'smooth',
+  //         block: 'end',
+  //         inline: 'start',
+  //       });
+  //     }
+  //   }
+  // }, [activeResult]);
   return (
-    <div style={{ padding: '10px 0', height: '100%', overflow: 'hidden' }}>
-      <p style={{ textAlign: 'left' }}>Best destinations for you:</p>
+    <div style={{ padding: '10px 0' }}>
+      <h4 style={{ textAlign: 'left' }}>Best destinations for you:</h4>
       {results.length > 0 ? (
-        <div style={{ overflow: 'auto', height: '90%' }} ref={accordElem}>
+        <div style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }} ref={accordElem}>
           <Accordion activeKey={activeIndex.toString()}>
-            {results?.map((item, index) => (
+            {results.slice(0, 10).map((item, index) => (
               <Accordion.Item eventKey={index.toString()} key={index}>
                 <Accordion.Header
                   onClick={() => {
@@ -50,10 +49,10 @@ export const Results = ({ results, stay, activeResult, userData }: ResultsProps)
                     }
                   }}
                 >
-                  {index + 1}. {item.region}
+                  {index + 1}. {item.name}
                 </Accordion.Header>
                 <Accordion.Body>
-                  <ResultInfo country={item} label={index + 1} stay={stay} userData={userData} />
+                  <ResultInfo country={item} stay={stay} />
                 </Accordion.Body>
               </Accordion.Item>
             ))}

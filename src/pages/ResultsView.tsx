@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import Map from '../components/Map';
-// import { Results } from '../views/ResultsView/Results';
+import { Results } from '../components/Results';
 import { features } from '../data/regions.json';
 
 interface ResultsViewProps {
@@ -33,15 +33,17 @@ const ResultsView = ({ item }: ResultsViewProps) => {
   React.useEffect(() => {
     if (!regions) return;
     setResultCountries(
-      features.map((feature) => {
-        const result = currentAResult!.find((res) => res.u_name === feature.properties.u_name);
-        const region = regions.find((region) => region.u_name === feature.properties.u_name);
-        return {
-          ...feature,
-          ...region!,
-          rankResult: result!,
-        };
-      }),
+      features
+        .map((feature) => {
+          const result = currentAResult!.find((res) => res.u_name === feature.properties.u_name);
+          const region = regions.find((region) => region.u_name === feature.properties.u_name);
+          return {
+            ...feature,
+            ...region!,
+            rankResult: result!,
+          };
+        })
+        .sort((a, b) => a.rankResult.rank - b.rankResult.rank),
     );
   }, [currentAResult, regions]);
 
@@ -50,13 +52,13 @@ const ResultsView = ({ item }: ResultsViewProps) => {
   }
 
   return (
-    <Container style={{ height: '100%' }}>
-      <Row style={{ height: '100%' }}>
-        <Col>Votes? Method switch?</Col>
-        <Col xs={6}>{resultCountries && <Map countries={resultCountries} />}</Col>
-        <Col>{/* <Results results={results} stay={userData.stay} activeResult={activeCountry} userData={userData} /> */}</Col>
-      </Row>
-    </Container>
+    <Row style={{ height: '100%' }}>
+      <Col>Votes? Method switch?</Col>
+      <Col xs={6}>{resultCountries && <Map countries={resultCountries} />}</Col>
+      <Col>
+        <Results results={resultCountries} stay={4} />
+      </Col>
+    </Row>
   );
 };
 export default ResultsView;

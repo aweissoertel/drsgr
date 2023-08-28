@@ -12,10 +12,10 @@ export const CountryPopup = ({ country }: CountryPopupProps) => {
   if (!country) return null;
   return (
     <div style={{ color: 'white' }}>
-      <h6>{country.name /* why is this zero?! */}</h6>
+      <h6>{country.name}</h6>
       <Row style={{ alignItems: 'flex-end' }}>
-        <Col>{country.name}</Col>
-        <Col style={{ textAlign: 'end' }}>Score: {country.rankResult.totalScore}/100</Col>
+        <Col>{country.parentRegion}</Col>
+        <Col style={{ textAlign: 'end' }}>Score: {country.rankResult.totalScore.toFixed(2)}/100</Col>
       </Row>
 
       <div style={{ width: '100%' }}>
