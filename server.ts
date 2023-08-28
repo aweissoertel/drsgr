@@ -14,6 +14,9 @@ app.use(express.json());
 
 const aggregator = new Aggregator();
 
+///// static /////
+app.get('/countries', (_, response) => aggregator.getCountries(response));
+
 ///// recommendations /////
 app.post('/recommendation', async (_, response) => aggregator.createRecommendation(response));
 app.get<{ code: string; full: string; id: string }>('/recommendation', async (request, response) =>

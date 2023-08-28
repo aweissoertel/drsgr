@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Alert, Button, FloatingLabel, Form, Modal, Stack } from 'react-bootstrap';
+import { Alert, Button, Col, Container, FloatingLabel, Form, Modal, Row, Stack } from 'react-bootstrap';
 
 import VotingContainer from '../components/VotingContainer';
 import { useLocation } from 'wouter';
@@ -27,17 +27,19 @@ const Votingview = ({ item, update }: VotingViewProps) => {
 
   return (
     <div>
-      <Stack direction='horizontal' gap={4}>
-        <div>
-          <h1>Group Recommendation #{item.sessionCode}</h1>
-          <p>Here you can see votes from others, vote yourself or end the voting phase when you are ready</p>
-        </div>
-        <div className='ms-auto d-flex flex-column align-items-center'>
-          <img src={item.qrcode} alt='alt' />
-          <h5 className='mt-2'>Share with your friends!</h5>
-        </div>
-      </Stack>
-      <hr className='mt-5' />
+      <Container fluid>
+        <Row>
+          <Col md={9}>
+            <h1>Group Recommendation #{item.sessionCode}</h1>
+            <p>Here you can see votes from others, vote yourself or end the voting phase when you are ready</p>
+          </Col>
+          <Col md={3} className='ms-auto d-flex flex-column align-items-center'>
+            <img src={item.qrcode} alt='alt' />
+            <h5 className='mt-2'>Share with your friends!</h5>
+          </Col>
+        </Row>
+      </Container>
+      <hr className='mt-3' />
       <Stack gap={1} className='mt-5'>
         {item.userVotes?.map((vote) => (
           <Alert key={vote.id} variant='light'>

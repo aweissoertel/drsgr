@@ -3,7 +3,7 @@ import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 
 import * as myConstant from '../../../data/constantData';
-import { BarChart } from '../../SharedComponents/BarChart';
+import { BarChart } from '../../../components/BarChart';
 
 interface AttributeScoreProps {
   score: Score;

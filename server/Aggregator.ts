@@ -6,7 +6,7 @@ import QRCode from 'qrcode';
 
 import { entries, values } from './util/helpers';
 
-const DEBUG_MODE = true;
+const DEBUG_MODE = false;
 
 export default class Aggregator {
   private _ready = false;
@@ -39,6 +39,16 @@ export default class Aggregator {
   }
 
   ////////////////////////////// ENDPOINTS //////////////////////////////
+
+  /**
+   * Returns the static list of countries
+   * @param res Response object
+   * @returns
+   */
+  public getCountries(res: Response) {
+    if (!this._ready) return;
+    res.send(this.countries);
+  }
 
   /**
    * Handles the creation of a new recommendation. Responds with this recommendation
@@ -145,12 +155,12 @@ export default class Aggregator {
     }
 
     try {
-      const recommenation = await this.prisma.groupRecommendation.findUniqueOrThrow({
+      const recommendation = await this.prisma.groupRecommendation.findUniqueOrThrow({
         where: {
           id: params,
         },
       });
-      if (recommenation.votingEnded && !DEBUG_MODE) {
+      if (recommendation.votingEnded && !DEBUG_MODE) {
         res.status(405).send('Voting already closed!');
         return;
       }
@@ -193,15 +203,15 @@ export default class Aggregator {
     const borda = this.bordaCountAggregationAP(this.rankPreferences(userVotes));
     const pleasure = this.mostPleasureAggregationAP(userVotes);
 
-    const rankedCountriesMultiExact = this.getRankedCountriesFromPreferencesExact(multi.normalizedResult).slice(0, 10);
-    const rankedCountriesAverageExact = this.getRankedCountriesFromPreferencesExact(average).slice(0, 10);
-    const rankedCountriesBordaExact = this.getRankedCountriesFromPreferencesExact(borda.normalizedResult).slice(0, 10);
-    const rankedCountriesPleasureExact = this.getRankedCountriesFromPreferencesExact(pleasure).slice(0, 10);
+    const rankedCountriesMultiExact = this.getRankedCountriesFromPreferencesExact(multi.normalizedResult);
+    const rankedCountriesAverageExact = this.getRankedCountriesFromPreferencesExact(average);
+    const rankedCountriesBordaExact = this.getRankedCountriesFromPreferencesExact(borda.normalizedResult);
+    const rankedCountriesPleasureExact = this.getRankedCountriesFromPreferencesExact(pleasure);
 
-    const rankedCountriesMultiMinimum = this.getRankedCountriesFromPreferencesMinimum(multi.normalizedResult).slice(0, 10);
-    const rankedCountriesAverageMinimum = this.getRankedCountriesFromPreferencesMinimum(average).slice(0, 10);
-    const rankedCountriesBordaMinimum = this.getRankedCountriesFromPreferencesMinimum(borda.normalizedResult).slice(0, 10);
-    const rankedCountriesPleasureMinimum = this.getRankedCountriesFromPreferencesMinimum(pleasure).slice(0, 10);
+    const rankedCountriesMultiMinimum = this.getRankedCountriesFromPreferencesMinimum(multi.normalizedResult);
+    const rankedCountriesAverageMinimum = this.getRankedCountriesFromPreferencesMinimum(average);
+    const rankedCountriesBordaMinimum = this.getRankedCountriesFromPreferencesMinimum(borda.normalizedResult);
+    const rankedCountriesPleasureMinimum = this.getRankedCountriesFromPreferencesMinimum(pleasure);
 
     const insertQuery = {
       where: {
@@ -233,9 +243,9 @@ export default class Aggregator {
 
     let gr: GroupRecommendation | undefined;
     try {
-      if (!DEBUG_MODE) {
-        gr = await this.prisma.groupRecommendation.update(insertQuery);
-      }
+      // if (!DEBUG_MODE) {
+      gr = await this.prisma.groupRecommendation.update(insertQuery);
+      // }
     } catch (e) {
       console.log(e);
       res.status(500).send('DB failure on inserting aggregationResults');
@@ -595,11 +605,11 @@ export default class Aggregator {
         rank: 0,
         rankReverse: 0,
         totalScore: totalScore / 9,
-        attributeScore,
       };
       const debug = DEBUG_MODE
         ? {
             name: country.name, // for debug only
+            attributeScore, // for debug only
             countryAttributes: country.attributes, // for debug only
           }
         : undefined;

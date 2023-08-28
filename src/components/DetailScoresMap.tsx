@@ -2,14 +2,14 @@ import React from 'react';
 
 import { Col, Row } from 'react-bootstrap';
 
-import { AttributeScore } from './AttributeScore';
+import { AttributeScore } from '../views/MapView/components/AttributeScore';
 
 interface DetailScoresProps {
   scores: Score[];
   price: number;
 }
 
-export const DetailScores = ({ scores, price }: DetailScoresProps) => {
+export const DetailScoresMap = ({ scores, price }: DetailScoresProps) => {
   return (
     <div>
       <div

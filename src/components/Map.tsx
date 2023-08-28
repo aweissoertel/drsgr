@@ -5,19 +5,19 @@ import { Map as IMAP, LatLngExpression, LeafletMouseEvent } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { GeoJSON, MapContainer } from 'react-leaflet';
 
-import { CountryPopup } from './components/CountryPopup';
-import { IndexLabel } from './components/IndexLabel';
-import Legend from './components/Legend';
+import { CountryPopup } from './CountryPopup';
+import { IndexLabel } from '../views/MapView/components/IndexLabel';
+import Legend from '../views/MapView/components/Legend';
 import './styles/Map.css';
 
 const position: LatLngExpression = [51.0967884, 5.9671304];
 
 interface MapProps {
-  countries: MapCountry[];
-  setActiveResult: React.Dispatch<React.SetStateAction<number>>;
+  countries: FullCountry[];
 }
 
-const Map = ({ countries, setActiveResult }: MapProps) => {
+const Map = ({ countries }: MapProps) => {
+  const [, setActiveCountry] = useState(-1);
   const [map, setMap] = useState<IMAP | undefined>(undefined);
   const geoJsonLayer = useRef<any>(null);
 
@@ -25,13 +25,14 @@ const Map = ({ countries, setActiveResult }: MapProps) => {
     if (geoJsonLayer.current) {
       geoJsonLayer.current.clearLayers().addData(countries);
     }
-  });
+  }, [geoJsonLayer.current]);
+
   //feature: Feature<Geometry, any>, layer: Layer
-  const onEachCountry: any = (country: MapCountry, layer: any) => {
+  const onEachCountry: any = (country: FullCountry, layer: any) => {
     const c = countries.findIndex((r) => r.properties.u_name === country.properties.u_name);
-    const score = country.properties.result!.scores.totalScore;
+    const score = country.rankResult.totalScore;
     layer.options.fillColor = getColor(score);
-    const popupContent = ReactDOMServer.renderToString(<CountryPopup country={country.properties.result} />);
+    const popupContent = ReactDOMServer.renderToString(<CountryPopup country={country} />);
     layer.bindPopup(popupContent, {
       // direction: "auto",
       keepInView: true,
@@ -82,9 +83,9 @@ const Map = ({ countries, setActiveResult }: MapProps) => {
   const clickCountry = (e: LeafletMouseEvent) => {
     const ind = countries.findIndex((r) => r.properties.u_name === e.target.feature.properties.u_name);
     if (ind < 10) {
-      setActiveResult(ind);
+      setActiveCountry(ind);
     } else {
-      setActiveResult(-1);
+      setActiveCountry(-1);
     }
   };
 
@@ -93,23 +94,21 @@ const Map = ({ countries, setActiveResult }: MapProps) => {
   };
 
   return (
-    <div>
-      <MapContainer
-        style={{ height: '100vh', width: 'auto' }}
-        zoom={4}
-        center={position}
-        ref={setMap as any}
-        doubleClickZoom={false}
-        // zoomControl={false}
-        // touchZoom={false}
-        // scrollWheelZoom={false}
-        // boxZoom={false}
-        // keyboard={false}
-      >
-        <GeoJSON ref={geoJsonLayer} style={countryStyle} data={countries as any} onEachFeature={onEachCountry} />
-        <Legend map={map} />
-      </MapContainer>
-    </div>
+    <MapContainer
+      style={{ height: '100%', width: 'auto' }}
+      zoom={4}
+      center={position}
+      ref={setMap as any}
+      doubleClickZoom={false}
+      // zoomControl={false}
+      // touchZoom={false}
+      // scrollWheelZoom={false}
+      // boxZoom={false}
+      // keyboard={false}
+    >
+      <GeoJSON ref={geoJsonLayer} style={countryStyle} data={countries as any} onEachFeature={onEachCountry} />
+      <Legend map={map} />
+    </MapContainer>
   );
 };
 

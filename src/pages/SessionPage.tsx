@@ -4,6 +4,7 @@ import { Spinner } from 'react-bootstrap';
 import { useLocation, useRoute } from 'wouter';
 
 import Votingview from './VotingView';
+import ResultsView from './ResultsView';
 
 const SessionPage = () => {
   const [, params] = useRoute('/session/:recommendationId');
@@ -40,7 +41,7 @@ const SessionPage = () => {
   return !data ? (
     <Spinner animation='border' variant='primary' />
   ) : data.votingEnded ? (
-    <div> This is the Resultsview</div>
+    <ResultsView item={data} />
   ) : (
     <Votingview item={data} update={update} />
   );

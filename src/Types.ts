@@ -44,14 +44,29 @@ interface MapCountry {
     u_name: string;
     AREA: number;
     PERIMETER: number;
-    country?: string;
-    name?: string;
-    result?: CompleteResult;
+    // country?: string;
+    // name?: string;
+    // result?: CompleteResult;
   };
   geometry: {
     type: string;
     coordinates: number[][][][];
   };
+}
+
+interface RankResult {
+  u_name: string;
+  rank: number;
+  rankReverse: number;
+  totalScore: number;
+}
+
+interface FullCountry extends MapCountry {
+  name: string;
+  parentRegion: string;
+  costPerWeek: number;
+  attributes: Attributes;
+  rankResult: RankResult;
 }
 
 interface Attributes {
@@ -107,4 +122,12 @@ interface AggregationResult {
     rankReverse: number;
     totalScore: number;
   }[];
+}
+
+interface Region {
+  name: string;
+  parentRegion: string;
+  u_name: string;
+  costPerWeek: number;
+  attributes: Attributes;
 }

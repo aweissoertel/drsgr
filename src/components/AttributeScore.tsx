@@ -2,13 +2,13 @@ import React from 'react';
 
 import { Col, Row } from 'react-bootstrap';
 
-import * as constants from '../../../data/constantData';
-import { BarChart } from '../../../components/BarChart';
+import * as constants from '../data/constantData';
+import { BarChart } from './BarChart';
 
 interface AttributeScoreProps {
   score: Score;
   index: number;
-  userPref: number;
+  userPref?: number;
 }
 
 export const AttributeScore = ({ score, index, userPref }: AttributeScoreProps) => {
@@ -21,9 +21,11 @@ export const AttributeScore = ({ score, index, userPref }: AttributeScoreProps) 
         <BarChart score={score} color={constants.COLORS[index % constants.COLORS.length]} benchmark={userPref} showBenchmark={true} />
       </Col>
 
-      <Col xs={1} style={{ textAlign: 'right', fontSize: 'small' }}>
-        {100 - Math.abs(score.value - userPref)}%
-      </Col>
+      {userPref && (
+        <Col xs={1} style={{ textAlign: 'right', fontSize: 'small' }}>
+          {100 - Math.abs(score.value - userPref)}%
+        </Col>
+      )}
     </Row>
   );
 };
