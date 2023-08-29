@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { DetailScores } from './DetailScores';
+
 // import PieChartComponent from '../views/ResultsView/components/PieChartComponent';
 
 interface ResultInfoProps {

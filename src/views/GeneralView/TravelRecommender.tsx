@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { Col, Row } from 'react-bootstrap';
 
 // import Map from '../MapView/Map';
 import Preferences from '../PreferencesView/Preferences';
-import { Results } from '../ResultsView/Results';
+
+// import { Results } from '../ResultsView/Results';
 
 interface TravelRecommenderProps {
   countries: MapCountry[];
@@ -13,8 +14,8 @@ interface TravelRecommenderProps {
   results: CompleteResult[];
 }
 
-const TravelRecommender = ({ /*countries,*/ userData, setUserData, results }: TravelRecommenderProps) => {
-  const [activeResult /*setActiveResult*/] = useState(0);
+const TravelRecommender = ({ /*countries,*/ userData, setUserData /*results*/ }: TravelRecommenderProps) => {
+  // const [activeResult setActiveResult] = useState(0);
 
   return (
     <div className='App'>
@@ -26,7 +27,7 @@ const TravelRecommender = ({ /*countries,*/ userData, setUserData, results }: Tr
           {/* <Map countries={countries} setActiveResult={setActiveResult} /> */}
         </Col>
         <Col style={{ height: '100%' }}>
-          <Results results={results} stay={userData.stay} activeResult={activeResult} userData={userData} />
+          {/* <Results results={results} stay={userData.stay} activeResult={activeResult} userData={userData} /> */}
         </Col>
       </Row>
     </div>

@@ -2,8 +2,8 @@ import React from 'react';
 
 import { Col, Row } from 'react-bootstrap';
 
-import * as myConstant from '../../../data/constantData';
 import { BarChart } from '../../../components/BarChart';
+import * as myConstant from '../../../data/constantData';
 
 interface AttributeScoreProps {
   score: Score;
@@ -17,7 +17,7 @@ export const AttributeScore = ({ score, index }: AttributeScoreProps) => {
         {score.name.charAt(0).toUpperCase() + score.name.slice(1)}
       </Col>
       <Col xs={8}>
-        <BarChart score={score} showBenchmark={false} color={myConstant.COLORS[index % myConstant.COLORS.length]} />
+        <BarChart score={score} color={myConstant.COLORS[index % myConstant.COLORS.length]} />
       </Col>
     </Row>
   );

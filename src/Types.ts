@@ -103,7 +103,8 @@ interface GroupRecommendation {
   sessionCode: string;
   userVotes?: UserVote[];
   votingEnded: boolean;
-  aggregationResults?: AggregationResult[];
+  aggregationResultsAR?: AggregationResult[];
+  aggregationResultsAP?: AggregationResult[];
   qrcode: string;
 }
 

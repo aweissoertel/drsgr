@@ -1,8 +1,8 @@
 import { GroupRecommendation, Prisma, PrismaClient } from '@prisma/client';
 import type { Request, Response } from 'express';
 import fetch from 'node-fetch';
-import papa from 'papaparse';
-import QRCode from 'qrcode';
+import { NODE_STREAM_INPUT, parse as papaparse } from 'papaparse';
+import { toDataURL as generateQR } from 'qrcode';
 
 import { entries, values } from './util/helpers';
 
@@ -68,7 +68,7 @@ export default class Aggregator {
           qrcode: '',
         },
       });
-      const qrcode = await QRCode.toDataURL(`https://group-travel.fly.dev/session/${entity.id}`);
+      const qrcode = await generateQR(`https://group-travel.fly.dev/session/${entity.id}`);
       const fullEntity = await this.prisma.groupRecommendation.update({
         where: {
           id: entity.id,
@@ -92,7 +92,8 @@ export default class Aggregator {
    */
   public async getRecommendation(req: Request<GetReqI>, res: Response) {
     const { code, id, full } = req.query as any;
-    if ((!code && full === '0') || (!id && full === '1')) {
+    const wantFull = full === '1';
+    if ((!code && full === '0') || (!id && wantFull)) {
       res.sendStatus(400);
       return;
     }
@@ -100,12 +101,14 @@ export default class Aggregator {
     try {
       const entity = await this.prisma.groupRecommendation.findFirstOrThrow({
         where: {
-          sessionCode: full === '0' ? code : undefined,
-          id: full === '1' ? id : undefined,
+          sessionCode: !wantFull ? code : undefined,
+          id: wantFull ? id : undefined,
         },
         include: {
-          aggregationResults: full === '1',
-          userVotes: full === '1',
+          aggregationResultsAR: wantFull,
+          aggregationResultsAP: wantFull,
+          userVotes: wantFull,
+          aggregatedInput: wantFull,
         },
       });
       res.send(entity);
@@ -208,17 +211,27 @@ export default class Aggregator {
     const rankedCountriesBordaExact = this.getRankedCountriesFromPreferencesExact(borda.normalizedResult);
     const rankedCountriesPleasureExact = this.getRankedCountriesFromPreferencesExact(pleasure);
 
-    const rankedCountriesMultiMinimum = this.getRankedCountriesFromPreferencesMinimum(multi.normalizedResult);
-    const rankedCountriesAverageMinimum = this.getRankedCountriesFromPreferencesMinimum(average);
-    const rankedCountriesBordaMinimum = this.getRankedCountriesFromPreferencesMinimum(borda.normalizedResult);
-    const rankedCountriesPleasureMinimum = this.getRankedCountriesFromPreferencesMinimum(pleasure);
+    // const rankedCountriesMultiMinimum = this.getRankedCountriesFromPreferencesMinimum(multi.normalizedResult);
+    // const rankedCountriesAverageMinimum = this.getRankedCountriesFromPreferencesMinimum(average);
+    // const rankedCountriesBordaMinimum = this.getRankedCountriesFromPreferencesMinimum(borda.normalizedResult);
+    // const rankedCountriesPleasureMinimum = this.getRankedCountriesFromPreferencesMinimum(pleasure);
 
-    const insertQuery = {
+    //////////////////////////// AGGREGATING RECOMMENDATIONS ////////////////////////////
+    const recommendationsPerUserVote = userVotes.map((vote) => this.getRankedCountriesFromPreferencesExact(vote));
+
+    const multiAR = this.multiplicativeAggregationAR(recommendationsPerUserVote);
+    const averageAR = this.averageAggregationAR(recommendationsPerUserVote);
+    const bordaAR = this.bordaCountAggregationAR(recommendationsPerUserVote);
+    const pleasureAR = this.mostPleasureAggregationAR(recommendationsPerUserVote);
+    const withoutMiseryAR = this.averageWithoutMiseryAggregationAR(recommendationsPerUserVote);
+
+    //////////////////////////// UPDATE DB & SEND RESPONSE ////////////////////////////
+    const insertQuery: Prisma.GroupRecommendationUpdateArgs = {
       where: {
         id: params,
       },
       data: {
-        aggregationResults: {
+        aggregationResultsAP: {
           create: [
             {
               method: 'multiplicative',
@@ -238,41 +251,61 @@ export default class Aggregator {
             },
           ],
         },
+        aggregationResultsAR: {
+          create: [
+            {
+              method: 'multiplicative',
+              rankedCountries: multiAR,
+            },
+            {
+              method: 'average',
+              rankedCountries: averageAR,
+            },
+            {
+              method: 'bordaCount',
+              rankedCountries: bordaAR,
+            },
+            {
+              method: 'mostPleasure',
+              rankedCountries: pleasureAR,
+            },
+            {
+              method: 'withoutMisery',
+              rankedCountries: withoutMiseryAR,
+            },
+          ],
+        },
+        aggregatedInput: {
+          create: {
+            multiAP: multi.normalizedResult,
+            averageAP: average,
+            bordaCountAP: borda.normalizedResult,
+            mostPleasureAP: pleasure,
+            recommendationsPerUserVote: recommendationsPerUserVote.map((rec) => ({ list: rec })),
+          },
+        },
       },
     };
 
     let gr: GroupRecommendation | undefined;
     try {
-      // if (!DEBUG_MODE) {
-      gr = await this.prisma.groupRecommendation.update(insertQuery);
-      // }
+      if (!DEBUG_MODE) {
+        gr = await this.prisma.groupRecommendation.update(insertQuery);
+      }
     } catch (e) {
       console.log(e);
       res.status(500).send('DB failure on inserting aggregationResults');
       return;
     }
 
-    //////////////////////////// AGGREGATING RECOMMENDATIONS ////////////////////////////
-    const recommendationsPerUserVote = userVotes.map((vote) => this.getRankedCountriesFromPreferencesExact(vote));
-
-    const multiAR = this.multiplicativeAggregationAR(recommendationsPerUserVote).slice(0, 10);
-    const averageAR = this.averageAggregationAR(recommendationsPerUserVote).slice(0, 10);
-    const bordaAR = this.bordaCountAggregationAR(recommendationsPerUserVote).slice(0, 10);
-    const pleasureAR = this.mostPleasureAggregationAR(recommendationsPerUserVote).slice(0, 10);
-    const withoutMiseryAR = this.averageWithoutMiseryAggregationAR(recommendationsPerUserVote).slice(0, 10);
-
     res.send({
       rankedCountriesMultiExact,
-      rankedCountriesMultiMinimum,
       multi,
       rankedCountriesAverageExact,
-      rankedCountriesAverageMinimum,
       average,
       rankedCountriesBordaExact,
-      rankedCountriesBordaMinimum,
       borda,
       rankedCountriesPleasureExact,
-      rankedCountriesPleasureMinimum,
       pleasure,
       gr,
       recommendationsPerUserVote,
@@ -356,7 +389,7 @@ export default class Aggregator {
   ////////////////////////////// AGGREGATION LOGIC - AGGREGATING RECOMMENDATIONS //////////////////////////////
 
   private multiplicativeAggregationAR(recommendations: RankResult[][]): RankResult[] {
-    const start: RankResult[] = this.countries.map((country) => ({ ...country, totalScore: 1, rank: 0, rankReverse: 0 }));
+    const start: RankResult[] = this.countries.map((country) => ({ u_name: country.u_name, totalScore: 1, rank: 0, rankReverse: 0 }));
     const result = recommendations.reduce(
       (accumulator, current) =>
         accumulator.map((country) => {
@@ -373,7 +406,7 @@ export default class Aggregator {
   }
 
   private averageAggregationAR(recommendations: RankResult[][]): RankResult[] {
-    const start: RankResult[] = this.countries.map((country) => ({ ...country, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const start: RankResult[] = this.countries.map((country) => ({ u_name: country.u_name, totalScore: 0, rank: 0, rankReverse: 0 }));
     const result = recommendations.reduce(
       (accumulator, current) =>
         accumulator.map((country) => {
@@ -391,7 +424,7 @@ export default class Aggregator {
   }
 
   private bordaCountAggregationAR(recommendations: RankResult[][]): RankResult[] {
-    const start: RankResult[] = this.countries.map((country) => ({ ...country, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const start: RankResult[] = this.countries.map((country) => ({ u_name: country.u_name, totalScore: 0, rank: 0, rankReverse: 0 }));
     const result = recommendations.reduce(
       (accumulator, current) =>
         accumulator.map((country) => {
@@ -408,7 +441,7 @@ export default class Aggregator {
   }
 
   private mostPleasureAggregationAR(recommendations: RankResult[][]): RankResult[] {
-    const start: RankResult[] = this.countries.map((country) => ({ ...country, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const start: RankResult[] = this.countries.map((country) => ({ u_name: country.u_name, totalScore: 0, rank: 0, rankReverse: 0 }));
     const result = recommendations.reduce(
       (accumulator, current) =>
         accumulator.map((country) => {
@@ -431,7 +464,7 @@ export default class Aggregator {
      */
     const miseryPercentage = 0.4;
 
-    const start: RankResult[] = this.countries.map((country) => ({ ...country, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const start: RankResult[] = this.countries.map((country) => ({ u_name: country.u_name, totalScore: 0, rank: 0, rankReverse: 0 }));
     const threshold = Math.floor((1 - miseryPercentage) * this.countries.length);
     const result = recommendations.reduce(
       (accumulator, current) =>
@@ -533,7 +566,7 @@ export default class Aggregator {
       return str;
     };
 
-    const stream = papa.parse(papa.NODE_STREAM_INPUT, { header: true });
+    const stream = papaparse(NODE_STREAM_INPUT, { header: true });
 
     const dataStream = await fetch(countryScoresUrl);
     if (!dataStream.body) {

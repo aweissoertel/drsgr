@@ -4,6 +4,8 @@ import { Col, Row } from 'react-bootstrap';
 
 import { DetailScoresMap } from './DetailScoresMap';
 
+// import { DetailScores } from './DetailScores';
+
 interface CountryPopupProps {
   country: FullCountry;
 }
@@ -25,7 +27,6 @@ export const CountryPopup = ({ country }: CountryPopupProps) => {
             value: country.attributes[key as keyof Attributes],
           }))}
           price={country.costPerWeek}
-          // userData={undefined}
         />
       </div>
     </div>

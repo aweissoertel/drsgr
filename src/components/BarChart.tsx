@@ -4,10 +4,10 @@ interface BarChartProps {
   score: Score;
   benchmark?: number;
   color: string;
-  showBenchmark?: boolean;
 }
 
-export const BarChart = ({ score, benchmark = 0, color, showBenchmark = false }: BarChartProps) => {
+export const BarChart = ({ score, benchmark = 0, color }: BarChartProps) => {
+  const showBenchmark = Boolean(benchmark);
   const getText = () => {
     if (showBenchmark) {
       const diff = score.value - benchmark;

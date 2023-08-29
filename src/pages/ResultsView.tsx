@@ -1,5 +1,7 @@
 import * as React from 'react';
+
 import { Col, Row } from 'react-bootstrap';
+
 import Map from '../components/Map';
 import { Results } from '../components/Results';
 import { features } from '../data/regions.json';
@@ -26,7 +28,7 @@ const ResultsView = ({ item }: ResultsViewProps) => {
   React.useEffect(() => {
     fetchRegions().then((res) => setRegions(res));
 
-    const first = item.aggregationResults?.at(0)?.rankedCountries;
+    const first = item.aggregationResultsAR?.at(0)?.rankedCountries;
     setCurrentAResult(first);
   }, []);
 

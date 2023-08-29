@@ -3,8 +3,8 @@ import * as React from 'react';
 import { Spinner } from 'react-bootstrap';
 import { useLocation, useRoute } from 'wouter';
 
-import Votingview from './VotingView';
 import ResultsView from './ResultsView';
+import Votingview from './VotingView';
 
 const SessionPage = () => {
   const [, params] = useRoute('/session/:recommendationId');

@@ -11,12 +11,14 @@ datasource db {
 }
 
 model GroupRecommendation{
-  id                  String      @id @default(auto()) @map("_id") @db.ObjectId
-  sessionCode         String      @unique
-  userVotes           UserVote[]
-  votingEnded         Boolean
-  aggregationResults  AggregationResult[]
-  qrcode              String
+  id                    String                @id @default(auto()) @map("_id") @db.ObjectId
+  sessionCode           String                @unique
+  userVotes             UserVote[]
+  votingEnded           Boolean
+  aggregationResultsAR  AggregationResult[]   @relation("AggregatingResults")
+  aggregationResultsAP  AggregationResult[]   @relation("AggregatingPreferences")
+  qrcode                String
+  aggregatedInput       AggregatedInput?
 }
 
 model UserVote {
@@ -28,11 +30,24 @@ model UserVote {
 }
 
 model AggregationResult {
-  id                String              @id @default(auto()) @map("_id") @db.ObjectId
-  recommendation    GroupRecommendation @relation(fields: [recommendationId], references: [id])
-  recommendationId  String              @db.ObjectId
+  id                String                @id @default(auto()) @map("_id") @db.ObjectId
+  recommendationAR  GroupRecommendation?  @relation("AggregatingResults", fields: [recommARId], references: [id])
+  recommARId        String?               @db.ObjectId
+  recommendationAP  GroupRecommendation?  @relation("AggregatingPreferences", fields: [recommAPId], references: [id])
+  recommAPId        String?               @db.ObjectId
   method            String
   rankedCountries   RankResult[]
+}
+
+model AggregatedInput {
+  id                          String              @id @default(auto()) @map("_id") @db.ObjectId
+  recommendation              GroupRecommendation @relation(fields: [recommendationId], references: [id])
+  recommendationId            String              @db.ObjectId @unique
+  multiAP                     Attributes
+  averageAP                   Attributes
+  bordaCountAP                Attributes
+  mostPleasureAP              Attributes
+  recommendationsPerUserVote  RankResultList[]
 }
 
 model Country {
@@ -60,4 +75,8 @@ type Attributes {
   culinary      Float
   entertainment Float
   shopping      Float
+}
+
+type RankResultList {
+  list RankResult[]
 }

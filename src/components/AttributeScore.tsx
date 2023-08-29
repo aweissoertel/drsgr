@@ -18,7 +18,7 @@ export const AttributeScore = ({ score, index, userPref }: AttributeScoreProps) 
         {score.name.charAt(0).toUpperCase() + score.name.slice(1)}
       </Col>
       <Col xs={5}>
-        <BarChart score={score} color={constants.COLORS[index % constants.COLORS.length]} benchmark={userPref} showBenchmark={true} />
+        <BarChart score={score} color={constants.COLORS[index % constants.COLORS.length]} benchmark={userPref} />
       </Col>
 
       {userPref && (

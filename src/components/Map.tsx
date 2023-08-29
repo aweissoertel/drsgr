@@ -5,9 +5,9 @@ import { Map as IMAP, LatLngExpression, LeafletMouseEvent } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { GeoJSON, MapContainer } from 'react-leaflet';
 
-import { CountryPopup } from './CountryPopup';
 import { IndexLabel } from '../views/MapView/components/IndexLabel';
 import Legend from '../views/MapView/components/Legend';
+import { CountryPopup } from './CountryPopup';
 import './styles/Map.css';
 
 const position: LatLngExpression = [51.0967884, 5.9671304];

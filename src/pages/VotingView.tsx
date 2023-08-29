@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 import { Alert, Button, Col, Container, FloatingLabel, Form, Modal, Row, Stack } from 'react-bootstrap';
+import { useLocation } from 'wouter';
 
 import VotingContainer from '../components/VotingContainer';
-import { useLocation } from 'wouter';
 
 interface VotingViewProps {
   item: GroupRecommendation;
