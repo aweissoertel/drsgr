@@ -25,11 +25,11 @@ const Map = ({ countries }: MapProps) => {
     if (geoJsonLayer.current) {
       geoJsonLayer.current.clearLayers().addData(countries);
     }
-  }, [geoJsonLayer.current]);
+  }, [geoJsonLayer.current, countries]);
 
   //feature: Feature<Geometry, any>, layer: Layer
   const onEachCountry: any = (country: FullCountry, layer: any) => {
-    const c = countries.findIndex((r) => r.properties.u_name === country.properties.u_name);
+    const ind = country.rankResult.rank - 1;
     const score = country.rankResult.totalScore;
     layer.options.fillColor = getColor(score);
     const popupContent = ReactDOMServer.renderToString(<CountryPopup country={country} />);
@@ -37,10 +37,9 @@ const Map = ({ countries }: MapProps) => {
       // direction: "auto",
       keepInView: true,
     });
-    const tooltipContent = ReactDOMServer.renderToString(<IndexLabel ind={c} />);
+    const tooltipContent = ReactDOMServer.renderToString(<IndexLabel ind={ind} />);
 
-    if (c < 10 && score > 0) {
-      layer.options.fillColor = getColor(100);
+    if (ind < 10) {
       layer.bindTooltip(tooltipContent, {
         permanent: true,
         opacity: 1,

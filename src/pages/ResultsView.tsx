@@ -3,12 +3,20 @@ import * as React from 'react';
 import { Col, Row } from 'react-bootstrap';
 
 import Map from '../components/Map';
+import MethodSelect from '../components/MethodSelect';
 import { Results } from '../components/Results';
 import { features } from '../data/regions.json';
 
 interface ResultsViewProps {
   item: GroupRecommendation;
 }
+
+const defaultResult: RankResult = {
+  u_name: 'default',
+  rank: 199,
+  rankReverse: 0,
+  totalScore: 0,
+};
 
 const ResultsView = ({ item }: ResultsViewProps) => {
   const [currentAResult, setCurrentAResult] = React.useState<RankResult[]>();
@@ -33,16 +41,17 @@ const ResultsView = ({ item }: ResultsViewProps) => {
   }, []);
 
   React.useEffect(() => {
-    if (!regions) return;
+    if (!regions || !currentAResult) return;
+    console.log(currentAResult);
     setResultCountries(
       features
         .map((feature) => {
-          const result = currentAResult!.find((res) => res.u_name === feature.properties.u_name);
+          const result = currentAResult!.find((res) => res.u_name === feature.properties.u_name) || defaultResult;
           const region = regions.find((region) => region.u_name === feature.properties.u_name);
           return {
             ...feature,
+            rankResult: result,
             ...region!,
-            rankResult: result!,
           };
         })
         .sort((a, b) => a.rankResult.rank - b.rankResult.rank),
@@ -55,7 +64,9 @@ const ResultsView = ({ item }: ResultsViewProps) => {
 
   return (
     <Row style={{ height: '100%' }}>
-      <Col>Votes? Method switch?</Col>
+      <Col>
+        <MethodSelect item={item} setCurrentAResult={setCurrentAResult} />
+      </Col>
       <Col xs={6}>{resultCountries && <Map countries={resultCountries} />}</Col>
       <Col>
         <Results results={resultCountries} stay={4} />

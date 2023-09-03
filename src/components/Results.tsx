@@ -11,7 +11,7 @@ interface ResultsProps {
 }
 
 export const Results = ({ results, stay }: ResultsProps) => {
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const [activeIndex, setActiveIndex] = useState(0);
   const accordElem = useRef<HTMLDivElement>(null);
   // useEffect(() => {
   //   if (results.length > 0) {
@@ -29,7 +29,7 @@ export const Results = ({ results, stay }: ResultsProps) => {
   // }, [activeResult]);
   return (
     <div style={{ padding: '10px 0' }}>
-      <h4 style={{ textAlign: 'left' }}>Best destinations for you:</h4>
+      <h4>Best destinations for you:</h4>
       {results.length > 0 ? (
         <div style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }} ref={accordElem}>
           <Accordion activeKey={activeIndex.toString()}>

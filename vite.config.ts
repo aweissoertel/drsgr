@@ -5,7 +5,7 @@ import { checker } from 'vite-plugin-checker';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   if (mode === 'development') {
-    return { plugins: [react(), checker({ eslint: { lintCommand: 'eslint . --ext .ts,.tsx' } })] };
+    return { plugins: [react(), checker({ eslint: { lintCommand: 'eslint . --ext .ts,.tsx' }, overlay: false })] };
   } else if (mode === 'production') {
     return { plugins: [react()] };
   } else {
