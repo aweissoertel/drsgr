@@ -42,7 +42,6 @@ const ResultsView = ({ item }: ResultsViewProps) => {
 
   React.useEffect(() => {
     if (!regions || !currentAResult) return;
-    console.log(currentAResult);
     setResultCountries(
       features
         .map((feature) => {

@@ -91,7 +91,7 @@ const MethodSelect = React.memo(function MethodSelect({ item, setCurrentAResult 
           <hr />
           <Form.Switch label='Show aggregated user votes' checked={showUserVotes} onChange={() => setShowUserVotes((p) => !p)} />
           {showUserVotes && (
-            <div className='bg-dark p-2 mt-2'>
+            <div className='bg-dark p-2 mt-2 border rounded'>
               <DetailScores
                 scores={Object.keys(item.aggregatedInput![getAggregatedInput(strategy)]).map((key) => ({
                   name: key,
