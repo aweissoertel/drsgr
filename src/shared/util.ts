@@ -14,3 +14,17 @@ export const getAggregationStrategy = (input: string) => {
       return 'not found';
   }
 };
+
+export const getAggregatedInput = (select: string): keyof AggregatedInput => {
+  switch (select) {
+    case 'multiplicative':
+      return 'multiAP';
+    case 'bordaCount':
+      return 'bordaCountAP';
+    case 'mostPleasure':
+      return 'mostPleasureAP';
+    case 'average':
+    default:
+      return 'averageAP';
+  }
+};

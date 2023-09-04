@@ -4,7 +4,8 @@ import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { BiInfoCircle } from 'react-icons/bi';
 
 import { APMethods, ARMethods } from '../shared/constants';
-import { getAggregationStrategy } from '../shared/util';
+import { getAggregatedInput, getAggregationStrategy } from '../shared/util';
+import { DetailScores } from './DetailScores';
 
 export interface MethodSelectProps {
   item: GroupRecommendation;
@@ -14,6 +15,7 @@ export interface MethodSelectProps {
 const MethodSelect = React.memo(function MethodSelect({ item, setCurrentAResult }: MethodSelectProps) {
   const [AGMethod, setAGMethod] = React.useState<string>('preferences');
   const [strategy, setStrategy] = React.useState<string>('average');
+  const [showUserVotes, setShowUserVotes] = React.useState(false);
 
   React.useEffect(() => {
     setCurrentAResult(
@@ -57,28 +59,18 @@ const MethodSelect = React.memo(function MethodSelect({ item, setCurrentAResult 
       </Form.Select>
       <p style={{ marginBottom: '0.5rem', marginTop: '1rem' }}>
         Choose the aggregation strategy{' '}
-        {/* <OverlayTrigger
+        <OverlayTrigger
           placement='bottom'
           overlay={
             <Tooltip>
-              <div>
-                <p>The aggregation method defines which dimension is aggregated.</p>
-                <p>
-                  - Aggregating Results: First, a ranked list of destinations is created for every user based on the user&apos;s
-                  preferences. Then, these lists of destinations get aggregated into one list, representing the group&apos;s preferences.
-                </p>
-                <p>
-                  - Aggregating Preferences: The preferences of every user get aggregated into combined preferences of the group. The
-                  destination recommendation list for this group is matched from these combined preferences.
-                </p>
-              </div>
+              <p>The aggregation algorithm used.</p>
             </Tooltip>
           }
         >
           <span>
             <BiInfoCircle />
           </span>
-        </OverlayTrigger> */}
+        </OverlayTrigger>
       </p>
       <Form.Select defaultValue='average' aria-label='Aggregation Strategy' onChange={(e) => setStrategy(e.target.value)}>
         <option>Select...</option>
@@ -94,6 +86,22 @@ const MethodSelect = React.memo(function MethodSelect({ item, setCurrentAResult 
               </option>
             ))}
       </Form.Select>
+      {AGMethod === 'preferences' && (
+        <>
+          <hr />
+          <Form.Switch label='Show aggregated user votes' checked={showUserVotes} onChange={() => setShowUserVotes((p) => !p)} />
+          {showUserVotes && (
+            <div className='bg-dark p-2 mt-2'>
+              <DetailScores
+                scores={Object.keys(item.aggregatedInput![getAggregatedInput(strategy)]).map((key) => ({
+                  name: key,
+                  value: item.aggregatedInput![getAggregatedInput(strategy)][key as keyof AggregatedInput],
+                }))}
+              />
+            </div>
+          )}
+        </>
+      )}
     </>
   );
 });

@@ -105,6 +105,7 @@ interface GroupRecommendation {
   votingEnded: boolean;
   aggregationResultsAR?: AggregationResult[];
   aggregationResultsAP?: AggregationResult[];
+  aggregatedInput?: AggregatedInput;
   qrcode: string;
 }
 
@@ -131,4 +132,14 @@ interface Region {
   u_name: string;
   costPerWeek: number;
   attributes: Attributes;
+}
+
+interface AggregatedInput {
+  multiAP: Attributes;
+  averageAP: Attributes;
+  bordaCountAP: Attributes;
+  mostPleasureAP: Attributes;
+  recommendationsPerUserVote: {
+    list: RankResult[];
+  }[];
 }
