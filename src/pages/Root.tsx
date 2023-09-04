@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Alert, Button, Form, Stack } from 'react-bootstrap';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 
 const Root = () => {
   const [input, setInput] = React.useState('');
@@ -55,9 +55,6 @@ const Root = () => {
               This id was not found
             </Alert>
           )}
-          <Link href='/session/abc123' className='active'>
-            Hello!
-          </Link>
         </Stack>
       </div>
     </div>
