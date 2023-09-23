@@ -317,6 +317,37 @@ export default class Aggregator {
     });
   }
 
+  public async reopenVoting(req: Request<{ id: string }>, res: Response) {
+    const params = req.query.id as string;
+    if (!params) {
+      res.sendStatus(400);
+      return;
+    }
+    try {
+      await this.prisma.groupRecommendation.update({
+        where: {
+          id: params,
+        },
+        data: {
+          votingEnded: false,
+          aggregationResultsAR: {
+            deleteMany: {},
+          },
+          aggregationResultsAP: {
+            deleteMany: {},
+          },
+          aggregatedInput: {
+            delete: true,
+          },
+        },
+      });
+      res.sendStatus(200);
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(500);
+    }
+  }
+
   ////////////////////////////// AGGREGATION LOGIC - AGGREGATING PREFERENCES //////////////////////////////
 
   private multiplicativeAggregationAP(preferences: Attributes[]): AggregationResult {

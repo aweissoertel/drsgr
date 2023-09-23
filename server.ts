@@ -23,6 +23,7 @@ app.get<{ code: string; full: string; id: string }>('/recommendation', async (re
   aggregator.getRecommendation(request, response),
 );
 app.put<{ id: string }>('/recommendation', async (request, response) => aggregator.endVoting(request, response));
+app.put<{ id: string }>('/recommendationreset', async (request, response) => aggregator.reopenVoting(request, response));
 app.delete<{ id: string }>('/recommendation', async (request, response) => aggregator.deleteRecommendation(request, response));
 
 ///// userVotes /////

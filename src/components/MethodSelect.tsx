@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { BiInfoCircle } from 'react-icons/bi';
 
 import { APMethods, ARMethods } from '../shared/constants';
@@ -25,8 +25,17 @@ const MethodSelect = React.memo(function MethodSelect({ item, setCurrentAResult 
     );
   }, [AGMethod, strategy]);
 
+  const handleGoBackButton = async () => {
+    const response = await fetch(`/recommendationreset?id=${item.id}`, { method: 'PUT' });
+    if (response.ok) {
+      location.reload();
+    } else {
+      console.log('error:', response);
+    }
+  };
+
   return (
-    <>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <h4 style={{ marginBottom: '1rem' }}>Setttings</h4>
       <p style={{ marginBottom: '0.5rem' }}>
         Choose the aggregation method{' '}
@@ -102,7 +111,10 @@ const MethodSelect = React.memo(function MethodSelect({ item, setCurrentAResult 
           )}
         </>
       )}
-    </>
+      <Button onClick={() => handleGoBackButton()} variant='danger' className='mt-auto'>
+        Go back to vote phase
+      </Button>
+    </div>
   );
 });
 export default MethodSelect;
