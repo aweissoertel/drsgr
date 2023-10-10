@@ -67,6 +67,12 @@ interface FullCountry extends MapCountry {
   costPerWeek: number;
   attributes: Attributes;
   rankResult: RankResult;
+  favorites: {
+    best: string[];
+    second: string[];
+    third: string[];
+    topFive: string[];
+  };
 }
 
 interface Attributes {
@@ -141,5 +147,6 @@ interface AggregatedInput {
   mostPleasureAP: Attributes;
   recommendationsPerUserVote: {
     list: RankResult[];
+    name: string;
   }[];
 }

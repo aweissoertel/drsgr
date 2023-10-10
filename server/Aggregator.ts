@@ -194,17 +194,18 @@ export default class Aggregator {
       return;
     }
 
-    const userVotes: Attributes[] = entity.userVotes.map((userVote) => userVote.preferences);
+    const userVotes = entity.userVotes.map((userVote) => ({ preferences: userVote.preferences, name: userVote.name }));
     if (userVotes.length === 0) {
       res.status(500).send('No votes for this code');
       return;
     }
 
     //////////////////////////// AGGREGATING PROFILES ////////////////////////////
-    const multi = this.multiplicativeAggregationAP(userVotes);
-    const average = this.averageAggregationAP(userVotes).normalizedResult;
-    const borda = this.bordaCountAggregationAP(this.rankPreferences(userVotes));
-    const pleasure = this.mostPleasureAggregationAP(userVotes);
+    const onlyPref = userVotes.map((vote) => vote.preferences);
+    const multi = this.multiplicativeAggregationAP(onlyPref);
+    const average = this.averageAggregationAP(onlyPref).normalizedResult;
+    const borda = this.bordaCountAggregationAP(this.rankPreferences(onlyPref));
+    const pleasure = this.mostPleasureAggregationAP(onlyPref);
 
     const rankedCountriesMultiExact = this.getRankedCountriesFromPreferencesExact(multi.normalizedResult);
     const rankedCountriesAverageExact = this.getRankedCountriesFromPreferencesExact(average);
@@ -217,7 +218,9 @@ export default class Aggregator {
     // const rankedCountriesPleasureMinimum = this.getRankedCountriesFromPreferencesMinimum(pleasure);
 
     //////////////////////////// AGGREGATING RECOMMENDATIONS ////////////////////////////
-    const recommendationsPerUserVote = userVotes.map((vote) => this.getRankedCountriesFromPreferencesExact(vote));
+    const recommendationsPerUserVote: RankResult[][] = userVotes.map((vote) =>
+      this.getRankedCountriesFromPreferencesExact(vote.preferences),
+    );
 
     const multiAR = this.multiplicativeAggregationAR(recommendationsPerUserVote);
     const averageAR = this.averageAggregationAR(recommendationsPerUserVote);
@@ -226,6 +229,10 @@ export default class Aggregator {
     const withoutMiseryAR = this.averageWithoutMiseryAggregationAR(recommendationsPerUserVote);
 
     //////////////////////////// UPDATE DB & SEND RESPONSE ////////////////////////////
+    const recsWithName: RecPerName[] = userVotes.map((vote) => ({
+      recommendations: this.getRankedCountriesFromPreferencesExact(vote.preferences),
+      name: vote.name,
+    }));
     const insertQuery: Prisma.GroupRecommendationUpdateArgs = {
       where: {
         id: params,
@@ -281,7 +288,7 @@ export default class Aggregator {
             averageAP: average,
             bordaCountAP: borda.normalizedResult,
             mostPleasureAP: pleasure,
-            recommendationsPerUserVote: recommendationsPerUserVote.map((rec) => ({ list: rec })),
+            recommendationsPerUserVote: recsWithName.map((rec) => ({ list: rec.recommendations, name: rec.name })),
           },
         },
       },

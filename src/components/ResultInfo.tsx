@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { MethodContext } from '../shared/MethodContext';
 import { DetailScores } from './DetailScores';
 
 // import PieChartComponent from '../views/ResultsView/components/PieChartComponent';
@@ -11,6 +12,8 @@ interface ResultInfoProps {
 }
 
 const ResultInfo = ({ country, stay, benchmark }: ResultInfoProps) => {
+  const isAGMPreferences = React.useContext(MethodContext) === 'preferences';
+
   return (
     <div>
       {/* <PieChartComponent scores={scores} label={label} countryName={country.country} region={country.region} /> */}
@@ -22,8 +25,10 @@ const ResultInfo = ({ country, stay, benchmark }: ResultInfoProps) => {
       </p>
       <hr />
       <p style={{ fontSize: 'x-small' }}>
-        Scores of {country.name} based on your preferences: (The bar demonstrates the score of the given attribute for {country.name} and
-        the black line shows your preference - hover on the bars for more details)
+        {isAGMPreferences
+          ? `Scores of ${country.name} based on the aggregated profile of your group: (The bar demonstrates the score of the given attribute for ${country.name} and
+            the black line shows the preference of your group - hover on the bars for more details)`
+          : `TBA`}
       </p>
       <DetailScores
         scores={Object.keys(country.attributes)?.map((key) => ({

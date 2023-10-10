@@ -10,59 +10,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model GroupRecommendation{
-  id                    String                @id @default(auto()) @map("_id") @db.ObjectId
-  sessionCode           String                @unique
-  userVotes             UserVote[]
-  votingEnded           Boolean
-  aggregationResultsAR  AggregationResult[]   @relation("AggregatingResults")
-  aggregationResultsAP  AggregationResult[]   @relation("AggregatingPreferences")
-  qrcode                String
-  aggregatedInput       AggregatedInput?
+model GroupRecommendation {
+  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
+  sessionCode          String              @unique
+  userVotes            UserVote[]
+  votingEnded          Boolean
+  aggregationResultsAR AggregationResult[] @relation("AggregatingResults")
+  aggregationResultsAP AggregationResult[] @relation("AggregatingPreferences")
+  qrcode               String
+  aggregatedInput      AggregatedInput?
 }
 
 model UserVote {
-  id                String              @id @default(auto()) @map("_id") @db.ObjectId
-  name              String
-  recommendation    GroupRecommendation @relation(fields: [recommendationId], references: [id])
-  recommendationId  String              @db.ObjectId
-  preferences       Attributes
+  id               String              @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  recommendation   GroupRecommendation @relation(fields: [recommendationId], references: [id])
+  recommendationId String              @db.ObjectId
+  preferences      Attributes
 }
 
 model AggregationResult {
-  id                String                @id @default(auto()) @map("_id") @db.ObjectId
-  recommendationAR  GroupRecommendation?  @relation("AggregatingResults", fields: [recommARId], references: [id])
-  recommARId        String?               @db.ObjectId
-  recommendationAP  GroupRecommendation?  @relation("AggregatingPreferences", fields: [recommAPId], references: [id])
-  recommAPId        String?               @db.ObjectId
-  method            String
-  rankedCountries   RankResult[]
+  id               String               @id @default(auto()) @map("_id") @db.ObjectId
+  recommendationAR GroupRecommendation? @relation("AggregatingResults", fields: [recommARId], references: [id])
+  recommARId       String?              @db.ObjectId
+  recommendationAP GroupRecommendation? @relation("AggregatingPreferences", fields: [recommAPId], references: [id])
+  recommAPId       String?              @db.ObjectId
+  method           String
+  rankedCountries  RankResult[]
 }
 
 model AggregatedInput {
-  id                          String              @id @default(auto()) @map("_id") @db.ObjectId
-  recommendation              GroupRecommendation @relation(fields: [recommendationId], references: [id])
-  recommendationId            String              @db.ObjectId @unique
-  multiAP                     Attributes
-  averageAP                   Attributes
-  bordaCountAP                Attributes
-  mostPleasureAP              Attributes
-  recommendationsPerUserVote  RankResultList[]
+  id                         String              @id @default(auto()) @map("_id") @db.ObjectId
+  recommendation             GroupRecommendation @relation(fields: [recommendationId], references: [id])
+  recommendationId           String              @unique @db.ObjectId
+  multiAP                    Attributes
+  averageAP                  Attributes
+  bordaCountAP               Attributes
+  mostPleasureAP             Attributes
+  recommendationsPerUserVote RankResultList[]
 }
 
 model Country {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  u_name      String
-  name        String
-  region      String
-  attributes  Attributes
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  u_name     String
+  name       String
+  region     String
+  attributes Attributes
 }
 
 type RankResult {
-  u_name          String
-  rank            Int
-  rankReverse     Int
-  totalScore      Float
+  u_name      String
+  rank        Int
+  rankReverse Int
+  totalScore  Float
 }
 
 type Attributes {
@@ -79,4 +79,5 @@ type Attributes {
 
 type RankResultList {
   list RankResult[]
+  name String
 }

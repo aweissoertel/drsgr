@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Button, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { BiInfoCircle } from 'react-icons/bi';
 
+import { MethodContext } from '../shared/MethodContext';
 import { APMethods, ARMethods } from '../shared/constants';
 import { getAggregatedInput, getAggregationStrategy } from '../shared/util';
 import { DetailScores } from './DetailScores';
@@ -12,6 +13,7 @@ export interface MethodSelectProps {
   setCurrentAResult: React.Dispatch<React.SetStateAction<RankResult[] | undefined>>;
   aggregatedProfile?: Attributes;
   setAggregatedProfile: React.Dispatch<React.SetStateAction<Attributes | undefined>>;
+  setAGMethod: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const MethodSelect = React.memo(function MethodSelect({
@@ -19,10 +21,12 @@ const MethodSelect = React.memo(function MethodSelect({
   setCurrentAResult,
   aggregatedProfile,
   setAggregatedProfile,
+  setAGMethod,
 }: MethodSelectProps) {
-  const [AGMethod, setAGMethod] = React.useState<string>('preferences');
   const [strategy, setStrategy] = React.useState<string>('average');
   const [showProfile, setShowProfile] = React.useState(false);
+
+  const AGMethod = React.useContext(MethodContext);
 
   React.useEffect(() => {
     if (AGMethod === 'preferences') {
@@ -31,7 +35,15 @@ const MethodSelect = React.memo(function MethodSelect({
       setCurrentAResult(item.aggregationResultsAR?.find((strat) => strat.method === strategy)?.rankedCountries);
     }
     handleShowAPSwitch();
-  }, [AGMethod, strategy]);
+  }, [AGMethod]);
+
+  React.useEffect(() => {
+    if (AGMethod === 'preferences') {
+      setCurrentAResult(item.aggregationResultsAP?.find((strat) => strat.method === strategy)?.rankedCountries);
+    } else {
+      setCurrentAResult(item.aggregationResultsAR?.find((strat) => strat.method === strategy)?.rankedCountries);
+    }
+  }, [strategy]);
 
   const handleGoBackButton = async () => {
     const response = await fetch(`/recommendationreset?id=${item.id}`, { method: 'PUT' });

@@ -86,3 +86,8 @@ interface GetReqI {
   full: string;
   id: string;
 }
+
+interface RecPerName {
+  recommendations: RankResult[];
+  name: string;
+}

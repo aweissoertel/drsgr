@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { MethodContext } from '../shared/MethodContext';
+
 interface BarChartProps {
   score: Score;
   benchmark?: number;
@@ -7,7 +9,8 @@ interface BarChartProps {
 }
 
 export const BarChart = ({ score, benchmark = 0, color }: BarChartProps) => {
-  const showBenchmark = Boolean(benchmark);
+  const isAGMPreferences = React.useContext(MethodContext) === 'preferences';
+  const showBenchmark = Boolean(benchmark) && isAGMPreferences;
   const getText = () => {
     if (showBenchmark) {
       const diff = score.value - benchmark;
@@ -18,7 +21,7 @@ export const BarChart = ({ score, benchmark = 0, color }: BarChartProps) => {
           score.name +
           ' of this country has the score ' +
           score.value +
-          ' which is equal to your preference. So the ' +
+          ' which is equal to your preference. So ' +
           score.name +
           ' is 100% matching.'
         );
@@ -30,7 +33,7 @@ export const BarChart = ({ score, benchmark = 0, color }: BarChartProps) => {
           score.value +
           ' which is ' +
           Math.abs(diff) +
-          '% more than what you prefer. So the ' +
+          '% more than what you prefer. So ' +
           score.name +
           ' is ' +
           total +
@@ -46,7 +49,7 @@ export const BarChart = ({ score, benchmark = 0, color }: BarChartProps) => {
           score.value +
           ' which is ' +
           Math.abs(diff) +
-          '% less than what you prefer. So the ' +
+          '% less than what you prefer. So ' +
           score.name +
           ' is ' +
           total +
