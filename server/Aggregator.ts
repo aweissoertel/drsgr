@@ -200,7 +200,7 @@ export default class Aggregator {
       return;
     }
 
-    //////////////////////////// AGGREGATING PREFERENCES ////////////////////////////
+    //////////////////////////// AGGREGATING PROFILES ////////////////////////////
     const multi = this.multiplicativeAggregationAP(userVotes);
     const average = this.averageAggregationAP(userVotes).normalizedResult;
     const borda = this.bordaCountAggregationAP(this.rankPreferences(userVotes));
@@ -348,7 +348,7 @@ export default class Aggregator {
     }
   }
 
-  ////////////////////////////// AGGREGATION LOGIC - AGGREGATING PREFERENCES //////////////////////////////
+  ////////////////////////////// AGGREGATION LOGIC - AGGREGATING PROFILES //////////////////////////////
 
   private multiplicativeAggregationAP(preferences: Attributes[]): AggregationResult {
     const normalizeFactor = this.MAX_VOTE_VALUE ** (preferences.length - 1);

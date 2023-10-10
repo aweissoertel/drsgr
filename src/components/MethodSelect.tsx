@@ -10,19 +10,27 @@ import { DetailScores } from './DetailScores';
 export interface MethodSelectProps {
   item: GroupRecommendation;
   setCurrentAResult: React.Dispatch<React.SetStateAction<RankResult[] | undefined>>;
+  aggregatedProfile?: Attributes;
+  setAggregatedProfile: React.Dispatch<React.SetStateAction<Attributes | undefined>>;
 }
 
-const MethodSelect = React.memo(function MethodSelect({ item, setCurrentAResult }: MethodSelectProps) {
+const MethodSelect = React.memo(function MethodSelect({
+  item,
+  setCurrentAResult,
+  aggregatedProfile,
+  setAggregatedProfile,
+}: MethodSelectProps) {
   const [AGMethod, setAGMethod] = React.useState<string>('preferences');
   const [strategy, setStrategy] = React.useState<string>('average');
-  const [showUserVotes, setShowUserVotes] = React.useState(false);
+  const [showProfile, setShowProfile] = React.useState(false);
 
   React.useEffect(() => {
-    setCurrentAResult(
-      AGMethod === 'preferences'
-        ? item.aggregationResultsAP?.find((strat) => strat.method === strategy)?.rankedCountries
-        : item.aggregationResultsAR?.find((strat) => strat.method === strategy)?.rankedCountries,
-    );
+    if (AGMethod === 'preferences') {
+      setCurrentAResult(item.aggregationResultsAP?.find((strat) => strat.method === strategy)?.rankedCountries);
+    } else {
+      setCurrentAResult(item.aggregationResultsAR?.find((strat) => strat.method === strategy)?.rankedCountries);
+    }
+    handleShowAPSwitch();
   }, [AGMethod, strategy]);
 
   const handleGoBackButton = async () => {
@@ -31,6 +39,17 @@ const MethodSelect = React.memo(function MethodSelect({ item, setCurrentAResult 
       location.reload();
     } else {
       console.log('error:', response);
+    }
+  };
+
+  const handleShowAPSwitch = () => {
+    if (showProfile) {
+      setAggregatedProfile(undefined);
+      setShowProfile(false);
+    } else {
+      const aInput = item.aggregatedInput![getAggregatedInput(strategy)] as Attributes;
+      setAggregatedProfile(aInput);
+      setShowProfile(true);
     }
   };
 
@@ -50,8 +69,8 @@ const MethodSelect = React.memo(function MethodSelect({ item, setCurrentAResult 
                   preferences. Then, these lists of destinations get aggregated into one list, representing the group&apos;s preferences.
                 </p>
                 <p>
-                  - Aggregating Preferences: The preferences of every user get aggregated into combined preferences of the group. The
-                  destination recommendation list for this group is matched from these combined preferences.
+                  - Aggregating Profiles: The profile of preferences of every user get aggregated into a combined profile of the group. The
+                  destination recommendation list for this group is matched from this combined profile with its preferences.
                 </p>
               </div>
             </Tooltip>
@@ -64,7 +83,7 @@ const MethodSelect = React.memo(function MethodSelect({ item, setCurrentAResult 
       </p>
       <Form.Select defaultValue='preferences' aria-label='Aggregation Method' onChange={(e) => setAGMethod(e.target.value)}>
         <option value='results'>Aggregating Results</option>
-        <option value='preferences'>Aggregating Preferences</option>
+        <option value='preferences'>Aggregating Profiles</option>
       </Form.Select>
       <p style={{ marginBottom: '0.5rem', marginTop: '1rem' }}>
         Choose the aggregation strategy{' '}
@@ -98,13 +117,13 @@ const MethodSelect = React.memo(function MethodSelect({ item, setCurrentAResult 
       {AGMethod === 'preferences' && (
         <>
           <hr />
-          <Form.Switch label='Show aggregated user votes' checked={showUserVotes} onChange={() => setShowUserVotes((p) => !p)} />
-          {showUserVotes && (
+          <Form.Switch label='Show aggregated profile' checked={showProfile} onChange={() => handleShowAPSwitch()} />
+          {showProfile && aggregatedProfile && (
             <div className='bg-dark p-2 mt-2 border rounded'>
               <DetailScores
-                scores={Object.keys(item.aggregatedInput![getAggregatedInput(strategy)]).map((key) => ({
+                scores={Object.keys(aggregatedProfile).map((key) => ({
                   name: key,
-                  value: item.aggregatedInput![getAggregatedInput(strategy)][key as keyof AggregatedInput],
+                  value: aggregatedProfile[key as keyof AggregatedInput],
                 }))}
               />
             </div>

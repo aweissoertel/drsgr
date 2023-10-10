@@ -22,6 +22,7 @@ const ResultsView = ({ item }: ResultsViewProps) => {
   const [currentAResult, setCurrentAResult] = React.useState<RankResult[]>();
   const [resultCountries, setResultCountries] = React.useState<FullCountry[]>();
   const [regions, setRegions] = React.useState<Region[]>();
+  const [aggregatedProfile, setAggregatedProfile] = React.useState<Attributes>();
 
   const fetchRegions = async () => {
     const response = await fetch('/countries', { method: 'GET' });
@@ -64,11 +65,16 @@ const ResultsView = ({ item }: ResultsViewProps) => {
   return (
     <Row style={{ height: '100%' }}>
       <Col>
-        <MethodSelect item={item} setCurrentAResult={setCurrentAResult} />
+        <MethodSelect
+          item={item}
+          setCurrentAResult={setCurrentAResult}
+          aggregatedProfile={aggregatedProfile}
+          setAggregatedProfile={setAggregatedProfile}
+        />
       </Col>
       <Col xs={6}>{resultCountries && <Map countries={resultCountries} />}</Col>
       <Col>
-        <Results results={resultCountries} stay={4} />
+        <Results results={resultCountries} aggregatedProfile={aggregatedProfile} stay={4} />
       </Col>
     </Row>
   );

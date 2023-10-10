@@ -7,10 +7,11 @@ import ResultInfo from './ResultInfo';
 interface ResultsProps {
   results: FullCountry[];
   stay: number;
+  aggregatedProfile?: Attributes;
   // activeResult: number;
 }
 
-export const Results = ({ results, stay }: ResultsProps) => {
+export const Results = ({ results, stay, aggregatedProfile }: ResultsProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const accordElem = useRef<HTMLDivElement>(null);
   // useEffect(() => {
@@ -52,7 +53,7 @@ export const Results = ({ results, stay }: ResultsProps) => {
                   {index + 1}. {item.name}
                 </Accordion.Header>
                 <Accordion.Body>
-                  <ResultInfo country={item} stay={stay} />
+                  <ResultInfo country={item} stay={stay} benchmark={aggregatedProfile} />
                 </Accordion.Body>
               </Accordion.Item>
             ))}

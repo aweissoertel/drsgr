@@ -7,18 +7,10 @@ import { DetailScores } from './DetailScores';
 interface ResultInfoProps {
   country: FullCountry;
   stay: number;
+  benchmark?: Attributes;
 }
 
-const ResultInfo = ({ country, stay }: ResultInfoProps) => {
-  // const [scores, setScores] = useState<Score[]>([]);
-  // const loadData = () => {
-  //   const s = Object.keys(country.scores.attr)?.map((key) => ({
-  //     name: key,
-  //     value: country.scores.attr[key as keyof Attributes],
-  //   }));
-  //   setScores(s);
-  // };
-  // useEffect(loadData, [country]);
+const ResultInfo = ({ country, stay, benchmark }: ResultInfoProps) => {
   return (
     <div>
       {/* <PieChartComponent scores={scores} label={label} countryName={country.country} region={country.region} /> */}
@@ -38,6 +30,7 @@ const ResultInfo = ({ country, stay }: ResultInfoProps) => {
           name: key,
           value: country.attributes[key as keyof Attributes],
         }))}
+        benchmark={benchmark}
       />
       <hr />
       <p>Overall score: {country.rankResult.totalScore.toFixed(2)}/100</p>
