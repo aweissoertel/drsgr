@@ -5,6 +5,7 @@ import { Map as IMAP, LatLngExpression, LeafletMouseEvent } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { GeoJSON, MapContainer } from 'react-leaflet';
 
+import { MethodContext } from '../shared/MethodContext';
 import { IndexLabel } from '../views/MapView/components/IndexLabel';
 import Legend from '../views/MapView/components/Legend';
 import { CountryPopup } from './CountryPopup';
@@ -20,6 +21,7 @@ const Map = ({ countries }: MapProps) => {
   const [, setActiveCountry] = useState(-1);
   const [map, setMap] = useState<IMAP | undefined>(undefined);
   const geoJsonLayer = useRef<any>(null);
+  const AGMethod = React.useContext(MethodContext);
 
   useEffect(() => {
     if (geoJsonLayer.current) {
@@ -31,15 +33,16 @@ const Map = ({ countries }: MapProps) => {
   const onEachCountry: any = (country: FullCountry, layer: any) => {
     const ind = country.rankResult.rank - 1;
     const score = country.rankResult.totalScore;
-    layer.options.fillColor = getColor(score);
+    layer.options.fillColor = getColor(AGMethod === 'preferences' ? score : country.rankResult.rank);
     const popupContent = ReactDOMServer.renderToString(<CountryPopup country={country} />);
     layer.bindPopup(popupContent, {
       // direction: "auto",
       keepInView: true,
     });
-    const tooltipContent = ReactDOMServer.renderToString(<IndexLabel ind={ind} />);
 
     if (ind < 10) {
+      const tooltipContent = ReactDOMServer.renderToString(<IndexLabel ind={ind} />);
+
       layer.bindTooltip(tooltipContent, {
         permanent: true,
         opacity: 1,
@@ -89,7 +92,11 @@ const Map = ({ countries }: MapProps) => {
   };
 
   const getColor = (d: number) => {
-    return d > 90 ? '#109146' : d > 70 ? '#7CBA43' : d > 60 ? '#FFCC06' : d > 50 ? '#F58E1D' : d >= 0 ? '#BF1E24' : '#fff';
+    if (AGMethod === 'preferences') {
+      return d > 90 ? '#109146' : d > 70 ? '#7CBA43' : d > 60 ? '#FFCC06' : d > 50 ? '#F58E1D' : d >= 0 ? '#BF1E24' : '#fff';
+    } else {
+      return d < 32 ? '#109146' : d < 64 ? '#7CBA43' : d < 96 ? '#FFCC06' : d < 128 ? '#F58E1D' : d < 164 ? '#BF1E24' : '#fff';
+    }
   };
 
   return (

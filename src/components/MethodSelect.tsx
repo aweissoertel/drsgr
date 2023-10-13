@@ -28,22 +28,26 @@ const MethodSelect = React.memo(function MethodSelect({
 
   const AGMethod = React.useContext(MethodContext);
 
-  React.useEffect(() => {
-    if (AGMethod === 'preferences') {
+  const handleAGMethodSwitch = (value: string) => {
+    setAGMethod(value);
+    if (value === 'preferences') {
       setCurrentAResult(item.aggregationResultsAP?.find((strat) => strat.method === strategy)?.rankedCountries);
     } else {
       setCurrentAResult(item.aggregationResultsAR?.find((strat) => strat.method === strategy)?.rankedCountries);
     }
     handleShowAPSwitch();
-  }, [AGMethod]);
+  };
 
-  React.useEffect(() => {
+  const handleStrategySwitch = (value: string) => {
+    setStrategy(value);
     if (AGMethod === 'preferences') {
-      setCurrentAResult(item.aggregationResultsAP?.find((strat) => strat.method === strategy)?.rankedCountries);
+      setCurrentAResult(item.aggregationResultsAP?.find((strat) => strat.method === value)?.rankedCountries);
+      const aInput = item.aggregatedInput![getAggregatedInput(value)] as Attributes;
+      setAggregatedProfile(aInput);
     } else {
-      setCurrentAResult(item.aggregationResultsAR?.find((strat) => strat.method === strategy)?.rankedCountries);
+      setCurrentAResult(item.aggregationResultsAR?.find((strat) => strat.method === value)?.rankedCountries);
     }
-  }, [strategy]);
+  };
 
   const handleGoBackButton = async () => {
     const response = await fetch(`/recommendationreset?id=${item.id}`, { method: 'PUT' });
@@ -93,7 +97,12 @@ const MethodSelect = React.memo(function MethodSelect({
           </span>
         </OverlayTrigger>
       </p>
-      <Form.Select defaultValue='preferences' aria-label='Aggregation Method' onChange={(e) => setAGMethod(e.target.value)}>
+      <Form.Select
+        defaultValue='preferences'
+        aria-label='Aggregation Method'
+        onChange={(e) => handleAGMethodSwitch(e.target.value)}
+        name='Aggregation Method'
+      >
         <option value='results'>Aggregating Results</option>
         <option value='preferences'>Aggregating Profiles</option>
       </Form.Select>
@@ -112,7 +121,12 @@ const MethodSelect = React.memo(function MethodSelect({
           </span>
         </OverlayTrigger>
       </p>
-      <Form.Select defaultValue='average' aria-label='Aggregation Strategy' onChange={(e) => setStrategy(e.target.value)}>
+      <Form.Select
+        defaultValue='average'
+        aria-label='Aggregation Strategy'
+        onChange={(e) => handleStrategySwitch(e.target.value)}
+        name='Aggregation Strategy'
+      >
         <option>Select...</option>
         {AGMethod === 'results'
           ? ARMethods.map((method, idx) => (
@@ -129,10 +143,16 @@ const MethodSelect = React.memo(function MethodSelect({
       {AGMethod === 'preferences' && (
         <>
           <hr />
-          <Form.Switch label='Show aggregated profile' checked={showProfile} onChange={() => handleShowAPSwitch()} />
+          <Form.Switch
+            label='Show aggregated profile'
+            checked={showProfile}
+            onChange={() => handleShowAPSwitch()}
+            id='Show aggregated profile'
+          />
           {showProfile && aggregatedProfile && (
             <div className='bg-dark p-2 mt-2 border rounded'>
               <DetailScores
+                groupProfileMode
                 scores={Object.keys(aggregatedProfile).map((key) => ({
                   name: key,
                   value: aggregatedProfile[key as keyof AggregatedInput],

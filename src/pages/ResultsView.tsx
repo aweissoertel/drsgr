@@ -36,11 +36,15 @@ const ResultsView = ({ item }: ResultsViewProps) => {
     }
   };
 
-  React.useEffect(() => {
-    fetchRegions().then((res) => setRegions(res));
-
-    const first = item.aggregationResultsAR?.at(0)?.rankedCountries;
+  const init = async () => {
+    const regions = await fetchRegions();
+    setRegions(regions);
+    const first = item.aggregationResultsAP?.find((item) => item.method === 'average')?.rankedCountries;
     setCurrentAResult(first);
+  };
+
+  React.useEffect(() => {
+    init();
   }, []);
 
   React.useEffect(() => {

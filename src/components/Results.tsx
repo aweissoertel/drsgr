@@ -20,7 +20,7 @@ export const Results = ({ results, stay, aggregatedProfile }: ResultsProps) => {
 
   return (
     <div style={{ padding: '10px 0' }}>
-      <h4>Best destinations for you:</h4>
+      <h4>Best destinations for your group:</h4>
       {results.length > 0 ? (
         <div style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }} ref={accordElem}>
           <Accordion activeKey={activeIndex.toString()}>
@@ -83,7 +83,7 @@ const Favorites = ({ item }: FavoritesProps) => {
             </Tooltip>
           }
         >
-          <Button disabled variant='info' size='sm' as='div'>
+          <Button disabled variant='info' size='sm' as='div' style={{ pointerEvents: 'none' }}>
             Best <Badge bg='dark'>{item.favorites.best.length}</Badge>
           </Button>
         </OverlayTrigger>

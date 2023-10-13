@@ -6,20 +6,21 @@ interface BarChartProps {
   score: Score;
   benchmark?: number;
   color: string;
+  groupProfileMode?: boolean;
 }
 
-export const BarChart = ({ score, benchmark = 0, color }: BarChartProps) => {
+export const BarChart = ({ score, benchmark = 0, color, groupProfileMode = false }: BarChartProps) => {
   const isAGMPreferences = React.useContext(MethodContext) === 'preferences';
   const showBenchmark = Boolean(benchmark) && isAGMPreferences;
   const getText = () => {
     if (showBenchmark) {
-      const diff = score.value - benchmark;
+      const diff = Math.round(score.value - benchmark);
       const total = 100 - Math.abs(diff);
       if (diff === 0) {
         return (
           'The ' +
           score.name +
-          ' of this country has the score ' +
+          ' attribute of this country has the score ' +
           score.value +
           ' which is equal to your preference. So ' +
           score.name +
@@ -29,7 +30,7 @@ export const BarChart = ({ score, benchmark = 0, color }: BarChartProps) => {
         return (
           'The ' +
           score.name +
-          ' of this country has the score ' +
+          ' attribute of this country has the score ' +
           score.value +
           ' which is ' +
           Math.abs(diff) +
@@ -37,7 +38,7 @@ export const BarChart = ({ score, benchmark = 0, color }: BarChartProps) => {
           score.name +
           ' is ' +
           total +
-          '%(100-' +
+          '% (100-' +
           Math.abs(diff) +
           ') matching.'
         );
@@ -45,7 +46,7 @@ export const BarChart = ({ score, benchmark = 0, color }: BarChartProps) => {
         return (
           'The ' +
           score.name +
-          ' of this country has the score ' +
+          ' attribute of this country has the score ' +
           score.value +
           ' which is ' +
           Math.abs(diff) +
@@ -53,13 +54,15 @@ export const BarChart = ({ score, benchmark = 0, color }: BarChartProps) => {
           score.name +
           ' is ' +
           total +
-          '%(100-' +
+          '% (100-' +
           Math.abs(diff) +
           ') matching.'
         );
       }
     } else {
-      return 'The ' + score.name + ' of this country has the score ' + score.value + '/100.';
+      return groupProfileMode
+        ? `The preference ${score.name} of your aggregated group profile is ${Math.round(score.value)}/100.`
+        : `The ${score.name} attribute of this country has the score ${Math.round(score.value)}/100.`;
     }
   };
   return (
