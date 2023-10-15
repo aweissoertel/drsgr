@@ -21,7 +21,7 @@ const ResultInfo = ({ country, stay, benchmark }: ResultInfoProps) => {
         {country.name}, {country.parentRegion}
       </p>
       <p style={{ fontSize: 'small' }}>
-        Price for {stay} days: {country.costPerWeek}€
+        Price for {stay} days: {Math.round((country.costPerWeek / 7) * stay)}€
       </p>
       <hr />
       <p style={{ fontSize: 'x-small' }}>

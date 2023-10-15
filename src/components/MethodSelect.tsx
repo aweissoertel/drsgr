@@ -14,6 +14,8 @@ export interface MethodSelectProps {
   aggregatedProfile?: Attributes;
   setAggregatedProfile: React.Dispatch<React.SetStateAction<Attributes | undefined>>;
   setAGMethod: React.Dispatch<React.SetStateAction<string>>;
+  ignoreBudget: boolean;
+  setIgnoreBudget: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const MethodSelect = React.memo(function MethodSelect({
@@ -22,6 +24,8 @@ const MethodSelect = React.memo(function MethodSelect({
   aggregatedProfile,
   setAggregatedProfile,
   setAGMethod,
+  ignoreBudget,
+  setIgnoreBudget,
 }: MethodSelectProps) {
   const [strategy, setStrategy] = React.useState<string>('average');
   const [showProfile, setShowProfile] = React.useState(false);
@@ -140,6 +144,13 @@ const MethodSelect = React.memo(function MethodSelect({
               </option>
             ))}
       </Form.Select>
+      <Form.Switch
+        className='mt-2'
+        label='Exclude destinations above budget'
+        checked={!ignoreBudget}
+        onChange={() => setIgnoreBudget((val) => !val)}
+        id='ignoreBudget'
+      />
       {AGMethod === 'preferences' && (
         <>
           <hr />

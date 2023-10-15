@@ -18,6 +18,19 @@ export const Results = ({ results, stay, aggregatedProfile }: ResultsProps) => {
   const accordElem = useRef<HTMLDivElement>(null);
   const isNotAGMPreferences = React.useContext(MethodContext) !== 'preferences';
 
+  const handleClick = (index: number) => {
+    if (index === activeIndex) {
+      setActiveIndex(-1);
+    } else {
+      setActiveIndex(index);
+      accordElem.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
+      });
+    }
+  };
+
   return (
     <div style={{ padding: '10px 0' }}>
       <h4>Best destinations for your group:</h4>
@@ -26,22 +39,9 @@ export const Results = ({ results, stay, aggregatedProfile }: ResultsProps) => {
           <Accordion activeKey={activeIndex.toString()}>
             {results.slice(0, 10).map((item, index) => (
               <Accordion.Item eventKey={index.toString()} key={index}>
-                <Accordion.Header
-                  onClick={() => {
-                    if (index === activeIndex) {
-                      setActiveIndex(-1);
-                    } else {
-                      setActiveIndex(index);
-                      accordElem.current?.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center',
-                        inline: 'nearest',
-                      });
-                    }
-                  }}
-                >
+                <Accordion.Header onClick={() => handleClick(index)}>
                   {index + 1}. {item.name}
-                  {isNotAGMPreferences && <Favorites item={item} />}
+                  {isNotAGMPreferences && <Favorites item={item} onClick={() => handleClick(index)} />}
                 </Accordion.Header>
                 <Accordion.Body>
                   <ResultInfo country={item} stay={stay} benchmark={aggregatedProfile} />
@@ -69,9 +69,10 @@ export const Results = ({ results, stay, aggregatedProfile }: ResultsProps) => {
 
 interface FavoritesProps {
   item: FullCountry;
+  onClick: () => void;
 }
 
-const Favorites = ({ item }: FavoritesProps) => {
+const Favorites = ({ item, onClick }: FavoritesProps) => {
   return (
     <Stack direction='horizontal' gap={2} style={{ marginLeft: 16 }}>
       {item.favorites.best.length > 0 && (
@@ -83,7 +84,7 @@ const Favorites = ({ item }: FavoritesProps) => {
             </Tooltip>
           }
         >
-          <Button disabled variant='info' size='sm' as='div' style={{ pointerEvents: 'none' }}>
+          <Button disabled variant='info' size='sm' as='div' onClick={onClick}>
             Best <Badge bg='dark'>{item.favorites.best.length}</Badge>
           </Button>
         </OverlayTrigger>
@@ -98,7 +99,7 @@ const Favorites = ({ item }: FavoritesProps) => {
             </Tooltip>
           }
         >
-          <Button disabled variant='success' size='sm' as='div'>
+          <Button disabled variant='success' size='sm' as='div' onClick={onClick}>
             Second <Badge bg='dark'>{item.favorites.second.length}</Badge>
           </Button>
         </OverlayTrigger>
@@ -113,23 +114,23 @@ const Favorites = ({ item }: FavoritesProps) => {
             </Tooltip>
           }
         >
-          <Button disabled variant='warning' size='sm' as='div'>
+          <Button disabled variant='warning' size='sm' as='div' onClick={onClick}>
             Third <Badge bg='dark'>{item.favorites.third.length}</Badge>
           </Button>
         </OverlayTrigger>
       )}
-      {item.favorites.topFive.length > 0 && (
+      {item.favorites.topTen.length > 0 && (
         <OverlayTrigger
           placement='bottom'
           overlay={
             <Tooltip>
-              This would be one of the top 5 destination for {item.favorites.topFive.length} member(s) of your group:{' '}
-              {item.favorites.topFive.join(', ')}
+              This would be one of the top ten destination for {item.favorites.topTen.length} member(s) of your group:{' '}
+              {item.favorites.topTen.join(', ')}
             </Tooltip>
           }
         >
-          <Button disabled variant='secondary' size='sm' as='div'>
-            Top 5 <Badge bg='dark'>{item.favorites.topFive.length}</Badge>
+          <Button disabled variant='secondary' size='sm' as='div' onClick={onClick}>
+            Top 10 <Badge bg='dark'>{item.favorites.topTen.length}</Badge>
           </Button>
         </OverlayTrigger>
       )}

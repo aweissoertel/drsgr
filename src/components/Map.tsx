@@ -15,9 +15,10 @@ const position: LatLngExpression = [51.0967884, 5.9671304];
 
 interface MapProps {
   countries: FullCountry[];
+  ignoreBudget: boolean;
 }
 
-const Map = ({ countries }: MapProps) => {
+const Map = ({ countries, ignoreBudget }: MapProps) => {
   const [, setActiveCountry] = useState(-1);
   const [map, setMap] = useState<IMAP | undefined>(undefined);
   const geoJsonLayer = useRef<any>(null);
@@ -26,21 +27,31 @@ const Map = ({ countries }: MapProps) => {
   useEffect(() => {
     if (geoJsonLayer.current) {
       geoJsonLayer.current.clearLayers().addData(countries);
+      geoJsonLayer.current.options.onEachFeature = onEachCountry(ignoreBudget, AGMethod);
     }
-  }, [geoJsonLayer.current, countries]);
+  }, [geoJsonLayer.current, countries, ignoreBudget, AGMethod]);
 
   //feature: Feature<Geometry, any>, layer: Layer
-  const onEachCountry: any = (country: FullCountry, layer: any) => {
-    const ind = country.rankResult.rank - 1;
+  const onEachCountry: any = (ignore: boolean, method: string) => (country: FullCountry, layer: any) => {
+    if (country.properties.u_name === 'SWE') {
+      console.log('inside', ignore, method, country.rankResult.overBudget);
+    }
+
+    const ind = ignore ? country.rankResult.rank - 1 : country.rankResult.rankOverBudget - 1;
     const score = country.rankResult.totalScore;
-    layer.options.fillColor = getColor(AGMethod === 'preferences' ? score : country.rankResult.rank);
+    layer.options.fillColor = getColor(
+      method === 'preferences' ? score : country.rankResult.rank,
+      ignore,
+      country.rankResult.overBudget,
+      method,
+    );
     const popupContent = ReactDOMServer.renderToString(<CountryPopup country={country} />);
     layer.bindPopup(popupContent, {
       // direction: "auto",
       keepInView: true,
     });
 
-    if (ind < 10) {
+    if (ind < 10 && ind > 0) {
       const tooltipContent = ReactDOMServer.renderToString(<IndexLabel ind={ind} />);
 
       layer.bindTooltip(tooltipContent, {
@@ -91,11 +102,14 @@ const Map = ({ countries }: MapProps) => {
     }
   };
 
-  const getColor = (d: number) => {
-    if (AGMethod === 'preferences') {
+  const getColor = (d: number, ignoreBudet: boolean, overBudget: boolean, method: string) => {
+    if (!ignoreBudet && overBudget) {
+      return '#BF1E24';
+    }
+    if (method === 'preferences') {
       return d > 90 ? '#109146' : d > 70 ? '#7CBA43' : d > 60 ? '#FFCC06' : d > 50 ? '#F58E1D' : d >= 0 ? '#BF1E24' : '#fff';
     } else {
-      return d < 32 ? '#109146' : d < 64 ? '#7CBA43' : d < 96 ? '#FFCC06' : d < 128 ? '#F58E1D' : d < 164 ? '#BF1E24' : '#fff';
+      return d < 32 ? '#109146' : d < 64 ? '#7CBA43' : d < 96 ? '#FFCC06' : d < 128 ? '#F58E1D' : d < 200 ? '#BF1E24' : '#fff';
     }
   };
 
@@ -112,7 +126,7 @@ const Map = ({ countries }: MapProps) => {
       // boxZoom={false}
       // keyboard={false}
     >
-      <GeoJSON ref={geoJsonLayer} style={countryStyle} data={countries as any} onEachFeature={onEachCountry} />
+      <GeoJSON ref={geoJsonLayer} style={countryStyle} data={countries as any} onEachFeature={onEachCountry(ignoreBudget)} />
       <Legend map={map} />
     </MapContainer>
   );

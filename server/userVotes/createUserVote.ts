@@ -5,6 +5,7 @@ export interface CreateUserVoteBody {
   recommendationId: string;
   name: string;
   preferences: Attributes;
+  budget: number;
 }
 
 export default async function createUserVote(req: Request<any, CreateUserVoteBody>, res: Response, prisma: PrismaClient) {

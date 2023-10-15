@@ -78,6 +78,8 @@ interface RankResult {
   rank: number;
   rankReverse: number;
   totalScore: number;
+  overBudget: boolean;
+  rankOverBudget: number;
   // attributeScore: Attributes;
 }
 

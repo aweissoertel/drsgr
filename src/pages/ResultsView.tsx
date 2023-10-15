@@ -16,7 +16,9 @@ const defaultResult: RankResult = {
   u_name: 'default',
   rank: 199,
   rankReverse: 0,
+  rankOverBudget: 0,
   totalScore: 0,
+  overBudget: false,
 };
 
 const ResultsView = ({ item }: ResultsViewProps) => {
@@ -25,6 +27,7 @@ const ResultsView = ({ item }: ResultsViewProps) => {
   const [regions, setRegions] = React.useState<Region[]>();
   const [aggregatedProfile, setAggregatedProfile] = React.useState<Attributes>();
   const [AGMethod, setAGMethod] = React.useState<string>('preferences');
+  const [ignoreBudget, setIgnoreBudet] = React.useState(true);
 
   const fetchRegions = async () => {
     const response = await fetch('/countries', { method: 'GET' });
@@ -60,22 +63,29 @@ const ResultsView = ({ item }: ResultsViewProps) => {
             best: [],
             second: [],
             third: [],
-            topFive: [],
+            topTen: [],
           },
           rankResult: result,
           ...region!,
         };
       })
-      .sort((a, b) => a.rankResult.rank - b.rankResult.rank);
+      .sort((a, b) => {
+        if (ignoreBudget) {
+          return a.rankResult.rank - b.rankResult.rank;
+        } else {
+          return a.rankResult.rankOverBudget - b.rankResult.rankOverBudget;
+        }
+      });
     item.aggregatedInput?.recommendationsPerUserVote.forEach((user) => {
       resCountries.find((country) => country.properties.u_name === user.list[0].u_name)!.favorites.best.push(user.name);
       resCountries.find((country) => country.properties.u_name === user.list[1].u_name)!.favorites.second.push(user.name);
       resCountries.find((country) => country.properties.u_name === user.list[2].u_name)!.favorites.third.push(user.name);
-      resCountries.find((country) => country.properties.u_name === user.list[3].u_name)!.favorites.topFive.push(user.name);
-      resCountries.find((country) => country.properties.u_name === user.list[4].u_name)!.favorites.topFive.push(user.name);
+      for (let i = 3; i < 10; i++) {
+        resCountries.find((country) => country.properties.u_name === user.list[i].u_name)!.favorites.topTen.push(user.name);
+      }
     });
     setResultCountries(resCountries);
-  }, [currentAResult, regions]);
+  }, [currentAResult, regions, ignoreBudget]);
 
   if (!resultCountries) {
     return <h1>Loading...</h1>;
@@ -91,11 +101,13 @@ const ResultsView = ({ item }: ResultsViewProps) => {
             aggregatedProfile={aggregatedProfile}
             setAggregatedProfile={setAggregatedProfile}
             setAGMethod={setAGMethod}
+            ignoreBudget={ignoreBudget}
+            setIgnoreBudget={setIgnoreBudet}
           />
         </Col>
-        <Col xs={6}>{resultCountries && <Map countries={resultCountries} />}</Col>
+        <Col xs={6}>{resultCountries && <Map countries={resultCountries} ignoreBudget={ignoreBudget} />}</Col>
         <Col>
-          <Results results={resultCountries} aggregatedProfile={aggregatedProfile} stay={4} />
+          <Results results={resultCountries} aggregatedProfile={aggregatedProfile} stay={item.stayDays} />
         </Col>
       </Row>
     </MethodContext.Provider>

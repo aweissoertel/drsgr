@@ -19,6 +19,8 @@ model GroupRecommendation {
   aggregationResultsAP AggregationResult[] @relation("AggregatingPreferences")
   qrcode               String
   aggregatedInput      AggregatedInput?
+  budget               Int
+  stayDays             Int
 }
 
 model UserVote {
@@ -27,6 +29,7 @@ model UserVote {
   recommendation   GroupRecommendation @relation(fields: [recommendationId], references: [id])
   recommendationId String              @db.ObjectId
   preferences      Attributes
+  budget           Int
 }
 
 model AggregationResult {
@@ -59,10 +62,12 @@ model Country {
 }
 
 type RankResult {
-  u_name      String
-  rank        Int
-  rankReverse Int
-  totalScore  Float
+  u_name         String
+  rank           Int
+  rankReverse    Int
+  rankOverBudget Int
+  totalScore     Float
+  overBudget     Boolean
 }
 
 type Attributes {

@@ -3,7 +3,7 @@ import express from 'express';
 // eslint-disable-next-line import/default
 import ViteExpress from 'vite-express';
 
-import Aggregator from './server/Aggregator';
+import Aggregator, { UpdateRecommendationBody } from './server/Aggregator';
 import createUserVote, { CreateUserVoteBody } from './server/userVotes/createUserVote';
 import deleteUserVote from './server/userVotes/deleteUserVote';
 import updateUserVote from './server/userVotes/updateUserVote';
@@ -24,6 +24,9 @@ app.get<{ code: string; full: string; id: string }>('/recommendation', async (re
 );
 app.put<{ id: string }>('/recommendation', async (request, response) => aggregator.endVoting(request, response));
 app.put<{ id: string }>('/recommendationreset', async (request, response) => aggregator.reopenVoting(request, response));
+app.put<{ id: string }, UpdateRecommendationBody>('/recommendationValues', async (request, response) =>
+  aggregator.updateRecommendation(request, response),
+);
 app.delete<{ id: string }>('/recommendation', async (request, response) => aggregator.deleteRecommendation(request, response));
 
 ///// userVotes /////

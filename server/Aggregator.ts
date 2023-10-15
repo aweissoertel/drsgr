@@ -8,6 +8,10 @@ import { entries, values } from './util/helpers';
 
 const DEBUG_MODE = false;
 
+export interface UpdateRecommendationBody {
+  stayDays: number;
+}
+
 export default class Aggregator {
   private _ready = false;
 
@@ -66,6 +70,8 @@ export default class Aggregator {
           sessionCode,
           votingEnded: false,
           qrcode: '',
+          budget: 500,
+          stayDays: 7,
         },
       });
       const qrcode = await generateQR(`https://group-travel.fly.dev/session/${entity.id}`);
@@ -112,6 +118,25 @@ export default class Aggregator {
         },
       });
       res.send(entity);
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(500);
+    }
+  }
+
+  public async updateRecommendation(req: Request<{ id: string }, UpdateRecommendationBody>, res: Response) {
+    const params = req.query.id as string;
+    const { stayDays } = req.body;
+    try {
+      await this.prisma.groupRecommendation.update({
+        where: {
+          id: params,
+        },
+        data: {
+          stayDays,
+        },
+      });
+      res.sendStatus(200);
     } catch (error) {
       console.log(error);
       res.sendStatus(500);
@@ -194,11 +219,20 @@ export default class Aggregator {
       return;
     }
 
-    const userVotes = entity.userVotes.map((userVote) => ({ preferences: userVote.preferences, name: userVote.name }));
+    const userVotes = entity.userVotes.map((userVote) => ({
+      preferences: userVote.preferences,
+      name: userVote.name,
+      budget: userVote.budget,
+    }));
     if (userVotes.length === 0) {
       res.status(500).send('No votes for this code');
       return;
     }
+
+    //////////////////////////// Budget ////////////////////////////
+
+    const minBudget = Math.min(...userVotes.map((vote) => vote.budget));
+    const groupBudgetPerWeek = (minBudget / entity.stayDays) * 7;
 
     //////////////////////////// AGGREGATING PROFILES ////////////////////////////
     const onlyPref = userVotes.map((vote) => vote.preferences);
@@ -207,10 +241,10 @@ export default class Aggregator {
     const borda = this.bordaCountAggregationAP(this.rankPreferences(onlyPref));
     const pleasure = this.mostPleasureAggregationAP(onlyPref);
 
-    const rankedCountriesMultiExact = this.getRankedCountriesFromPreferencesExact(multi.normalizedResult);
-    const rankedCountriesAverageExact = this.getRankedCountriesFromPreferencesExact(average);
-    const rankedCountriesBordaExact = this.getRankedCountriesFromPreferencesExact(borda.normalizedResult);
-    const rankedCountriesPleasureExact = this.getRankedCountriesFromPreferencesExact(pleasure);
+    const rankedCountriesMultiExact = this.getRankedCountriesFromPreferencesExact(multi.normalizedResult, groupBudgetPerWeek);
+    const rankedCountriesAverageExact = this.getRankedCountriesFromPreferencesExact(average, groupBudgetPerWeek);
+    const rankedCountriesBordaExact = this.getRankedCountriesFromPreferencesExact(borda.normalizedResult, groupBudgetPerWeek);
+    const rankedCountriesPleasureExact = this.getRankedCountriesFromPreferencesExact(pleasure, groupBudgetPerWeek);
 
     // const rankedCountriesMultiMinimum = this.getRankedCountriesFromPreferencesMinimum(multi.normalizedResult);
     // const rankedCountriesAverageMinimum = this.getRankedCountriesFromPreferencesMinimum(average);
@@ -219,7 +253,7 @@ export default class Aggregator {
 
     //////////////////////////// AGGREGATING RECOMMENDATIONS ////////////////////////////
     const recommendationsPerUserVote: RankResult[][] = userVotes.map((vote) =>
-      this.getRankedCountriesFromPreferencesExact(vote.preferences),
+      this.getRankedCountriesFromPreferencesExact(vote.preferences, groupBudgetPerWeek),
     );
 
     const multiAR = this.multiplicativeAggregationAR(recommendationsPerUserVote);
@@ -230,7 +264,7 @@ export default class Aggregator {
 
     //////////////////////////// UPDATE DB & SEND RESPONSE ////////////////////////////
     const recsWithName: RecPerName[] = userVotes.map((vote) => ({
-      recommendations: this.getRankedCountriesFromPreferencesExact(vote.preferences),
+      recommendations: this.getRankedCountriesFromPreferencesExact(vote.preferences, groupBudgetPerWeek),
       name: vote.name,
     }));
     const insertQuery: Prisma.GroupRecommendationUpdateArgs = {
@@ -427,7 +461,14 @@ export default class Aggregator {
   ////////////////////////////// AGGREGATION LOGIC - AGGREGATING RECOMMENDATIONS //////////////////////////////
 
   private multiplicativeAggregationAR(recommendations: RankResult[][]): RankResult[] {
-    const start: RankResult[] = this.countries.map((country) => ({ u_name: country.u_name, totalScore: 1, rank: 0, rankReverse: 0 }));
+    const start: RankResult[] = this.countries.map((country) => ({
+      u_name: country.u_name,
+      totalScore: 1,
+      rank: 0,
+      rankReverse: 0,
+      rankOverBudget: 0,
+      overBudget: recommendations[0].find((rec) => rec.u_name === country.u_name)!.overBudget,
+    }));
     const result = recommendations.reduce(
       (accumulator, current) =>
         accumulator.map((country) => {
@@ -444,7 +485,14 @@ export default class Aggregator {
   }
 
   private averageAggregationAR(recommendations: RankResult[][]): RankResult[] {
-    const start: RankResult[] = this.countries.map((country) => ({ u_name: country.u_name, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const start: RankResult[] = this.countries.map((country) => ({
+      u_name: country.u_name,
+      totalScore: 0,
+      rank: 0,
+      rankReverse: 0,
+      rankOverBudget: 0,
+      overBudget: recommendations[0].find((rec) => rec.u_name === country.u_name)!.overBudget,
+    }));
     const result = recommendations.reduce(
       (accumulator, current) =>
         accumulator.map((country) => {
@@ -462,7 +510,14 @@ export default class Aggregator {
   }
 
   private bordaCountAggregationAR(recommendations: RankResult[][]): RankResult[] {
-    const start: RankResult[] = this.countries.map((country) => ({ u_name: country.u_name, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const start: RankResult[] = this.countries.map((country) => ({
+      u_name: country.u_name,
+      totalScore: 0,
+      rank: 0,
+      rankReverse: 0,
+      rankOverBudget: 0,
+      overBudget: recommendations[0].find((rec) => rec.u_name === country.u_name)!.overBudget,
+    }));
     const result = recommendations.reduce(
       (accumulator, current) =>
         accumulator.map((country) => {
@@ -479,7 +534,14 @@ export default class Aggregator {
   }
 
   private mostPleasureAggregationAR(recommendations: RankResult[][]): RankResult[] {
-    const start: RankResult[] = this.countries.map((country) => ({ u_name: country.u_name, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const start: RankResult[] = this.countries.map((country) => ({
+      u_name: country.u_name,
+      totalScore: 0,
+      rank: 0,
+      rankReverse: 0,
+      rankOverBudget: 0,
+      overBudget: recommendations[0].find((rec) => rec.u_name === country.u_name)!.overBudget,
+    }));
     const result = recommendations.reduce(
       (accumulator, current) =>
         accumulator.map((country) => {
@@ -502,7 +564,14 @@ export default class Aggregator {
      */
     const miseryPercentage = 0.4;
 
-    const start: RankResult[] = this.countries.map((country) => ({ u_name: country.u_name, totalScore: 0, rank: 0, rankReverse: 0 }));
+    const start: RankResult[] = this.countries.map((country) => ({
+      u_name: country.u_name,
+      totalScore: 0,
+      rank: 0,
+      rankReverse: 0,
+      rankOverBudget: 0,
+      overBudget: recommendations[0].find((rec) => rec.u_name === country.u_name)!.overBudget,
+    }));
     const threshold = Math.floor((1 - miseryPercentage) * this.countries.length);
     const result = recommendations.reduce(
       (accumulator, current) =>
@@ -662,7 +731,7 @@ export default class Aggregator {
     return numScore;
   }
 
-  private getRankedCountries(pref: Attributes, scoreFunction: (should: number, is: number) => number): RankResult[] {
+  private getRankedCountries(pref: Attributes, scoreFunction: (should: number, is: number) => number, budget: number): RankResult[] {
     const countries: RankResult[] = this.countries.map((country) => {
       const attributeScore = this.getNewEmptyAttributes();
       let totalScore = 0;
@@ -671,11 +740,17 @@ export default class Aggregator {
         attributeScore[rKey] = subScore;
         totalScore += subScore;
       }
+      const overBudget = country.costPerWeek > budget;
+      if (!overBudget) {
+        totalScore += 100;
+      }
       const result = {
         u_name: country.u_name,
         rank: 0,
         rankReverse: 0,
-        totalScore: totalScore / 9,
+        rankOverBudget: 0,
+        totalScore: totalScore / 10,
+        overBudget,
       };
       const debug = DEBUG_MODE
         ? {
@@ -693,22 +768,26 @@ export default class Aggregator {
     return countries;
   }
 
-  private getRankedCountriesFromPreferencesExact(pref: Attributes): RankResult[] {
+  private getRankedCountriesFromPreferencesExact(pref: Attributes, budget: number): RankResult[] {
     const scoreFunction = (should: number, is: number) => {
       return 100 - Math.abs(should - is);
     };
-    return this.getRankedCountries(pref, scoreFunction);
+    return this.getRankedCountries(pref, scoreFunction, budget);
   }
 
-  private getRankedCountriesFromPreferencesMinimum(pref: Attributes): RankResult[] {
+  private getRankedCountriesFromPreferencesMinimum(pref: Attributes, budget: number): RankResult[] {
     const scoreFunction = (should: number, is: number) => {
       const diff = is - should;
       return diff > 0 ? Math.min(25, diff) : diff * 10;
     };
-    return this.getRankedCountries(pref, scoreFunction);
+    return this.getRankedCountries(pref, scoreFunction, budget);
   }
 
   private sortAndUpdateRanks(list: RankResult[]) {
+    list.sort((a, b) => (b.overBudget ? 0 : b.totalScore) - (a.overBudget ? 0 : a.totalScore));
+    list.forEach((country, idx) => {
+      country.rankOverBudget = idx + 1;
+    });
     list.sort((a, b) => b.totalScore - a.totalScore);
     list.forEach((country, idx) => {
       country.rank = idx + 1;

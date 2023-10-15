@@ -58,7 +58,9 @@ interface RankResult {
   u_name: string;
   rank: number;
   rankReverse: number;
+  rankOverBudget: number;
   totalScore: number;
+  overBudget: boolean;
 }
 
 interface FullCountry extends MapCountry {
@@ -71,7 +73,7 @@ interface FullCountry extends MapCountry {
     best: string[];
     second: string[];
     third: string[];
-    topFive: string[];
+    topTen: string[];
   };
 }
 
@@ -113,23 +115,20 @@ interface GroupRecommendation {
   aggregationResultsAP?: AggregationResult[];
   aggregatedInput?: AggregatedInput;
   qrcode: string;
+  stayDays: number;
 }
 
 interface UserVote {
   id: string;
   name: string;
   preferences: Attributes;
+  budget: number;
 }
 
 interface AggregationResult {
   id: string;
   method: string;
-  rankedCountries: {
-    u_name: string;
-    rank: number;
-    rankReverse: number;
-    totalScore: number;
-  }[];
+  rankedCountries: RankResult[];
 }
 
 interface Region {

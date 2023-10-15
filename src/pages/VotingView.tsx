@@ -1,6 +1,22 @@
 import * as React from 'react';
 
-import { Alert, Button, Col, Container, FloatingLabel, Form, Modal, Row, Stack } from 'react-bootstrap';
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Container,
+  FloatingLabel,
+  Form,
+  Modal,
+  OverlayTrigger,
+  Row,
+  Stack,
+  Toast,
+  ToastContainer,
+  Tooltip,
+} from 'react-bootstrap';
+import { BiInfoCircle } from 'react-icons/bi';
 import { useLocation } from 'wouter';
 
 import VotingContainer from '../components/VotingContainer';
@@ -15,6 +31,8 @@ const Votingview = ({ item, update }: VotingViewProps) => {
   const [modalDelete, setModalDelete] = React.useState<UserVote | undefined>(undefined);
   const [modalEdit, setModalEdit] = React.useState<UserVote | undefined>(undefined);
   const [showEditModal, setShowEditModal] = React.useState(false);
+  const [stayDays, setStayDays] = React.useState(item.stayDays);
+  const [showToast, setShowToast] = React.useState(false);
 
   const endVoting = async () => {
     const response = await fetch(`/recommendation?id=${item.id}&full=0`, { method: 'PUT' });
@@ -25,13 +43,41 @@ const Votingview = ({ item, update }: VotingViewProps) => {
     update();
   };
 
+  const handleSaveSettings = async () => {
+    const body = { stayDays };
+    const response = await fetch(`/recommendationValues?id=${item.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) {
+      console.log(response);
+      setLocation('/error');
+    } else {
+      setShowToast(true);
+    }
+  };
+
   return (
     <div>
       <Container fluid>
         <Row>
           <Col md={9}>
             <h1>Group Recommendation #{item.sessionCode}</h1>
-            <p>Here you can see votes from others, vote yourself or end the voting phase when you are ready</p>
+            <p>Here you can adjust settings, vote, or end the voting phase when you are ready</p>
+            <Card body>
+              <FloatingLabel label='Total number of days for your trip' className='mb-3'>
+                <Form.Control
+                  value={stayDays}
+                  onChange={(e) => setStayDays(Number(e.target.value))}
+                  placeholder='Total number of days for your trip'
+                  type='number'
+                  style={{ maxWidth: 300 }}
+                  id='stayDayInput'
+                />
+              </FloatingLabel>
+              <Button onClick={handleSaveSettings}>Save settings</Button>
+            </Card>
           </Col>
           <Col md={3} className='ms-auto d-flex flex-column align-items-center'>
             <img src={item.qrcode} alt='alt' />
@@ -85,6 +131,14 @@ const Votingview = ({ item, update }: VotingViewProps) => {
         }}
         update={update}
       />
+      <ToastContainer className='p-3' position='bottom-start' style={{ zIndex: 1 }}>
+        <Toast onClose={() => setShowToast(false)} show={showToast} delay={3000} autohide bg='success'>
+          <Toast.Header>
+            <strong className='me-auto'>Settings</strong>
+          </Toast.Header>
+          <Toast.Body>Settings saved</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 };
@@ -132,6 +186,7 @@ const DeleteConfirmationModal = ({ item, onHide, update, ...rest }: DeleteConfir
 const emptyVote: UserVote = {
   id: '',
   name: '',
+  budget: 500,
   preferences: {
     nature: 50,
     architecture: 50,
@@ -193,14 +248,40 @@ const CreateEditModal = ({ item, parentId, onHide, update, ...rest }: CreateEdit
       </Modal.Header>
       <Modal.Body>
         <Stack gap={4}>
-          <FloatingLabel controlId='floatingInput' label='Enter your name' className='mb-3'>
+          <FloatingLabel label='Enter your name'>
             <Form.Control
+              id='nameInput'
               value={value.name}
               onChange={(e) => setValue((old) => ({ ...old, name: e.target.value }))}
               className='me-auto'
               placeholder='Enter your name...'
             />
           </FloatingLabel>
+          <Form.Group className='mb-3'>
+            <Form.Label>
+              Maximum Budget in €{' '}
+              <OverlayTrigger
+                placement='bottom'
+                overlay={
+                  <Tooltip>
+                    The maximum amount of money you are willing to spend for the <strong>whole trip</strong>.
+                  </Tooltip>
+                }
+              >
+                <span>
+                  <BiInfoCircle />
+                </span>
+              </OverlayTrigger>
+            </Form.Label>
+            <Form.Control
+              value={value.budget}
+              onChange={(e) => setValue((old) => ({ ...old, budget: Number(e.target.value) }))}
+              placeholder='Maximum Budget'
+              type='number'
+              style={{ maxWidth: 300 }}
+              id='budgetInput'
+            />
+          </Form.Group>
           <VotingContainer userData={value} setUserData={setValue} />
         </Stack>
       </Modal.Body>
