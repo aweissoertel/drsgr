@@ -159,9 +159,10 @@ const MethodSelect = React.memo(function MethodSelect({
             checked={showProfile}
             onChange={() => handleShowAPSwitch()}
             id='Show aggregated profile'
+            className='mb-2'
           />
           {showProfile && aggregatedProfile && (
-            <div className='bg-dark p-2 mt-2 border rounded'>
+            <div className='bg-dark p-2 mt-2 mb-2 border rounded'>
               <DetailScores
                 groupProfileMode
                 scores={Object.keys(aggregatedProfile).map((key) => ({

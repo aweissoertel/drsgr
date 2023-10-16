@@ -10,10 +10,10 @@ interface ResultsProps {
   results: FullCountry[];
   stay: number;
   aggregatedProfile?: Attributes;
-  // activeResult: number;
+  openVoteModal: (u_name: string) => void;
 }
 
-export const Results = ({ results, stay, aggregatedProfile }: ResultsProps) => {
+export const Results = ({ results, stay, aggregatedProfile, openVoteModal }: ResultsProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const accordElem = useRef<HTMLDivElement>(null);
   const isNotAGMPreferences = React.useContext(MethodContext) !== 'preferences';
@@ -44,7 +44,7 @@ export const Results = ({ results, stay, aggregatedProfile }: ResultsProps) => {
                   {isNotAGMPreferences && <Favorites item={item} onClick={() => handleClick(index)} />}
                 </Accordion.Header>
                 <Accordion.Body>
-                  <ResultInfo country={item} stay={stay} benchmark={aggregatedProfile} />
+                  <ResultInfo openVoteModal={openVoteModal} country={item} stay={stay} benchmark={aggregatedProfile} />
                 </Accordion.Body>
               </Accordion.Item>
             ))}

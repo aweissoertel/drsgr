@@ -21,6 +21,7 @@ model GroupRecommendation {
   aggregatedInput      AggregatedInput?
   budget               Int
   stayDays             Int
+  finalVotes           FinalVote[]
 }
 
 model UserVote {
@@ -59,6 +60,16 @@ model Country {
   name       String
   region     String
   attributes Attributes
+}
+
+model FinalVote {
+  id               String              @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  recommendation   GroupRecommendation @relation(fields: [recommendationId], references: [id])
+  recommendationId String              @db.ObjectId
+  first            String?
+  second           String?
+  third            String?
 }
 
 type RankResult {

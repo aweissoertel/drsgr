@@ -325,6 +325,9 @@ export default class Aggregator {
             recommendationsPerUserVote: recsWithName.map((rec) => ({ list: rec.recommendations, name: rec.name })),
           },
         },
+        finalVotes: {
+          create: userVotes.map((vote) => ({ name: vote.name })),
+        },
       },
     };
 
@@ -339,23 +342,7 @@ export default class Aggregator {
       return;
     }
 
-    res.send({
-      rankedCountriesMultiExact,
-      multi,
-      rankedCountriesAverageExact,
-      average,
-      rankedCountriesBordaExact,
-      borda,
-      rankedCountriesPleasureExact,
-      pleasure,
-      gr,
-      recommendationsPerUserVote,
-      multiAR,
-      averageAR,
-      bordaAR,
-      pleasureAR,
-      withoutMiseryAR,
-    });
+    res.send(gr);
   }
 
   public async reopenVoting(req: Request<{ id: string }>, res: Response) {

@@ -93,3 +93,14 @@ interface RecPerName {
   recommendations: RankResult[];
   name: string;
 }
+
+interface IdReq {
+  id: string;
+}
+
+interface SaveVoteBody {
+  recommendationId: string;
+  userId: string;
+  u_name: string;
+  position: number;
+}

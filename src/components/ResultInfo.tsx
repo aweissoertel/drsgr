@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { Button } from 'react-bootstrap';
+
 import { MethodContext } from '../shared/MethodContext';
 import { DetailScores } from './DetailScores';
 
@@ -8,10 +10,11 @@ import { DetailScores } from './DetailScores';
 interface ResultInfoProps {
   country: FullCountry;
   stay: number;
+  openVoteModal: (u_name: string) => void;
   benchmark?: Attributes;
 }
 
-const ResultInfo = ({ country, stay, benchmark }: ResultInfoProps) => {
+const ResultInfo = ({ country, stay, openVoteModal, benchmark }: ResultInfoProps) => {
   const isAGMPreferences = React.useContext(MethodContext) === 'preferences';
 
   return (
@@ -39,10 +42,15 @@ const ResultInfo = ({ country, stay, benchmark }: ResultInfoProps) => {
         benchmark={isAGMPreferences ? benchmark : undefined}
       />
       <hr />
-      <p>
-        Overall score: {country.rankResult.totalScore.toFixed(2)}
-        {isAGMPreferences && '/100'}
-      </p>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <span>
+          Overall score: {country.rankResult.totalScore.toFixed(2)}
+          {isAGMPreferences && '/100'}
+        </span>
+        <Button onClick={() => openVoteModal(country.properties.u_name)} size='sm' style={{ marginLeft: 'auto' }}>
+          Vote for this destination
+        </Button>
+      </div>
     </div>
   );
 };

@@ -33,10 +33,6 @@ const Map = ({ countries, ignoreBudget }: MapProps) => {
 
   //feature: Feature<Geometry, any>, layer: Layer
   const onEachCountry: any = (ignore: boolean, method: string) => (country: FullCountry, layer: any) => {
-    if (country.properties.u_name === 'SWE') {
-      console.log('inside', ignore, method, country.rankResult.overBudget);
-    }
-
     const ind = ignore ? country.rankResult.rank - 1 : country.rankResult.rankOverBudget - 1;
     const score = country.rankResult.totalScore;
     layer.options.fillColor = getColor(
@@ -45,13 +41,13 @@ const Map = ({ countries, ignoreBudget }: MapProps) => {
       country.rankResult.overBudget,
       method,
     );
-    const popupContent = ReactDOMServer.renderToString(<CountryPopup country={country} />);
+    const popupContent = ReactDOMServer.renderToString(<CountryPopup country={country} nonRelative={method === 'results'} />);
     layer.bindPopup(popupContent, {
       // direction: "auto",
       keepInView: true,
     });
 
-    if (ind < 10 && ind > 0) {
+    if (ind < 10 && ind > -1) {
       const tooltipContent = ReactDOMServer.renderToString(<IndexLabel ind={ind} />);
 
       layer.bindTooltip(tooltipContent, {

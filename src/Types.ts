@@ -149,3 +149,12 @@ interface AggregatedInput {
     name: string;
   }[];
 }
+
+interface FinalVote {
+  id: string;
+  name: string;
+  recommendationId: string;
+  first: string;
+  second: string;
+  third: string;
+}

@@ -8,16 +8,20 @@ import { DetailScoresMap } from './DetailScoresMap';
 
 interface CountryPopupProps {
   country: FullCountry;
+  nonRelative?: boolean;
 }
 
-export const CountryPopup = ({ country }: CountryPopupProps) => {
+export const CountryPopup = ({ country, nonRelative = false }: CountryPopupProps) => {
   if (!country) return null;
   return (
     <div style={{ color: 'white' }}>
       <h6>{country.name}</h6>
       <Row style={{ alignItems: 'flex-end' }}>
         <Col>{country.parentRegion}</Col>
-        <Col style={{ textAlign: 'end' }}>Score: {country.rankResult.totalScore.toFixed(2)}/100</Col>
+        <Col style={{ textAlign: 'end' }}>
+          Score: {country.rankResult.totalScore.toFixed(2)}
+          {nonRelative ? '' : '/100'}
+        </Col>
       </Row>
 
       <div style={{ width: '100%' }}>

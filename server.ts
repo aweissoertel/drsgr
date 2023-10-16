@@ -1,9 +1,9 @@
 import { UserVote } from '@prisma/client';
 import express from 'express';
-// eslint-disable-next-line import/default
 import ViteExpress from 'vite-express';
 
 import Aggregator, { UpdateRecommendationBody } from './server/Aggregator';
+import FinalVoter from './server/finalVotes/FinalVoter';
 import createUserVote, { CreateUserVoteBody } from './server/userVotes/createUserVote';
 import deleteUserVote from './server/userVotes/deleteUserVote';
 import updateUserVote from './server/userVotes/updateUserVote';
@@ -13,25 +13,30 @@ const app = express();
 app.use(express.json());
 
 const aggregator = new Aggregator();
+const finalVoter = new FinalVoter(aggregator.prisma);
 
 ///// static /////
 app.get('/countries', (_, response) => aggregator.getCountries(response));
 
 ///// recommendations /////
-app.post('/recommendation', async (_, response) => aggregator.createRecommendation(response));
-app.get<{ code: string; full: string; id: string }>('/recommendation', async (request, response) =>
+app.post('/recommendation', (_, response) => aggregator.createRecommendation(response));
+app.get<{ code: string; full: string; id: string }>('/recommendation', (request, response) =>
   aggregator.getRecommendation(request, response),
 );
-app.put<{ id: string }>('/recommendation', async (request, response) => aggregator.endVoting(request, response));
-app.put<{ id: string }>('/recommendationreset', async (request, response) => aggregator.reopenVoting(request, response));
-app.put<{ id: string }, UpdateRecommendationBody>('/recommendationValues', async (request, response) =>
+app.put<IdReq>('/recommendation', (request, response) => aggregator.endVoting(request, response));
+app.put<IdReq>('/recommendationreset', (request, response) => aggregator.reopenVoting(request, response));
+app.put<IdReq, UpdateRecommendationBody>('/recommendationValues', (request, response) =>
   aggregator.updateRecommendation(request, response),
 );
-app.delete<{ id: string }>('/recommendation', async (request, response) => aggregator.deleteRecommendation(request, response));
+app.delete<IdReq>('/recommendation', (request, response) => aggregator.deleteRecommendation(request, response));
 
 ///// userVotes /////
-app.post<any, CreateUserVoteBody>('/userVote', async (request, response) => createUserVote(request, response, aggregator.prisma));
-app.delete<{ id: string }>('/userVote', (request, response) => deleteUserVote(request, response, aggregator.prisma));
-app.put<{ id: string }, UserVote>('/userVote', (request, response) => updateUserVote(request, response, aggregator.prisma));
+app.post<any, CreateUserVoteBody>('/userVote', (request, response) => createUserVote(request, response, aggregator.prisma));
+app.delete<IdReq>('/userVote', (request, response) => deleteUserVote(request, response, aggregator.prisma));
+app.put<IdReq, UserVote>('/userVote', (request, response) => updateUserVote(request, response, aggregator.prisma));
+
+///// finalVotes /////
+app.get<IdReq>('/finalVotes', (request, response) => finalVoter.getVotes(request, response));
+app.put<any, SaveVoteBody>('/finalVote', (request, response) => finalVoter.saveVote(request, response));
 
 ViteExpress.listen(app, port, () => console.log(`Server is listening on port: ${port}`));

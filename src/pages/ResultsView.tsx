@@ -1,11 +1,12 @@
 import * as React from 'react';
 
-import { Col, Row } from 'react-bootstrap';
+import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
 
 import Map from '../components/Map';
 import MethodSelect from '../components/MethodSelect';
 import { Results } from '../components/Results';
 import { features } from '../data/regions.json';
+import { FinalVoteContext } from '../shared/FinalVoteontext';
 import { MethodContext } from '../shared/MethodContext';
 
 interface ResultsViewProps {
@@ -28,6 +29,8 @@ const ResultsView = ({ item }: ResultsViewProps) => {
   const [aggregatedProfile, setAggregatedProfile] = React.useState<Attributes>();
   const [AGMethod, setAGMethod] = React.useState<string>('preferences');
   const [ignoreBudget, setIgnoreBudet] = React.useState(true);
+  const [finalVotes, setFinalVotes] = React.useState<FinalVote[]>([]);
+  const [voteModal, setVoteModal] = React.useState<FullCountry | undefined>(undefined);
 
   const fetchRegions = async () => {
     const response = await fetch('/countries', { method: 'GET' });
@@ -39,11 +42,27 @@ const ResultsView = ({ item }: ResultsViewProps) => {
     }
   };
 
+  const fetchFinalVotes = async () => {
+    const response = await fetch(`/finalVotes?id=${item.id}`, { method: 'GET' });
+    if (response.ok) {
+      const data: FinalVote[] | Record<string, never> = await response.json();
+      return Object.keys(data).length === 0 ? [] : (data as FinalVote[]);
+    } else {
+      console.log('error:', response);
+    }
+  };
+
+  const openVoteModal = (u_name: string) => {
+    setVoteModal(resultCountries!.find((country) => country.properties.u_name === u_name));
+  };
+
   const init = async () => {
     const regions = await fetchRegions();
     setRegions(regions);
     const first = item.aggregationResultsAP?.find((item) => item.method === 'average')?.rankedCountries;
     setCurrentAResult(first);
+    const finVotes = await fetchFinalVotes();
+    setFinalVotes(finVotes || []);
   };
 
   React.useEffect(() => {
@@ -92,25 +111,109 @@ const ResultsView = ({ item }: ResultsViewProps) => {
   }
 
   return (
-    <MethodContext.Provider value={AGMethod}>
-      <Row style={{ height: '100%' }}>
-        <Col>
-          <MethodSelect
-            item={item}
-            setCurrentAResult={setCurrentAResult}
-            aggregatedProfile={aggregatedProfile}
-            setAggregatedProfile={setAggregatedProfile}
-            setAGMethod={setAGMethod}
-            ignoreBudget={ignoreBudget}
-            setIgnoreBudget={setIgnoreBudet}
-          />
-        </Col>
-        <Col xs={6}>{resultCountries && <Map countries={resultCountries} ignoreBudget={ignoreBudget} />}</Col>
-        <Col>
-          <Results results={resultCountries} aggregatedProfile={aggregatedProfile} stay={item.stayDays} />
-        </Col>
-      </Row>
-    </MethodContext.Provider>
+    <FinalVoteContext.Provider value={finalVotes}>
+      <MethodContext.Provider value={AGMethod}>
+        <Row style={{ height: '100%' }}>
+          <Col xs lg>
+            <MethodSelect
+              item={item}
+              setCurrentAResult={setCurrentAResult}
+              aggregatedProfile={aggregatedProfile}
+              setAggregatedProfile={setAggregatedProfile}
+              setAGMethod={setAGMethod}
+              ignoreBudget={ignoreBudget}
+              setIgnoreBudget={setIgnoreBudet}
+            />
+          </Col>
+          <Col xs lg={5}>
+            {resultCountries && <Map countries={resultCountries} ignoreBudget={ignoreBudget} />}
+          </Col>
+          <Col xs={12} lg>
+            <Results openVoteModal={openVoteModal} results={resultCountries} aggregatedProfile={aggregatedProfile} stay={item.stayDays} />
+          </Col>
+        </Row>
+        <VoteModal item={voteModal} show={Boolean(voteModal)} onHide={() => setVoteModal(undefined)} setFinalVotes={setFinalVotes} />
+      </MethodContext.Provider>
+    </FinalVoteContext.Provider>
   );
 };
 export default ResultsView;
+
+interface VoteModalProps {
+  item?: FullCountry;
+  show: boolean;
+  onHide: () => void;
+  setFinalVotes: React.Dispatch<React.SetStateAction<FinalVote[]>>;
+}
+
+type Prio = 'first' | 'second' | 'third' | '';
+
+const VoteModal = ({ item, onHide, setFinalVotes, ...rest }: VoteModalProps) => {
+  const allVotes = React.useContext(FinalVoteContext);
+  const [saving, setSaving] = React.useState(false);
+  const [nameId, setNameId] = React.useState<string>('');
+  const [prio, setPrio] = React.useState<Prio>('');
+
+  const handleSave = async () => {
+    setSaving(true);
+    const idx = allVotes.findIndex((vote) => vote.id === nameId);
+    const body = allVotes[idx];
+    console.log(nameId, prio);
+
+    const res = await fetch('/finalVote', {
+      method: 'PUT',
+      body: JSON.stringify({ ...body, [prio as string]: item!.properties.u_name }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const json = await res.json();
+    setFinalVotes((old) => {
+      const updated = old;
+      updated[idx] = json;
+      return updated;
+    });
+    setSaving(false);
+    onHide();
+  };
+
+  return (
+    <Modal onHide={onHide} {...rest} size='lg' centered>
+      <Modal.Header closeButton>
+        <Modal.Title id='contained-modal-title-vcenter'>Vote for {item?.name}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form.Label htmlFor='nameSelect'>My name is</Form.Label>
+        <Form.Select id='nameSelect' onChange={(e) => setNameId(e.target.value)}>
+          <option value=''>Please select</option>
+          {allVotes.map((vote) => (
+            <option value={vote.id} key={vote.id}>
+              {vote.name}
+            </option>
+          ))}
+        </Form.Select>
+        <p style={{ marginTop: '0.5rem', marginBottom: 0 }}>
+          and I vote for{' '}
+          <strong>
+            {item?.name}, {item?.parentRegion}
+          </strong>
+        </p>
+        <Form.Label htmlFor='prioritySelect'>as my</Form.Label>
+        <Form.Select id='nameSelect' onChange={(e) => setPrio(e.target.value as Prio)}>
+          <option value=''>Please select</option>
+          <option value='first'>most</option>
+          <option value='second'>second most</option>
+          <option value='third'>third most</option>
+        </Form.Select>
+        <p style={{ marginTop: '0.5rem' }}>favorite destination.</p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={onHide} variant='outline-secondary'>
+          Cancel
+        </Button>
+        <Button onClick={() => handleSave()} variant='success' disabled={nameId.length === 0 || prio.length === 0}>
+          Save
+          <Spinner as='span' size='sm' hidden={!saving} />
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
