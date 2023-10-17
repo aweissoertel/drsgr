@@ -11,9 +11,10 @@ interface ResultsProps {
   stay: number;
   aggregatedProfile?: Attributes;
   openVoteModal: (u_name: string) => void;
+  openConfirmModal: () => void;
 }
 
-export const Results = ({ results, stay, aggregatedProfile, openVoteModal }: ResultsProps) => {
+export const Results = ({ results, stay, aggregatedProfile, openVoteModal, openConfirmModal }: ResultsProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const accordElem = useRef<HTMLDivElement>(null);
   const isNotAGMPreferences = React.useContext(MethodContext) !== 'preferences';
@@ -32,7 +33,7 @@ export const Results = ({ results, stay, aggregatedProfile, openVoteModal }: Res
   };
 
   return (
-    <div style={{ padding: '10px 0' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <h4>Best destinations for your group:</h4>
       {results.length > 0 ? (
         <div style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }} ref={accordElem}>
@@ -63,6 +64,9 @@ export const Results = ({ results, stay, aggregatedProfile, openVoteModal }: Res
           <p style={{ fontWeight: 'bold', color: 'red' }}>No results found!</p>
         </div>
       )}
+      <Button onClick={openConfirmModal} variant='success' style={{ marginTop: 'auto', width: '100%' }}>
+        Conclude Session
+      </Button>
     </div>
   );
 };

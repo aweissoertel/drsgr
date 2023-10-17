@@ -69,6 +69,7 @@ export default class Aggregator {
         data: {
           sessionCode,
           votingEnded: false,
+          concluded: false,
           qrcode: '',
           budget: 500,
           stayDays: 7,

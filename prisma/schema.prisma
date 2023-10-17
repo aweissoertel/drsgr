@@ -22,6 +22,8 @@ model GroupRecommendation {
   budget               Int
   stayDays             Int
   finalVotes           FinalVote[]
+  concluded            Boolean
+  finalWinner          RankResult?
 }
 
 model UserVote {

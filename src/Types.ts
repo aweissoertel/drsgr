@@ -116,6 +116,7 @@ interface GroupRecommendation {
   aggregatedInput?: AggregatedInput;
   qrcode: string;
   stayDays: number;
+  concluded: boolean;
 }
 
 interface UserVote {

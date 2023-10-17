@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
+import { Button, Col, Form, ListGroup, Modal, Row, Spinner } from 'react-bootstrap';
 
 import Map from '../components/Map';
 import MethodSelect from '../components/MethodSelect';
@@ -31,6 +31,7 @@ const ResultsView = ({ item }: ResultsViewProps) => {
   const [ignoreBudget, setIgnoreBudet] = React.useState(true);
   const [finalVotes, setFinalVotes] = React.useState<FinalVote[]>([]);
   const [voteModal, setVoteModal] = React.useState<FullCountry | undefined>(undefined);
+  const [confirmModal, setConfirmModal] = React.useState(false);
 
   const fetchRegions = async () => {
     const response = await fetch('/countries', { method: 'GET' });
@@ -129,10 +130,17 @@ const ResultsView = ({ item }: ResultsViewProps) => {
             {resultCountries && <Map countries={resultCountries} ignoreBudget={ignoreBudget} />}
           </Col>
           <Col xs={12} lg>
-            <Results openVoteModal={openVoteModal} results={resultCountries} aggregatedProfile={aggregatedProfile} stay={item.stayDays} />
+            <Results
+              openConfirmModal={() => setConfirmModal(true)}
+              openVoteModal={openVoteModal}
+              results={resultCountries}
+              aggregatedProfile={aggregatedProfile}
+              stay={item.stayDays}
+            />
           </Col>
         </Row>
         <VoteModal item={voteModal} show={Boolean(voteModal)} onHide={() => setVoteModal(undefined)} setFinalVotes={setFinalVotes} />
+        <ConfirmModal countries={resultCountries} show={confirmModal} onHide={() => setConfirmModal(false)} />
       </MethodContext.Provider>
     </FinalVoteContext.Provider>
   );
@@ -158,7 +166,6 @@ const VoteModal = ({ item, onHide, setFinalVotes, ...rest }: VoteModalProps) => 
     setSaving(true);
     const idx = allVotes.findIndex((vote) => vote.id === nameId);
     const body = allVotes[idx];
-    console.log(nameId, prio);
 
     const res = await fetch('/finalVote', {
       method: 'PUT',
@@ -197,7 +204,7 @@ const VoteModal = ({ item, onHide, setFinalVotes, ...rest }: VoteModalProps) => 
           </strong>
         </p>
         <Form.Label htmlFor='prioritySelect'>as my</Form.Label>
-        <Form.Select id='nameSelect' onChange={(e) => setPrio(e.target.value as Prio)}>
+        <Form.Select id='prioritySelect' onChange={(e) => setPrio(e.target.value as Prio)}>
           <option value=''>Please select</option>
           <option value='first'>most</option>
           <option value='second'>second most</option>
@@ -211,6 +218,66 @@ const VoteModal = ({ item, onHide, setFinalVotes, ...rest }: VoteModalProps) => 
         </Button>
         <Button onClick={() => handleSave()} variant='success' disabled={nameId.length === 0 || prio.length === 0}>
           Save
+          <Spinner as='span' size='sm' hidden={!saving} />
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
+interface ConfirmModalProps {
+  show: boolean;
+  countries: FullCountry[];
+  onHide: () => void;
+}
+
+const ConfirmModal = ({ onHide, countries, ...rest }: ConfirmModalProps) => {
+  const allVotes = React.useContext(FinalVoteContext);
+  const [saving, setSaving] = React.useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+
+    console.log('saved, yo');
+    setSaving(false);
+    onHide();
+  };
+
+  const getText = (input: string) => {
+    if (!input) {
+      return <i>no choice</i>;
+    } else {
+      const country = countries.find((c) => c.properties.u_name === input);
+      return country!.name;
+    }
+  };
+
+  return (
+    <Modal onHide={onHide} {...rest} size='lg' centered>
+      <Modal.Header closeButton>
+        <Modal.Title id='contained-modal-title-vcenter'>Conclude Session</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p style={{ marginBottom: '1rem' }}>Here is how everybody voted:</p>
+        <ListGroup>
+          {allVotes.map((vote) => (
+            <ListGroup.Item key={vote.id}>
+              <strong>{vote.name}</strong>: First choice: {getText(vote.first)}. Second choice: {getText(vote.second)}. Third choice:{' '}
+              {getText(vote.third)}
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
+        <p style={{ marginTop: '1rem', marginBottom: 0 }}>
+          Do you want to conclude this session and see the final results of the destinations you voted for?
+        </p>
+        <p>You can still go back later.</p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={onHide} variant='outline-secondary'>
+          Cancel
+        </Button>
+        <Button onClick={() => handleSave()} variant='success'>
+          See results
           <Spinner as='span' size='sm' hidden={!saving} />
         </Button>
       </Modal.Footer>

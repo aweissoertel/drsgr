@@ -13,7 +13,13 @@ const app = express();
 app.use(express.json());
 
 const aggregator = new Aggregator();
-const finalVoter = new FinalVoter(aggregator.prisma);
+// bell of shame: 🔔
+let countries: Region[] = [];
+let finalVoter: FinalVoter;
+new Promise((resolve) => setTimeout(resolve, 5000)).then(() => {
+  countries = aggregator.countries;
+  finalVoter = new FinalVoter(aggregator.prisma, countries);
+});
 
 ///// static /////
 app.get('/countries', (_, response) => aggregator.getCountries(response));
@@ -38,5 +44,7 @@ app.put<IdReq, UserVote>('/userVote', (request, response) => updateUserVote(requ
 ///// finalVotes /////
 app.get<IdReq>('/finalVotes', (request, response) => finalVoter.getVotes(request, response));
 app.put<any, SaveVoteBody>('/finalVote', (request, response) => finalVoter.saveVote(request, response));
+app.post<IdReq>('/concludeSession', (request, response) => finalVoter.concludeSession(request, response));
+app.post<IdReq>('/reopenSession', (request, response) => finalVoter.reopenSession(request, response));
 
 ViteExpress.listen(app, port, () => console.log(`Server is listening on port: ${port}`));

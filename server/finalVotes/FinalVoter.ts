@@ -1,8 +1,11 @@
-import type { PrismaClient } from '@prisma/client';
+import type { FinalVote, PrismaClient, RankResult } from '@prisma/client';
 import type { Request, Response } from 'express';
 
 export default class FinalVoter {
-  constructor(private prisma: PrismaClient) {
+  constructor(
+    private prisma: PrismaClient,
+    private countries: Region[],
+  ) {
     // no-op
   }
 
@@ -41,5 +44,118 @@ export default class FinalVoter {
       console.log(error);
       res.sendStatus(500);
     }
+  }
+
+  public async concludeSession(req: Request<IdReq>, res: Response) {
+    const params = req.query.id as string;
+
+    try {
+      await this.prisma.groupRecommendation.update({
+        where: {
+          id: params,
+        },
+        data: {
+          concluded: true,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(500);
+    }
+
+    let votes: FinalVote[] = [];
+    try {
+      votes = await this.prisma.finalVote.findMany({
+        where: {
+          recommendation: {
+            id: params,
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(500);
+    }
+
+    const preparedVotes = this.prepareFinalVotes(votes);
+
+    const results = this.multiplicativeAggregationAR(preparedVotes);
+    const winner = results[0];
+
+    try {
+      await this.prisma.groupRecommendation.update({
+        where: {
+          id: params,
+        },
+        data: {
+          finalWinner: winner,
+        },
+      });
+      res.send(winner);
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(500);
+    }
+  }
+
+  public async reopenSession(req: Request<IdReq>, res: Response) {
+    const params = req.query.id as string;
+
+    try {
+      await this.prisma.groupRecommendation.update({
+        where: {
+          id: params,
+        },
+        data: {
+          concluded: false,
+          finalWinner: undefined,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(500);
+    }
+  }
+
+  private prepareFinalVotes(votes: FinalVote[]): RankResult[][] {
+    return votes.map((vote) =>
+      [vote.first, vote.second, vote.third].flatMap((item, idx) =>
+        item
+          ? [
+              {
+                u_name: item,
+                rank: idx + 1,
+                rankReverse: 3 - idx,
+                rankOverBudget: idx + 1,
+                overBudget: false,
+                totalScore: 0,
+              },
+            ]
+          : [],
+      ),
+    );
+  }
+
+  private multiplicativeAggregationAR(recommendations: RankResult[][]): RankResult[] {
+    const start: RankResult[] = this.countries.map((country) => ({
+      u_name: country.u_name,
+      totalScore: 1,
+      rank: 0,
+      rankReverse: 0,
+      rankOverBudget: 0,
+      overBudget: false,
+    }));
+    const result = recommendations.reduce(
+      (accumulator, current) =>
+        accumulator.map((country) => {
+          const score = country.totalScore * (current.find((element) => element.u_name === country.u_name)?.rankReverse || 1);
+          return {
+            ...country,
+            totalScore: score,
+          };
+        }),
+      start,
+    );
+    return result;
   }
 }
