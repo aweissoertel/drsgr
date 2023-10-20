@@ -19,6 +19,7 @@ let finalVoter: FinalVoter;
 new Promise((resolve) => setTimeout(resolve, 5000)).then(() => {
   countries = aggregator.countries;
   finalVoter = new FinalVoter(aggregator.prisma, countries);
+  console.log('application ready');
 });
 
 ///// static /////

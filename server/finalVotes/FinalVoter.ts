@@ -80,18 +80,19 @@ export default class FinalVoter {
     const preparedVotes = this.prepareFinalVotes(votes);
 
     const results = this.multiplicativeAggregationAR(preparedVotes);
-    const winner = results[0];
+    results.sort((a, b) => b.totalScore - a.totalScore);
+    const winners = results.slice(0, 3);
 
     try {
-      await this.prisma.groupRecommendation.update({
+      const updated = await this.prisma.groupRecommendation.update({
         where: {
           id: params,
         },
         data: {
-          finalWinner: winner,
+          finalWinners: winners,
         },
       });
-      res.send(winner);
+      res.send(updated);
     } catch (error) {
       console.log(error);
       res.sendStatus(500);
@@ -102,15 +103,16 @@ export default class FinalVoter {
     const params = req.query.id as string;
 
     try {
-      await this.prisma.groupRecommendation.update({
+      const updated = await this.prisma.groupRecommendation.update({
         where: {
           id: params,
         },
         data: {
           concluded: false,
-          finalWinner: undefined,
+          finalWinners: undefined,
         },
       });
+      res.send(updated);
     } catch (error) {
       console.log(error);
       res.sendStatus(500);

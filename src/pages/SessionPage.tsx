@@ -41,7 +41,7 @@ const SessionPage = () => {
   return !data ? (
     <Spinner animation='border' variant='primary' />
   ) : data.votingEnded ? (
-    <ResultsView item={data} />
+    <ResultsView setData={setData} item={data} />
   ) : (
     <Votingview item={data} update={update} />
   );

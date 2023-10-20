@@ -23,7 +23,7 @@ model GroupRecommendation {
   stayDays             Int
   finalVotes           FinalVote[]
   concluded            Boolean
-  finalWinner          RankResult?
+  finalWinners         RankResult[]
 }
 
 model UserVote {

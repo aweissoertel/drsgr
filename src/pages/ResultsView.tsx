@@ -8,9 +8,11 @@ import { Results } from '../components/Results';
 import { features } from '../data/regions.json';
 import { FinalVoteContext } from '../shared/FinalVoteontext';
 import { MethodContext } from '../shared/MethodContext';
+import ConcludedView from './ConcludedView';
 
 interface ResultsViewProps {
   item: GroupRecommendation;
+  setData: React.Dispatch<React.SetStateAction<GroupRecommendation | undefined>>;
 }
 
 const defaultResult: RankResult = {
@@ -22,7 +24,7 @@ const defaultResult: RankResult = {
   overBudget: false,
 };
 
-const ResultsView = ({ item }: ResultsViewProps) => {
+const ResultsView = ({ item, setData }: ResultsViewProps) => {
   const [currentAResult, setCurrentAResult] = React.useState<RankResult[]>();
   const [resultCountries, setResultCountries] = React.useState<FullCountry[]>();
   const [regions, setRegions] = React.useState<Region[]>();
@@ -114,33 +116,45 @@ const ResultsView = ({ item }: ResultsViewProps) => {
   return (
     <FinalVoteContext.Provider value={finalVotes}>
       <MethodContext.Provider value={AGMethod}>
-        <Row style={{ height: '100%' }}>
-          <Col xs lg>
-            <MethodSelect
-              item={item}
-              setCurrentAResult={setCurrentAResult}
-              aggregatedProfile={aggregatedProfile}
-              setAggregatedProfile={setAggregatedProfile}
-              setAGMethod={setAGMethod}
-              ignoreBudget={ignoreBudget}
-              setIgnoreBudget={setIgnoreBudet}
+        {item.concluded ? (
+          <ConcludedView item={item} countries={resultCountries} setData={setData} />
+        ) : (
+          <>
+            <Row style={{ height: '100%' }}>
+              <Col xs lg>
+                <MethodSelect
+                  item={item}
+                  setCurrentAResult={setCurrentAResult}
+                  aggregatedProfile={aggregatedProfile}
+                  setAggregatedProfile={setAggregatedProfile}
+                  setAGMethod={setAGMethod}
+                  ignoreBudget={ignoreBudget}
+                  setIgnoreBudget={setIgnoreBudet}
+                />
+              </Col>
+              <Col xs lg={5}>
+                {resultCountries && <Map countries={resultCountries} ignoreBudget={ignoreBudget} />}
+              </Col>
+              <Col xs={12} lg>
+                <Results
+                  openConfirmModal={() => setConfirmModal(true)}
+                  openVoteModal={openVoteModal}
+                  results={resultCountries}
+                  aggregatedProfile={aggregatedProfile}
+                  stay={item.stayDays}
+                />
+              </Col>
+            </Row>
+            <VoteModal item={voteModal} show={Boolean(voteModal)} onHide={() => setVoteModal(undefined)} setFinalVotes={setFinalVotes} />
+            <ConfirmModal
+              countries={resultCountries}
+              show={confirmModal}
+              onHide={() => setConfirmModal(false)}
+              id={item.id}
+              setData={setData}
             />
-          </Col>
-          <Col xs lg={5}>
-            {resultCountries && <Map countries={resultCountries} ignoreBudget={ignoreBudget} />}
-          </Col>
-          <Col xs={12} lg>
-            <Results
-              openConfirmModal={() => setConfirmModal(true)}
-              openVoteModal={openVoteModal}
-              results={resultCountries}
-              aggregatedProfile={aggregatedProfile}
-              stay={item.stayDays}
-            />
-          </Col>
-        </Row>
-        <VoteModal item={voteModal} show={Boolean(voteModal)} onHide={() => setVoteModal(undefined)} setFinalVotes={setFinalVotes} />
-        <ConfirmModal countries={resultCountries} show={confirmModal} onHide={() => setConfirmModal(false)} />
+          </>
+        )}
       </MethodContext.Provider>
     </FinalVoteContext.Provider>
   );
@@ -226,21 +240,28 @@ const VoteModal = ({ item, onHide, setFinalVotes, ...rest }: VoteModalProps) => 
 };
 
 interface ConfirmModalProps {
+  id: string;
   show: boolean;
   countries: FullCountry[];
   onHide: () => void;
+  setData: React.Dispatch<React.SetStateAction<GroupRecommendation | undefined>>;
 }
 
-const ConfirmModal = ({ onHide, countries, ...rest }: ConfirmModalProps) => {
+const ConfirmModal = ({ id, onHide, countries, setData, ...rest }: ConfirmModalProps) => {
   const allVotes = React.useContext(FinalVoteContext);
   const [saving, setSaving] = React.useState(false);
 
   const handleSave = async () => {
     setSaving(true);
 
-    console.log('saved, yo');
+    const res = await fetch(`/concludeSession?id=${id}`, {
+      method: 'POST',
+    });
+    const body = await res.json();
+
     setSaving(false);
     onHide();
+    setData(body);
   };
 
   const getText = (input: string) => {

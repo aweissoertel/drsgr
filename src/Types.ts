@@ -117,6 +117,7 @@ interface GroupRecommendation {
   qrcode: string;
   stayDays: number;
   concluded: boolean;
+  finalWinners?: RankResult[];
 }
 
 interface UserVote {
