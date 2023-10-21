@@ -111,6 +111,12 @@ export default class FinalVoter {
           concluded: false,
           finalWinners: undefined,
         },
+        include: {
+          aggregationResultsAR: true,
+          aggregationResultsAP: true,
+          userVotes: true,
+          aggregatedInput: true,
+        },
       });
       res.send(updated);
     } catch (error) {

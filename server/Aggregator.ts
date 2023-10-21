@@ -353,7 +353,7 @@ export default class Aggregator {
       return;
     }
     try {
-      await this.prisma.groupRecommendation.update({
+      const updated = await this.prisma.groupRecommendation.update({
         where: {
           id: params,
         },
@@ -368,6 +368,14 @@ export default class Aggregator {
           aggregatedInput: {
             delete: true,
           },
+        },
+        include: {
+          finalVotes: true,
+        },
+      });
+      await this.prisma.finalVote.deleteMany({
+        where: {
+          id: { in: updated.finalVotes.map((vote) => vote.id) },
         },
       });
       res.sendStatus(200);

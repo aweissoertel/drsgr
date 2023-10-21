@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Col, Row } from 'react-bootstrap';
 
-import { AttributeScore } from '../views/MapView/components/AttributeScore';
+import { AttributeScore } from './AttributeScore';
 
 interface DetailScoresProps {
   scores: Score[];

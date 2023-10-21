@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { Badge, Button, OverlayTrigger, Stack, Tooltip } from 'react-bootstrap';
 import Accordion from 'react-bootstrap/Accordion';
 
-import { MethodContext } from '../shared/MethodContext';
+import { MethodContext } from '../../shared/MethodContext';
 import ResultInfo from './ResultInfo';
 
 interface ResultsProps {

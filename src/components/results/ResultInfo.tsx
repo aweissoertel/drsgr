@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Button } from 'react-bootstrap';
 
-import { MethodContext } from '../shared/MethodContext';
+import { MethodContext } from '../../shared/MethodContext';
 import { DetailScores } from './DetailScores';
 
 // import PieChartComponent from '../views/ResultsView/components/PieChartComponent';

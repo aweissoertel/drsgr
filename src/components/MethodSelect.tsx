@@ -6,7 +6,7 @@ import { BiInfoCircle } from 'react-icons/bi';
 import { MethodContext } from '../shared/MethodContext';
 import { APMethods, ARMethods } from '../shared/constants';
 import { getAggregatedInput, getAggregationStrategy } from '../shared/util';
-import { DetailScores } from './DetailScores';
+import { DetailScores } from './results/DetailScores';
 
 export interface MethodSelectProps {
   item: GroupRecommendation;
@@ -67,6 +67,7 @@ const MethodSelect = React.memo(function MethodSelect({
       setAggregatedProfile(undefined);
       setShowProfile(false);
     } else {
+      console.log(item, strategy);
       const aInput = item.aggregatedInput![getAggregatedInput(strategy)] as Attributes;
       setAggregatedProfile(aInput);
       setShowProfile(true);

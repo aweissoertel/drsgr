@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { Button } from 'react-bootstrap';
 
 import Delayed from '../components/Delayed';
-import ResultInfo from '../components/ResultInfo';
+import ResultInfo from '../components/results/ResultInfo';
 
 interface ConcludedViewProps {
   item: GroupRecommendation;
@@ -56,7 +56,7 @@ const ConcludedView = ({ item, countries, setData }: ConcludedViewProps) => {
       </Delayed>
       <Delayed delay={6000}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 100, paddingBottom: 20 }}>
-          <h2>The following countries might be great alternatives:</h2>
+          <h2>The following destinations might be great alternatives:</h2>
           <h2 style={{ marginTop: 50 }}>{second.name}</h2>
           <h6>Region of {second.parentRegion}</h6>
           <h5>Costs: {Math.round((second.costPerWeek / 7) * item.stayDays)}€ per Person.</h5>
@@ -70,7 +70,7 @@ const ConcludedView = ({ item, countries, setData }: ConcludedViewProps) => {
             <ResultInfo country={third} stay={item.stayDays} isFinalResultMode />
           </div>
           <Button variant='danger' onClick={goBack} style={{ marginTop: 50 }}>
-            Go back and vote for other countries instead
+            Go back and vote for other destinations instead
           </Button>
         </div>
       </Delayed>

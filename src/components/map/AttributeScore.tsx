@@ -2,8 +2,8 @@ import React from 'react';
 
 import { Col, Row } from 'react-bootstrap';
 
-import { BarChart } from '../../../components/BarChart';
-import * as myConstant from '../../../data/constantData';
+import * as myConstant from '../../data/constantData';
+import { BarChart } from '../results/BarChart';
 
 interface AttributeScoreProps {
   score: Score;

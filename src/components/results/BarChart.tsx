@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { MethodContext } from '../shared/MethodContext';
+import { MethodContext } from '../../shared/MethodContext';
 
 interface BarChartProps {
   score: Score;

@@ -2,11 +2,11 @@ import * as React from 'react';
 
 import { Button, Col, Form, ListGroup, Modal, Row, Spinner } from 'react-bootstrap';
 
-import Map from '../components/Map';
 import MethodSelect from '../components/MethodSelect';
-import { Results } from '../components/Results';
+import Map from '../components/map/Map';
+import { Results } from '../components/results/Results';
 import { features } from '../data/regions.json';
-import { FinalVoteContext } from '../shared/FinalVoteontext';
+import { FinalVoteContext } from '../shared/FinalVoteContext';
 import { MethodContext } from '../shared/MethodContext';
 import ConcludedView from './ConcludedView';
 

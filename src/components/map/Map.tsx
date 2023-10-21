@@ -5,11 +5,11 @@ import { Map as IMAP, LatLngExpression, LeafletMouseEvent } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { GeoJSON, MapContainer } from 'react-leaflet';
 
-import { MethodContext } from '../shared/MethodContext';
-import { IndexLabel } from '../views/MapView/components/IndexLabel';
-import Legend from '../views/MapView/components/Legend';
+import { MethodContext } from '../../shared/MethodContext';
 import { CountryPopup } from './CountryPopup';
-import './styles/Map.css';
+import { IndexLabel } from './IndexLabel';
+import Legend from './Legend';
+import './Map.css';
 
 const position: LatLngExpression = [51.0967884, 5.9671304];
 
