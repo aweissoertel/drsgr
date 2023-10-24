@@ -98,6 +98,10 @@ interface IdReq {
   id: string;
 }
 
+interface CreateRReq {
+  surveyMode: boolean;
+}
+
 interface SaveVoteBody {
   recommendationId: string;
   userId: string;

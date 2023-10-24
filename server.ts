@@ -26,7 +26,7 @@ new Promise((resolve) => setTimeout(resolve, 5000)).then(() => {
 app.get('/countries', (_, response) => aggregator.getCountries(response));
 
 ///// recommendations /////
-app.post('/recommendation', (_, response) => aggregator.createRecommendation(response));
+app.post<CreateRReq>('/recommendation', (request, response) => aggregator.createRecommendation(request, response));
 app.get<{ code: string; full: string; id: string }>('/recommendation', (request, response) =>
   aggregator.getRecommendation(request, response),
 );

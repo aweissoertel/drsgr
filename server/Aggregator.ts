@@ -4,6 +4,7 @@ import fetch from 'node-fetch';
 import { NODE_STREAM_INPUT, parse as papaparse } from 'papaparse';
 import { toDataURL as generateQR } from 'qrcode';
 
+import { userVotes } from './static/surveyData';
 import { entries, values } from './util/helpers';
 
 const DEBUG_MODE = false;
@@ -53,12 +54,16 @@ export default class Aggregator {
   /**
    * Handles the creation of a new recommendation. Responds with this recommendation
    */
-  public async createRecommendation(res: Response) {
+  public async createRecommendation(req: Request<CreateRReq>, res: Response) {
+    const { surveyMode } = req.query as any;
+    const isSurvey = Boolean(surveyMode);
     // https://stackoverflow.com/a/12502559
     // generates alphanumeric code in the form of ABC123:
     // string of length 6 with random uppercase letters and digits
     // duplicates after 70 million generations
     const sessionCode = Math.random().toString(36).slice(2, 8).toUpperCase();
+
+    const surveyUsers = isSurvey ? { userVotes: { createMany: { data: userVotes } } } : undefined;
 
     try {
       const entity = await this.prisma.groupRecommendation.create({
@@ -70,6 +75,8 @@ export default class Aggregator {
           budget: 500,
           stayDays: 7,
           description: '',
+          surveyMode: isSurvey,
+          ...surveyUsers,
         },
       });
       const qrcode = await generateQR(`https://group-travel.fly.dev/session/${entity.id}`);
@@ -266,6 +273,32 @@ export default class Aggregator {
       recommendations: this.getRankedCountriesFromPreferencesExact(vote.preferences, groupBudgetPerWeek),
       name: vote.name,
     }));
+
+    const getFinalVotes = (): Prisma.FinalVoteCreateManyRecommendationInputEnvelope => {
+      if (!entity.surveyMode) {
+        return { data: userVotes.map((vote) => ({ name: vote.name })) };
+      } else {
+        const users = userVotes.filter((vote) => vote.name !== 'Alice' && vote.name !== 'Bob');
+        return {
+          data: [
+            {
+              name: 'Alice',
+              first: recsWithName.find((rec) => rec.name === 'Alice')!.recommendations[0].u_name,
+              second: recsWithName.find((rec) => rec.name === 'Alice')!.recommendations[1].u_name,
+              third: recsWithName.find((rec) => rec.name === 'Alice')!.recommendations[2].u_name,
+            },
+            {
+              name: 'Bob',
+              first: recsWithName.find((rec) => rec.name === 'Bob')!.recommendations[0].u_name,
+              second: recsWithName.find((rec) => rec.name === 'Bob')!.recommendations[1].u_name,
+              third: recsWithName.find((rec) => rec.name === 'Bob')!.recommendations[2].u_name,
+            },
+            ...users.map((vote) => ({ name: vote.name })),
+          ],
+        };
+      }
+    };
+
     const insertQuery: Prisma.GroupRecommendationUpdateArgs = {
       where: {
         id: params,
@@ -325,7 +358,7 @@ export default class Aggregator {
           },
         },
         finalVotes: {
-          create: userVotes.map((vote) => ({ name: vote.name })),
+          createMany: getFinalVotes(),
         },
       },
     };

@@ -22,7 +22,7 @@ const Root = () => {
 
   const handleCreate = async () => {
     setCreateLoading(true);
-    const response = await fetch('/recommendation', { method: 'POST' });
+    const response = await fetch('/recommendation?surveyMode=false', { method: 'POST' });
     if (response.ok) {
       const data = await response.json();
       setLocation(`/session/${data.id}`);
@@ -31,6 +31,15 @@ const Root = () => {
       setLocation('error');
     }
   };
+
+  const handleCreateSess = async () => {
+    const response = await fetch('/recommendation?surveyMode=true', { method: 'POST' });
+    const data = await response.json();
+    console.log('Survey Sess created. Id:');
+    console.log(data.sessionCode);
+  };
+
+  const isAdminMode = window.localStorage.getItem('admin') === 'survey';
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', textAlign: 'center' }}>
@@ -57,6 +66,7 @@ const Root = () => {
           )}
         </Stack>
       </div>
+      {isAdminMode && <Button onClick={() => handleCreateSess()}>Create Survey Sess</Button>}
     </div>
   );
 };

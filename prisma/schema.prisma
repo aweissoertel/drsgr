@@ -25,6 +25,7 @@ model GroupRecommendation {
   finalVotes           FinalVote[]
   concluded            Boolean
   finalWinners         RankResult[]
+  surveyMode           Boolean
 }
 
 model UserVote {
