@@ -21,6 +21,7 @@ model GroupRecommendation {
   aggregatedInput      AggregatedInput?
   budget               Int
   stayDays             Int
+  description          String
   finalVotes           FinalVote[]
   concluded            Boolean
   finalWinners         RankResult[]

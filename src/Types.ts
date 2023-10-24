@@ -116,6 +116,7 @@ interface GroupRecommendation {
   aggregatedInput?: AggregatedInput;
   qrcode: string;
   stayDays: number;
+  description: string;
   concluded: boolean;
   finalWinners?: RankResult[];
 }

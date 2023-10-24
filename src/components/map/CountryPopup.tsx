@@ -8,10 +8,11 @@ import { DetailScoresMap } from './DetailScoresMap';
 
 interface CountryPopupProps {
   country: FullCountry;
+  stayDays: number;
   nonRelative?: boolean;
 }
 
-export const CountryPopup = ({ country, nonRelative = false }: CountryPopupProps) => {
+export const CountryPopup = ({ country, stayDays, nonRelative = false }: CountryPopupProps) => {
   if (!country) return null;
   return (
     <div style={{ color: 'white' }}>
@@ -30,7 +31,7 @@ export const CountryPopup = ({ country, nonRelative = false }: CountryPopupProps
             name: key,
             value: country.attributes[key as keyof Attributes],
           }))}
-          price={country.costPerWeek}
+          price={Math.round((country.costPerWeek / 7) * stayDays)}
         />
       </div>
     </div>

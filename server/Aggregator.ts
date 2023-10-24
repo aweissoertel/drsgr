@@ -8,10 +8,6 @@ import { entries, values } from './util/helpers';
 
 const DEBUG_MODE = false;
 
-export interface UpdateRecommendationBody {
-  stayDays: number;
-}
-
 export default class Aggregator {
   private _ready = false;
 
@@ -73,6 +69,7 @@ export default class Aggregator {
           qrcode: '',
           budget: 500,
           stayDays: 7,
+          description: '',
         },
       });
       const qrcode = await generateQR(`https://group-travel.fly.dev/session/${entity.id}`);
@@ -127,7 +124,7 @@ export default class Aggregator {
 
   public async updateRecommendation(req: Request<{ id: string }, UpdateRecommendationBody>, res: Response) {
     const params = req.query.id as string;
-    const { stayDays } = req.body;
+    const { stayDays, description } = req.body;
     try {
       await this.prisma.groupRecommendation.update({
         where: {
@@ -135,6 +132,7 @@ export default class Aggregator {
         },
         data: {
           stayDays,
+          description,
         },
       });
       res.sendStatus(200);

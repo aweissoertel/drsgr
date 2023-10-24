@@ -15,10 +15,11 @@ const position: LatLngExpression = [51.0967884, 5.9671304];
 
 interface MapProps {
   countries: FullCountry[];
+  stayDays: number;
   ignoreBudget: boolean;
 }
 
-const Map = ({ countries, ignoreBudget }: MapProps) => {
+const Map = ({ countries, stayDays, ignoreBudget }: MapProps) => {
   const [, setActiveCountry] = useState(-1);
   const [map, setMap] = useState<IMAP | undefined>(undefined);
   const geoJsonLayer = useRef<any>(null);
@@ -41,7 +42,9 @@ const Map = ({ countries, ignoreBudget }: MapProps) => {
       country.rankResult.overBudget,
       method,
     );
-    const popupContent = ReactDOMServer.renderToString(<CountryPopup country={country} nonRelative={method === 'results'} />);
+    const popupContent = ReactDOMServer.renderToString(
+      <CountryPopup country={country} stayDays={stayDays} nonRelative={method === 'results'} />,
+    );
     layer.bindPopup(popupContent, {
       // direction: "auto",
       keepInView: true,

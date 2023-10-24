@@ -46,13 +46,13 @@ const Root = () => {
               value={input}
               onChange={(e) => setInput(e.target.value.toUpperCase().slice(0, 6))}
               className='me-auto'
-              placeholder='Go to existing id...'
+              placeholder='Go to session id...'
             />
             <Button onClick={handleGetButton}>Go!</Button>
           </Stack>
           {showError && (
             <Alert className='mt-3' variant='danger' onClose={() => setShowError(false)} dismissible>
-              This id was not found
+              This session id was not found
             </Alert>
           )}
         </Stack>

@@ -16,7 +16,7 @@ import {
   ToastContainer,
   Tooltip,
 } from 'react-bootstrap';
-import { BiInfoCircle } from 'react-icons/bi';
+import { BiCopy, BiInfoCircle } from 'react-icons/bi';
 import { useLocation } from 'wouter';
 
 import VotingContainer from '../components/VotingContainer';
@@ -32,6 +32,7 @@ const Votingview = ({ item, update }: VotingViewProps) => {
   const [modalEdit, setModalEdit] = React.useState<UserVote | undefined>(undefined);
   const [showEditModal, setShowEditModal] = React.useState(false);
   const [stayDays, setStayDays] = React.useState(item.stayDays);
+  const [description, setDescription] = React.useState(item.description);
   const [showToast, setShowToast] = React.useState(false);
 
   const endVoting = async () => {
@@ -44,7 +45,7 @@ const Votingview = ({ item, update }: VotingViewProps) => {
   };
 
   const handleSaveSettings = async () => {
-    const body = { stayDays };
+    const body = { stayDays, description };
     const response = await fetch(`/recommendationValues?id=${item.id}`, {
       method: 'PUT',
       body: JSON.stringify(body),
@@ -66,22 +67,45 @@ const Votingview = ({ item, update }: VotingViewProps) => {
             <h1>Group Recommendation #{item.sessionCode}</h1>
             <p>Here you can adjust settings, vote, or end the voting phase when you are ready</p>
             <Card body>
-              <FloatingLabel label='Total number of days for your trip' className='mb-3'>
-                <Form.Control
-                  value={stayDays}
-                  onChange={(e) => setStayDays(Number(e.target.value))}
-                  placeholder='Total number of days for your trip'
-                  type='number'
-                  style={{ maxWidth: 300 }}
-                  id='stayDayInput'
-                />
-              </FloatingLabel>
+              <h5>Settings</h5>
+              <Stack direction='horizontal' gap={4}>
+                <FloatingLabel label='Total number of days for your trip' className='mb-3'>
+                  <Form.Control
+                    value={stayDays}
+                    onChange={(e) => setStayDays(Number(e.target.value))}
+                    placeholder='Total number of days for your trip'
+                    type='number'
+                    style={{ width: 250 }}
+                    id='stayDayInput'
+                  />
+                </FloatingLabel>
+                <FloatingLabel label='Description' className='mb-3'>
+                  <Form.Control
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder='Description'
+                    style={{ width: 500 }}
+                    id='descriptionInput'
+                  />
+                </FloatingLabel>
+              </Stack>
               <Button onClick={handleSaveSettings}>Save settings</Button>
             </Card>
           </Col>
           <Col md={3} className='ms-auto d-flex flex-column align-items-center'>
             <img src={item.qrcode} alt='alt' />
             <h5 className='mt-2'>Share with your friends!</h5>
+            <Stack direction='horizontal' gap={2} style={{ alignSelf: 'revert' }}>
+              <Button
+                variant='outline-light'
+                onClick={() => navigator.clipboard.writeText(`https://group-travel.fly.dev/session/${item.id}`)}
+              >
+                Copy Link <BiCopy />
+              </Button>
+              <Button variant='outline-light' onClick={() => navigator.clipboard.writeText(item.sessionCode)}>
+                Copy Session Id <BiCopy />
+              </Button>
+            </Stack>
           </Col>
         </Row>
       </Container>
@@ -107,7 +131,7 @@ const Votingview = ({ item, update }: VotingViewProps) => {
           </Alert>
         ))}
         <Button size='lg' variant='success' onClick={() => setShowEditModal(true)}>
-          + Create new vote
+          + Add new user
         </Button>
         <Button size='lg' variant='warning' onClick={() => endVoting()}>
           End voting phase & see results
@@ -242,7 +266,7 @@ const CreateEditModal = ({ item, parentId, onHide, update, ...rest }: CreateEdit
   };
 
   return (
-    <Modal onHide={onHide} {...rest} size='lg' aria-labelledby='contained-modal-title-vcenter' centered>
+    <Modal onHide={onHide} {...rest} size='lg' aria-labelledby='contained-modal-title-vcenter' backdrop='static' centered>
       <Modal.Header closeButton>
         <Modal.Title id='contained-modal-title-vcenter'>Edit Vote</Modal.Title>
       </Modal.Header>

@@ -104,3 +104,8 @@ interface SaveVoteBody {
   u_name: string;
   position: number;
 }
+
+interface UpdateRecommendationBody {
+  stayDays: number;
+  description: string;
+}

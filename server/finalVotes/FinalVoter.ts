@@ -133,7 +133,7 @@ export default class FinalVoter {
               {
                 u_name: item,
                 rank: idx + 1,
-                rankReverse: 3 - idx,
+                rankReverse: 4 - idx,
                 rankOverBudget: idx + 1,
                 overBudget: false,
                 totalScore: 0,

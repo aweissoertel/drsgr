@@ -2,7 +2,7 @@ import { UserVote } from '@prisma/client';
 import express from 'express';
 import ViteExpress from 'vite-express';
 
-import Aggregator, { UpdateRecommendationBody } from './server/Aggregator';
+import Aggregator from './server/Aggregator';
 import FinalVoter from './server/finalVotes/FinalVoter';
 import createUserVote, { CreateUserVoteBody } from './server/userVotes/createUserVote';
 import deleteUserVote from './server/userVotes/deleteUserVote';

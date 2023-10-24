@@ -28,7 +28,7 @@ const ResultsView = ({ item, setData }: ResultsViewProps) => {
   const [currentAResult, setCurrentAResult] = React.useState<RankResult[]>();
   const [resultCountries, setResultCountries] = React.useState<FullCountry[]>();
   const [regions, setRegions] = React.useState<Region[]>();
-  const [aggregatedProfile, setAggregatedProfile] = React.useState<Attributes>();
+  const [aggregatedProfile, setAggregatedProfile] = React.useState<Attributes | undefined>(item.aggregatedInput?.averageAP as Attributes);
   const [AGMethod, setAGMethod] = React.useState<string>('preferences');
   const [ignoreBudget, setIgnoreBudet] = React.useState(true);
   const [finalVotes, setFinalVotes] = React.useState<FinalVote[]>([]);
@@ -133,7 +133,7 @@ const ResultsView = ({ item, setData }: ResultsViewProps) => {
                 />
               </Col>
               <Col xs lg={5}>
-                {resultCountries && <Map countries={resultCountries} ignoreBudget={ignoreBudget} />}
+                {resultCountries && <Map countries={resultCountries} stayDays={item.stayDays} ignoreBudget={ignoreBudget} />}
               </Col>
               <Col xs={12} lg>
                 <Results
@@ -149,6 +149,7 @@ const ResultsView = ({ item, setData }: ResultsViewProps) => {
             <ConfirmModal
               countries={resultCountries}
               show={confirmModal}
+              privacy={!aggregatedProfile}
               onHide={() => setConfirmModal(false)}
               id={item.id}
               setData={setData}
@@ -230,7 +231,7 @@ const VoteModal = ({ item, onHide, setFinalVotes, ...rest }: VoteModalProps) => 
         <Button onClick={onHide} variant='outline-secondary'>
           Cancel
         </Button>
-        <Button onClick={() => handleSave()} variant='success' disabled={nameId.length === 0 || prio.length === 0}>
+        <Button onClick={() => handleSave()} variant='success' disabled={!nameId || !prio || nameId.length === 0 || prio.length === 0}>
           Save
           <Spinner as='span' size='sm' hidden={!saving} />
         </Button>
@@ -242,12 +243,13 @@ const VoteModal = ({ item, onHide, setFinalVotes, ...rest }: VoteModalProps) => 
 interface ConfirmModalProps {
   id: string;
   show: boolean;
+  privacy: boolean;
   countries: FullCountry[];
   onHide: () => void;
   setData: React.Dispatch<React.SetStateAction<GroupRecommendation | undefined>>;
 }
 
-const ConfirmModal = ({ id, onHide, countries, setData, ...rest }: ConfirmModalProps) => {
+const ConfirmModal = ({ id, onHide, privacy, countries, setData, ...rest }: ConfirmModalProps) => {
   const allVotes = React.useContext(FinalVoteContext);
   const [saving, setSaving] = React.useState(false);
 
@@ -279,15 +281,19 @@ const ConfirmModal = ({ id, onHide, countries, setData, ...rest }: ConfirmModalP
         <Modal.Title id='contained-modal-title-vcenter'>Conclude Session</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p style={{ marginBottom: '1rem' }}>Here is how everybody voted:</p>
-        <ListGroup>
-          {allVotes.map((vote) => (
-            <ListGroup.Item key={vote.id}>
-              <strong>{vote.name}</strong>: First choice: {getText(vote.first)}. Second choice: {getText(vote.second)}. Third choice:{' '}
-              {getText(vote.third)}
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
+        {!privacy && (
+          <>
+            <p style={{ marginBottom: '1rem' }}>Here is how everybody voted:</p>
+            <ListGroup>
+              {allVotes.map((vote) => (
+                <ListGroup.Item key={vote.id}>
+                  <strong>{vote.name}</strong>: First choice: {getText(vote.first)}. Second choice: {getText(vote.second)}. Third choice:{' '}
+                  {getText(vote.third)}
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          </>
+        )}
         <p style={{ marginTop: '1rem', marginBottom: 0 }}>
           Do you want to conclude this session and see the final results of the destinations you voted for?
         </p>

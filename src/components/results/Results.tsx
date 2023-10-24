@@ -42,7 +42,7 @@ export const Results = ({ results, stay, aggregatedProfile, openVoteModal, openC
               <Accordion.Item eventKey={index.toString()} key={index}>
                 <Accordion.Header onClick={() => handleClick(index)}>
                   {index + 1}. {item.name}
-                  {isNotAGMPreferences && <Favorites item={item} onClick={() => handleClick(index)} />}
+                  {isNotAGMPreferences && aggregatedProfile && <Favorites item={item} onClick={() => handleClick(index)} />}
                 </Accordion.Header>
                 <Accordion.Body>
                   <ResultInfo openVoteModal={openVoteModal} country={item} stay={stay} benchmark={aggregatedProfile} />
@@ -65,7 +65,7 @@ export const Results = ({ results, stay, aggregatedProfile, openVoteModal, openC
         </div>
       )}
       <Button onClick={openConfirmModal} variant='success' style={{ marginTop: 'auto', width: '100%' }}>
-        Conclude Session
+        Continue...
       </Button>
     </div>
   );

@@ -22,7 +22,7 @@ export const BarChart = ({ score, benchmark = 0, color, groupProfileMode = false
           score.name +
           ' attribute of this country has the score ' +
           score.value +
-          ' which is equal to your preference. So ' +
+          ' which is equal to your group preference. So ' +
           score.name +
           ' is 100% matching.'
         );
@@ -34,7 +34,7 @@ export const BarChart = ({ score, benchmark = 0, color, groupProfileMode = false
           score.value +
           ' which is ' +
           Math.abs(diff) +
-          '% more than what you prefer. So ' +
+          '% more than what your group prefers. So ' +
           score.name +
           ' is ' +
           total +
@@ -50,7 +50,7 @@ export const BarChart = ({ score, benchmark = 0, color, groupProfileMode = false
           score.value +
           ' which is ' +
           Math.abs(diff) +
-          '% less than what you prefer. So ' +
+          '% less than what your group prefers. So ' +
           score.name +
           ' is ' +
           total +
