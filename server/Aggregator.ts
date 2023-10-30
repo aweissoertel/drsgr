@@ -56,7 +56,7 @@ export default class Aggregator {
    */
   public async createRecommendation(req: Request<CreateRReq>, res: Response) {
     const { surveyMode } = req.query as any;
-    const isSurvey = Boolean(surveyMode);
+    const isSurvey = surveyMode === 'true';
     // https://stackoverflow.com/a/12502559
     // generates alphanumeric code in the form of ABC123:
     // string of length 6 with random uppercase letters and digits

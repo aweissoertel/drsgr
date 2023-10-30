@@ -278,7 +278,7 @@ const ConfirmModal = ({ id, onHide, privacy, countries, setData, ...rest }: Conf
   return (
     <Modal onHide={onHide} {...rest} size='lg' centered>
       <Modal.Header closeButton>
-        <Modal.Title id='contained-modal-title-vcenter'>Conclude Session</Modal.Title>
+        <Modal.Title id='contained-modal-title-vcenter'>Conclude Session And Find Consensus</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {!privacy && (
@@ -294,9 +294,7 @@ const ConfirmModal = ({ id, onHide, privacy, countries, setData, ...rest }: Conf
             </ListGroup>
           </>
         )}
-        <p style={{ marginTop: '1rem', marginBottom: 0 }}>
-          Do you want to conclude this session and see the final results of the destinations you voted for?
-        </p>
+        <p style={{ marginTop: '1rem', marginBottom: 0 }}>Do you want to conclude this session and see your group consensus?</p>
         <p>You can still go back later.</p>
       </Modal.Body>
       <Modal.Footer>
@@ -304,7 +302,7 @@ const ConfirmModal = ({ id, onHide, privacy, countries, setData, ...rest }: Conf
           Cancel
         </Button>
         <Button onClick={() => handleSave()} variant='success'>
-          See results
+          See consensus
           <Spinner as='span' size='sm' hidden={!saving} />
         </Button>
       </Modal.Footer>
