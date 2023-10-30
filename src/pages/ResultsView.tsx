@@ -287,8 +287,8 @@ const ConfirmModal = ({ id, onHide, privacy, countries, setData, ...rest }: Conf
             <ListGroup>
               {allVotes.map((vote) => (
                 <ListGroup.Item key={vote.id}>
-                  <strong>{vote.name}</strong>: First choice: {getText(vote.first)}. Second choice: {getText(vote.second)}. Third choice:{' '}
-                  {getText(vote.third)}
+                  <strong>{vote.name}</strong>: <i>First choice</i>: {getText(vote.first)}. <i>Second choice</i>: {getText(vote.second)}.{' '}
+                  <i>Third choice</i>: {getText(vote.third)}
                 </ListGroup.Item>
               ))}
             </ListGroup>

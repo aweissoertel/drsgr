@@ -1,7 +1,6 @@
 import * as React from 'react';
 
-import { Button, Form, Modal, OverlayTrigger, Stack, Tooltip } from 'react-bootstrap';
-import { BiInfoCircle } from 'react-icons/bi';
+import { Button, Form, Modal, Stack } from 'react-bootstrap';
 
 import { MethodContext } from '../shared/MethodContext';
 import { APMethods, ARMethods } from '../shared/constants';
@@ -97,21 +96,7 @@ const MethodSelect = React.memo(function MethodSelect({
         <option value='results'>Aggregating Results</option>
         <option value='preferences'>Aggregating Profiles</option>
       </Form.Select>
-      <p style={{ marginBottom: '0.5rem', marginTop: '1rem' }}>
-        Choose the aggregation strategy{' '}
-        <OverlayTrigger
-          placement='bottom'
-          overlay={
-            <Tooltip>
-              <p>The aggregation algorithm used.</p>
-            </Tooltip>
-          }
-        >
-          <span>
-            <BiInfoCircle />
-          </span>
-        </OverlayTrigger>
-      </p>
+      <p style={{ marginBottom: '0.5rem', marginTop: '1rem' }}>Choose the aggregation strategy</p>
       <Form.Select
         defaultValue='average'
         aria-label='Aggregation Strategy'
@@ -133,7 +118,7 @@ const MethodSelect = React.memo(function MethodSelect({
       </Form.Select>
       <Form.Switch
         className='mt-2'
-        label='Exclude destinations above budget'
+        label='Exclude destinations above living costs budget'
         checked={!ignoreBudget}
         onChange={() => setIgnoreBudget((val) => !val)}
         id='ignoreBudget'

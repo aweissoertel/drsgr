@@ -283,12 +283,15 @@ const CreateEditModal = ({ item, parentId, onHide, update, ...rest }: CreateEdit
           </FloatingLabel>
           <Form.Group className='mb-3'>
             <Form.Label>
-              Maximum Budget in €{' '}
+              Maximum Living Costs Budget in €{' '}
               <OverlayTrigger
                 placement='bottom'
                 overlay={
                   <Tooltip>
-                    The maximum amount of money you are willing to spend for the <strong>whole trip</strong>.
+                    The maximum amount of money you are willing to spend on <strong>living costs</strong> such as hotel fees and food for
+                    the <i>whole trip</i>.<br />
+                    This number <i>can</i> be used to exclude destinations costing more at a later stage. If a destination is cheaper than
+                    this budget, however, is <strong>always</strong> taken into account.
                   </Tooltip>
                 }
               >
@@ -300,7 +303,7 @@ const CreateEditModal = ({ item, parentId, onHide, update, ...rest }: CreateEdit
             <Form.Control
               value={value.budget}
               onChange={(e) => setValue((old) => ({ ...old, budget: Number(e.target.value) }))}
-              placeholder='Maximum Budget'
+              placeholder='Maximum Living Costs Budget'
               type='number'
               style={{ maxWidth: 300 }}
               id='budgetInput'

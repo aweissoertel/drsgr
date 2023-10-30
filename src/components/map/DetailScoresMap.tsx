@@ -21,7 +21,7 @@ export const DetailScoresMap = ({ scores, price }: DetailScoresProps) => {
         }}
       >
         <div style={{ width: '100%' }}>
-          <p style={{ margin: 0 }}>Price for your trip length: {price}€</p>
+          <p style={{ margin: 0 }}>Living costs for your trip length: {price}€</p>
           <hr style={{ marginBottom: '1.2rem', marginTop: 0 }} />
         </div>
         <div>

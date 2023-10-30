@@ -73,7 +73,7 @@ export default class Aggregator {
           concluded: false,
           qrcode: '',
           budget: 500,
-          stayDays: 7,
+          stayDays: isSurvey ? 3 : 7,
           description: '',
           surveyMode: isSurvey,
           ...surveyUsers,
@@ -274,7 +274,7 @@ export default class Aggregator {
       name: vote.name,
     }));
 
-    const getFinalVotes = (): Prisma.FinalVoteCreateManyRecommendationInputEnvelope => {
+    const finalVotes = (): Prisma.FinalVoteCreateManyRecommendationInputEnvelope => {
       if (!entity.surveyMode) {
         return { data: userVotes.map((vote) => ({ name: vote.name })) };
       } else {
@@ -283,15 +283,15 @@ export default class Aggregator {
           data: [
             {
               name: 'Alice',
-              first: recsWithName.find((rec) => rec.name === 'Alice')!.recommendations[0].u_name,
-              second: recsWithName.find((rec) => rec.name === 'Alice')!.recommendations[1].u_name,
-              third: recsWithName.find((rec) => rec.name === 'Alice')!.recommendations[2].u_name,
+              first: multiAR[0].u_name,
+              second: multiAR[1].u_name,
+              third: multiAR[2].u_name,
             },
             {
               name: 'Bob',
-              first: recsWithName.find((rec) => rec.name === 'Bob')!.recommendations[0].u_name,
-              second: recsWithName.find((rec) => rec.name === 'Bob')!.recommendations[1].u_name,
-              third: recsWithName.find((rec) => rec.name === 'Bob')!.recommendations[2].u_name,
+              first: averageAR[0].u_name,
+              second: averageAR[1].u_name,
+              third: averageAR[2].u_name,
             },
             ...users.map((vote) => ({ name: vote.name })),
           ],
@@ -304,6 +304,7 @@ export default class Aggregator {
         id: params,
       },
       data: {
+        budget: minBudget,
         aggregationResultsAP: {
           create: [
             {
@@ -358,7 +359,7 @@ export default class Aggregator {
           },
         },
         finalVotes: {
-          createMany: getFinalVotes(),
+          createMany: finalVotes(),
         },
       },
     };

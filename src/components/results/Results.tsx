@@ -36,7 +36,7 @@ export const Results = ({ results, stay, aggregatedProfile, openVoteModal, openC
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <h4>Best destinations for your group:</h4>
       {results.length > 0 ? (
-        <div style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }} ref={accordElem}>
+        <div style={{ maxHeight: 'calc(100vh - 130px)', overflowY: 'auto' }} ref={accordElem}>
           <Accordion activeKey={activeIndex.toString()}>
             {results.slice(0, 10).map((item, index) => (
               <Accordion.Item eventKey={index.toString()} key={index}>

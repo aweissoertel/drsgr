@@ -46,7 +46,8 @@ const ConcludedView = ({ item, countries, setData }: ConcludedViewProps) => {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <h6>Region of {winner.parentRegion}</h6>
           <h5>
-            The cost for your {item.stayDays}-day trip will be about {Math.round((winner.costPerWeek / 7) * item.stayDays)}€ per Person.
+            The living costs for your {item.stayDays}-day trip will be about {Math.round((winner.costPerWeek / 7) * item.stayDays)}€ per
+            Person.
           </h5>
           <h4>These are the details of {winner.name}:</h4>
           <div className='bg-dark p-2 mt-2 mb-2 border rounded' style={{ width: 500 }}>
@@ -59,13 +60,13 @@ const ConcludedView = ({ item, countries, setData }: ConcludedViewProps) => {
           <h2>The following destinations might be great alternatives:</h2>
           <h2 style={{ marginTop: 50 }}>{second.name}</h2>
           <h6>Region of {second.parentRegion}</h6>
-          <h5>Costs: {Math.round((second.costPerWeek / 7) * item.stayDays)}€ per Person.</h5>
+          <h5>Living costs: {Math.round((second.costPerWeek / 7) * item.stayDays)}€ per Person.</h5>
           <div className='bg-dark p-2 mt-2 mb-2 border rounded' style={{ width: 500 }}>
             <ResultInfo country={second} stay={item.stayDays} isFinalResultMode />
           </div>
           <h2 style={{ marginTop: 50 }}>{third.name}</h2>
           <h6>Region of {third.parentRegion}</h6>
-          <h5>Costs: {Math.round((third.costPerWeek / 7) * item.stayDays)}€ per Person.</h5>
+          <h5>Living costs: {Math.round((third.costPerWeek / 7) * item.stayDays)}€ per Person.</h5>
           <div className='bg-dark p-2 mt-2 mb-2 border rounded' style={{ width: 500 }}>
             <ResultInfo country={third} stay={item.stayDays} isFinalResultMode />
           </div>
