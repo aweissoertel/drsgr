@@ -169,11 +169,13 @@ const HelpModal = ({ onHide, ...rest }: ConfirmModalProps) => {
           <ul>
             <li>
               <strong>Aggregating Results</strong>: First, a ranked list of destinations is created for every user based on the user&apos;s
-              preferences. Then, these lists of destinations get aggregated into one list, representing the group&apos;s preferences.
+              preferences. Then, these lists of destinations get aggregated into one list of destinations with the strategy specified below.
+              The group list can display which rank the corresponding destination had for every user individually.
             </li>
             <li>
-              <strong>Aggregating Profiles</strong>: The profile of preferences of every user get aggregated into a combined profile of the
-              group. The destination recommendation list for this group is matched from this combined profile with its preferences.
+              <strong>Aggregating Profiles</strong>: The profiles of preferences of every user get aggregated into a combined profile of the
+              group with the strategy specified below. The destination recommendation list for this group is matched from this combined
+              profile with its preferences. The attributes of every destination can be compared with the combined group profile.
             </li>
           </ul>
           <h5>Aggregation Strategy</h5>
@@ -187,13 +189,14 @@ const HelpModal = ({ onHide, ...rest }: ConfirmModalProps) => {
               <strong>Average</strong>: The mean of the items&apos; ranks
             </li>
             <li>
-              <strong>Borda Count</strong>: Score is the items&apos; ranks added together
+              <strong>Borda Count</strong>: Score is the items&apos; modified reverse ranks added together. Modified because last rank gets
+              zero points, second to last one etc.
             </li>
             <li>
               <strong>Most Pleasure</strong>: The maximum of the ranks of an item
             </li>
             <li>
-              <strong>Average Without Misery</strong>: Like Average, but the items with a rank in the lower 40% are not taken into account
+              <strong>Average Without Misery</strong>: Like Average, but items with a rank in the lower 40% are not taken into account
             </li>
           </ul>
         </div>

@@ -134,7 +134,7 @@ const Votingview = ({ item, update }: VotingViewProps) => {
           + Add new user
         </Button>
         <Button size='lg' variant='warning' onClick={() => endVoting()}>
-          End voting phase & see results
+          End voting phase & see recommendations
         </Button>
       </Stack>
       <CreateEditModal
