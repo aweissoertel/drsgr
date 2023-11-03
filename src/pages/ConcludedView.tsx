@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import confetti from 'canvas-confetti';
 import { Button } from 'react-bootstrap';
+import { FaArrowLeftLong } from 'react-icons/fa6';
 
 import Delayed from '../components/Delayed';
 import ResultInfo from '../components/results/ResultInfo';
@@ -40,7 +41,7 @@ const ConcludedView = ({ item, countries, setData }: ConcludedViewProps) => {
         <h1>It is...</h1>
       </Delayed>
       <Delayed delay={2000}>
-        <h1 style={{ marginTop: 400 }}>{winner.name}</h1>
+        <h1 style={{ marginTop: 200 }}>{winner.name}</h1>
       </Delayed>
       <Delayed delay={3000}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -71,7 +72,7 @@ const ConcludedView = ({ item, countries, setData }: ConcludedViewProps) => {
             <ResultInfo country={third} stay={item.stayDays} isFinalResultMode />
           </div>
           <Button variant='danger' onClick={goBack} style={{ marginTop: 50 }}>
-            Go back and vote for other destinations instead
+            <FaArrowLeftLong /> Go back and vote for other destinations instead
           </Button>
         </div>
       </Delayed>

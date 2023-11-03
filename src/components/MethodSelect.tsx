@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { Button, Form, Modal, Stack } from 'react-bootstrap';
+import { FaArrowLeftLong } from 'react-icons/fa6';
 
 import { MethodContext } from '../shared/MethodContext';
 import { APMethods, ARMethods } from '../shared/constants';
@@ -143,7 +144,7 @@ const MethodSelect = React.memo(function MethodSelect({
         </div>
       )}
       <Button onClick={() => handleGoBackButton()} variant='danger' className='mt-auto'>
-        Go back to vote phase
+        <FaArrowLeftLong /> Go back to vote phase
       </Button>
       <HelpModal show={showHelpModal} onHide={() => setShowHelpModal(false)} />
     </div>

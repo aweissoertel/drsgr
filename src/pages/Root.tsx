@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { Alert, Button, Form, Stack } from 'react-bootstrap';
+import { FaArrowRightLong } from 'react-icons/fa6';
 import { useLocation } from 'wouter';
 
 const Root = () => {
@@ -47,7 +48,8 @@ const Root = () => {
       <div style={{ flex: '1 1 auto', display: 'grid', justifyContent: 'center' }}>
         <Stack gap={2} className='mx-auto my-auto'>
           <Button disabled={createLoading} variant='success' onClick={() => handleCreate()}>
-            {createLoading ? 'Loading...' : 'Create a new session'}
+            {createLoading ? 'Loading...' : 'Create a new session '}
+            {!createLoading && <FaArrowRightLong />}
           </Button>
           <h4>or</h4>
           <Stack direction='horizontal' gap={3}>
@@ -57,7 +59,9 @@ const Root = () => {
               className='me-auto'
               placeholder='Go to session id...'
             />
-            <Button onClick={handleGetButton}>Go!</Button>
+            <Button style={{ width: 100 }} onClick={handleGetButton}>
+              Go <FaArrowRightLong />
+            </Button>
           </Stack>
           {showError && (
             <Alert className='mt-3' variant='danger' onClose={() => setShowError(false)} dismissible>

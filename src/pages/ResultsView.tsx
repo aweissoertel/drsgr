@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { Button, Col, Form, ListGroup, Modal, Row, Spinner } from 'react-bootstrap';
+import { FaArrowRightLong } from 'react-icons/fa6';
 
 import MethodSelect from '../components/MethodSelect';
 import Map from '../components/map/Map';
@@ -193,12 +194,23 @@ const VoteModal = ({ item, onHide, setFinalVotes, ...rest }: VoteModalProps) => 
       updated[idx] = json;
       return updated;
     });
+    reset();
+    onHide();
+  };
+
+  const reset = () => {
     setSaving(false);
+    setNameId('');
+    setPrio('');
+  };
+
+  const hide = () => {
+    reset();
     onHide();
   };
 
   return (
-    <Modal onHide={onHide} {...rest} size='lg' centered>
+    <Modal onHide={hide} {...rest} size='lg' centered>
       <Modal.Header closeButton>
         <Modal.Title id='contained-modal-title-vcenter'>Vote for {item?.name}</Modal.Title>
       </Modal.Header>
@@ -228,7 +240,7 @@ const VoteModal = ({ item, onHide, setFinalVotes, ...rest }: VoteModalProps) => 
         <p style={{ marginTop: '0.5rem' }}>favorite destination.</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onHide} variant='outline-secondary'>
+        <Button onClick={hide} variant='outline-secondary'>
           Cancel
         </Button>
         <Button onClick={() => handleSave()} variant='success' disabled={!nameId || !prio || nameId.length === 0 || prio.length === 0}>
@@ -270,10 +282,15 @@ const ConfirmModal = ({ id, onHide, privacy, countries, setData, ...rest }: Conf
     if (!input) {
       return <i>no choice</i>;
     } else {
+      if (privacy) {
+        return '✅';
+      }
       const country = countries.find((c) => c.properties.u_name === input);
       return country!.name;
     }
   };
+
+  const emptyVotes = allVotes.every((vote) => !vote.first && !vote.second && !vote.third);
 
   return (
     <Modal onHide={onHide} {...rest} size='lg' centered>
@@ -281,19 +298,18 @@ const ConfirmModal = ({ id, onHide, privacy, countries, setData, ...rest }: Conf
         <Modal.Title id='contained-modal-title-vcenter'>Conclude Session And Find Consensus</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {!privacy && (
-          <>
-            <p style={{ marginBottom: '1rem' }}>Here is how everybody voted:</p>
-            <ListGroup>
-              {allVotes.map((vote) => (
-                <ListGroup.Item key={vote.id}>
-                  <strong>{vote.name}</strong>: <i>First choice</i>: {getText(vote.first)}. <i>Second choice</i>: {getText(vote.second)}.{' '}
-                  <i>Third choice</i>: {getText(vote.third)}
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-          </>
-        )}
+        <p>
+          You can vote for your favorite three destinations with the blue button at the bottom of every destination to the right of the map!
+        </p>
+        <p style={{ marginBottom: '1rem' }}>Here is {privacy ? 'if' : 'how'} everybody voted:</p>
+        <ListGroup>
+          {allVotes.map((vote) => (
+            <ListGroup.Item key={vote.id}>
+              <strong>{vote.name}</strong>: <i>First choice</i>: {getText(vote.first)}. <i>Second choice</i>: {getText(vote.second)}.{' '}
+              <i>Third choice</i>: {getText(vote.third)}
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
         <p style={{ marginTop: '1rem', marginBottom: 0 }}>Do you want to conclude this session and see your group consensus?</p>
         <p>You can still go back later.</p>
       </Modal.Body>
@@ -301,8 +317,8 @@ const ConfirmModal = ({ id, onHide, privacy, countries, setData, ...rest }: Conf
         <Button onClick={onHide} variant='outline-secondary'>
           Cancel
         </Button>
-        <Button onClick={() => handleSave()} variant='success'>
-          See consensus
+        <Button disabled={emptyVotes} onClick={() => handleSave()} variant='success'>
+          See consensus <FaArrowRightLong />
           <Spinner as='span' size='sm' hidden={!saving} />
         </Button>
       </Modal.Footer>

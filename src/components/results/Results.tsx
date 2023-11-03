@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 
-import { Badge, Button, OverlayTrigger, Stack, Tooltip } from 'react-bootstrap';
-import Accordion from 'react-bootstrap/Accordion';
+import { Accordion, Badge, Button, OverlayTrigger, Stack, Tooltip } from 'react-bootstrap';
+import { FaArrowRightLong } from 'react-icons/fa6';
 
 import { MethodContext } from '../../shared/MethodContext';
 import ResultInfo from './ResultInfo';
@@ -65,7 +65,7 @@ export const Results = ({ results, stay, aggregatedProfile, openVoteModal, openC
         </div>
       )}
       <Button onClick={openConfirmModal} variant='success' style={{ marginTop: 'auto', width: '100%' }}>
-        Continue...
+        Continue... <FaArrowRightLong />
       </Button>
     </div>
   );
