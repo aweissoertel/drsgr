@@ -69,7 +69,7 @@ const Votingview = ({ item, update }: VotingViewProps) => {
             <p>Here you can adjust settings, vote, or end the voting phase when you are ready</p>
             <Card body>
               <h5>Settings</h5>
-              <Stack direction='horizontal' gap={4}>
+              <Stack direction='horizontal' style={{ flexWrap: 'wrap' }} gap={4}>
                 <FloatingLabel label='Total number of days for your trip' className='mb-3'>
                   <Form.Control
                     value={stayDays}
@@ -80,12 +80,11 @@ const Votingview = ({ item, update }: VotingViewProps) => {
                     id='stayDayInput'
                   />
                 </FloatingLabel>
-                <FloatingLabel label='Description' className='mb-3'>
+                <FloatingLabel label='Description' style={{ flex: '1 1 auto' }} className='mb-3'>
                   <Form.Control
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder='Description'
-                    style={{ width: 500 }}
                     id='descriptionInput'
                   />
                 </FloatingLabel>
