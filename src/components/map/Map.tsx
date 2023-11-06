@@ -125,7 +125,7 @@ const Map = ({ countries, stayDays, ignoreBudget }: MapProps) => {
       // boxZoom={false}
       // keyboard={false}
     >
-      <GeoJSON ref={geoJsonLayer} style={countryStyle} data={countries as any} onEachFeature={onEachCountry(ignoreBudget)} />
+      <GeoJSON ref={geoJsonLayer} style={countryStyle} data={countries as any} onEachFeature={onEachCountry(ignoreBudget, AGMethod)} />
       <Legend map={map} />
     </MapContainer>
   );

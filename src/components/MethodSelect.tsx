@@ -82,7 +82,7 @@ const MethodSelect = React.memo(function MethodSelect({
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Stack direction='horizontal' style={{ marginBottom: '1rem' }} gap={4}>
-        <h4>Setttings</h4>
+        <h4>Settings</h4>
         <Button variant='outline-secondary' size='sm' onClick={() => setShowHelpModal(true)}>
           Need Help?
         </Button>
