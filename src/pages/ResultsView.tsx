@@ -47,7 +47,7 @@ const ResultsView = ({ item, setData }: ResultsViewProps) => {
   };
 
   const fetchFinalVotes = async () => {
-    const response = await fetch(`/finalVotes?id=${item.id}`, { method: 'GET' });
+    const response = await fetch(`/finalVote?id=${item.id}`, { method: 'GET' });
     if (response.ok) {
       const data: FinalVote[] | Record<string, never> = await response.json();
       return Object.keys(data).length === 0 ? [] : (data as FinalVote[]);

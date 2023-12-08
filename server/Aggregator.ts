@@ -258,9 +258,11 @@ export default class Aggregator {
     // const rankedCountriesPleasureMinimum = this.getRankedCountriesFromPreferencesMinimum(pleasure);
 
     //////////////////////////// AGGREGATING RECOMMENDATIONS ////////////////////////////
-    const recommendationsPerUserVote: RankResult[][] = userVotes.map((vote) =>
-      this.getRankedCountriesFromPreferencesExact(vote.preferences, groupBudgetPerWeek),
-    );
+    const recsWithName: RecPerName[] = userVotes.map((vote) => ({
+      recommendations: this.getRankedCountriesFromPreferencesExact(vote.preferences, groupBudgetPerWeek),
+      name: vote.name,
+    }));
+    const recommendationsPerUserVote: RankResult[][] = recsWithName.map((rec) => rec.recommendations);
 
     const multiAR = this.multiplicativeAggregationAR(recommendationsPerUserVote);
     const averageAR = this.averageAggregationAR(recommendationsPerUserVote);
@@ -269,11 +271,6 @@ export default class Aggregator {
     const withoutMiseryAR = this.averageWithoutMiseryAggregationAR(recommendationsPerUserVote);
 
     //////////////////////////// UPDATE DB & SEND RESPONSE ////////////////////////////
-    const recsWithName: RecPerName[] = userVotes.map((vote) => ({
-      recommendations: this.getRankedCountriesFromPreferencesExact(vote.preferences, groupBudgetPerWeek),
-      name: vote.name,
-    }));
-
     const finalVotes = (): Prisma.FinalVoteCreateManyRecommendationInputEnvelope => {
       if (!entity.surveyMode) {
         return { data: userVotes.map((vote) => ({ name: vote.name })) };
@@ -604,13 +601,14 @@ export default class Aggregator {
     const result = recommendations.reduce(
       (accumulator, current) =>
         current.map((country, idx) => {
-          if (idx > threshold || country.totalScore === -1) {
+          const accumulatorScore = accumulator.find((element) => element.u_name === country.u_name)!.totalScore;
+          if (idx > threshold || accumulatorScore === -1) {
             return {
               ...country,
               totalScore: -1,
             };
           }
-          const score = country.rankReverse + accumulator.find((element) => element.u_name === country.u_name)!.totalScore;
+          const score = country.rankReverse + accumulatorScore;
           return {
             ...country,
             totalScore: score,

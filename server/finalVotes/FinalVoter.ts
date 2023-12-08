@@ -9,7 +9,7 @@ export default class FinalVoter {
     // no-op
   }
 
-  public async saveVote(req: Request<any, SaveVoteBody>, res: Response) {
+  public async saveVote(req: Request<any, FinalVote>, res: Response) {
     const { id, ...rest } = req.body;
 
     try {

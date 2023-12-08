@@ -1,4 +1,4 @@
-import { UserVote } from '@prisma/client';
+import { FinalVote, UserVote } from '@prisma/client';
 import express from 'express';
 import ViteExpress from 'vite-express';
 
@@ -13,7 +13,6 @@ const app = express();
 app.use(express.json());
 
 const aggregator = new Aggregator();
-// bell of shame: 🔔
 let countries: Region[] = [];
 let finalVoter: FinalVoter;
 new Promise((resolve) => setTimeout(resolve, 5000)).then(() => {
@@ -43,8 +42,8 @@ app.delete<IdReq>('/userVote', (request, response) => deleteUserVote(request, re
 app.put<IdReq, UserVote>('/userVote', (request, response) => updateUserVote(request, response, aggregator.prisma));
 
 ///// finalVotes /////
-app.get<IdReq>('/finalVotes', (request, response) => finalVoter.getVotes(request, response));
-app.put<any, SaveVoteBody>('/finalVote', (request, response) => finalVoter.saveVote(request, response));
+app.get<IdReq>('/finalVote', (request, response) => finalVoter.getVotes(request, response));
+app.put<any, FinalVote>('/finalVote', (request, response) => finalVoter.saveVote(request, response));
 app.post<IdReq>('/concludeSession', (request, response) => finalVoter.concludeSession(request, response));
 app.post<IdReq>('/reopenSession', (request, response) => finalVoter.reopenSession(request, response));
 
