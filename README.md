@@ -3,7 +3,6 @@
 Repository for the front and back end of a destination recommender system. This application was implemented for a Master Thesis at [TUM](https://www.tum.de/) with the title "Extending a Web-based Destination Recommender System for Group Recommendations".
 It is extending a [recommender system](https://github.com/asalnesar/destination-finder) developed for a single user.
 
-⚠️The thesis is still ongoing and this code is also work in progess⚠️
 
 ## Demo
 
